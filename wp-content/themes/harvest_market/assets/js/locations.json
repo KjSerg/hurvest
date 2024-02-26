@@ -1,0 +1,116 @@
+[{
+    "id": ["1"],
+    "title": ["Груша"],
+    "link": ["#1"],
+    "verified":1,
+    "date": ["16 сер."],
+    "lat": 49.423008,
+    "lng": 26.974753,
+    "subtitle": ["Фермерське господарство Вітамін"],
+    "delivery": ["50 успішних доставок"],
+    "place": "Хмельницький",
+    "distance": "Відстань: 2 км",
+    "price": ["100"],
+    "price_value": ["грн/кг"],
+    "reviews": ["20 відгуків"],
+    "rating": ["4.5"],
+    
+    "slider": [["img/product1.webp", "img/product2.webp", "img/product2.webp"]],
+    "shipping": ["Власна доставка2"],
+    "order": ["від 30 кг"],
+    "stock": ["300 л"]
+
+  },
+  {
+    "id": ["2"],
+    "title": ["Яклука"],
+    "link": ["#2"],
+    "verified":["0"],
+    "date": ["12 сер."],
+    "lat": 49.422983,
+    "lng": 26.9871331,
+    "subtitle": ["2Aksa Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai."],
+    "delivery": ["10 успішних доставок"],
+    "place": "Хмельницький1",
+    "distance": "Відстань: 3 км",
+    "price": ["200"],
+    "price_value": ["грн/кг"],
+    "reviews": ["10 відгуків"],
+    "rating": ["3.5"],
+    "slider": [["img/product2.webp", "img/product1.webp", "img/product3.webp"]],
+    "shipping": ["Власна доставка1"],
+    "order": ["від 10 кг"],
+    "stock": ["120 л"]
+  },
+  {
+    "id":["3"],
+    "title": ["Дунаївецька оливкова олія"],
+    "link": ["#3"],
+    "verified":["1"],
+    "date": ["11 сер."],
+    "lat": 49.419364,
+    "lng": 27.022884,
+    "subtitle": ["1Aksa Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai."],
+    "delivery": ["0 успішних доставок"],
+    "place": ["Хмельницький3"],
+    "distance": ["Відстань: 5 км"],
+    "price": ["400"],
+    "price_value": ["грн/л"],
+    "reviews": ["10 відгуків"],
+    "rating": ["2.5"],
+    "slider": [[" img/product3.webp", "img/product1.webp", "img/product2.webp"]],
+    "shipping": ["Власна доставка"],
+    "order": ["від 10 кг"],
+    "stock": ["100 л"]
+
+  },
+  {
+    "id": ["4"],
+    "title": ["Яйця курячі"],
+    "link": ["#56"],
+    "verified":["0"],
+    "date": ["10 сер."],
+    "lat": 49.400808,
+    "lng": 26.966896,
+    "subtitle": ["Яйка Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai."],
+    "delivery": ["1 успішних доставок"],
+    "place": "Хмельницький3",
+    "distance": "Відстань: 1 км",
+    "price": ["7"],
+    "price_value": ["грн/ш"],
+    "reviews": ["10 відгуків"],
+    "rating": ["2.5"],
+    "slider": [["img/product4.webp", "img/product1.webp", "img/product3.webp"]]
+
+      ,
+      "shipping": ["Власна доставка"],
+    "order": ["від 10 шт"],
+    "stock": ["100 шт"]
+  }
+  ,
+
+
+  {
+    "id": ["5","6","7"],
+    "title": ["Яйця курячі1", "Яйця курячі2", "Яйця курячі3"],
+    "link": ["#Яйцякурячі1", "#Яйцякурячі2", "#Яйцякурячі3"],
+    "verified":["0", "1", "0"],
+    "date": ["10 сер.", "12 сер.","13 сер."],
+    "lat": 49.400800,
+    "lng": 26.966800,
+    "subtitle": ["Яйка1 Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai.", "Яйка2 Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai.", "Яйка3 Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai."],
+    "delivery": ["1 успішних доставок","2 успішних доставок", "3 успішних доставок" ],
+    "place": "Хмельницький3",
+    "distance": "Відстань: 1 км",
+    "price": ["1", "2", "3"],
+    "price_value": ["грн/ш1", "грн/ш2", "грн/ш3"],
+    "reviews": ["1 відгуків", "2 відгуків", "3 відгуків"],
+    "rating": ["1.5","2.5","3.5"],
+    "slider": [["img/product4.webp", "img/product1.webp", "img/product3.webp"], ["img/product2.webp", "img/product3.webp", "img/product1.webp"], ["img/product1.webp", "img/product2.webp", "img/product3.webp"]],
+    "shipping": ["Власна доставка1","Власна доставка2","Власна доставка3"],
+    "order": ["від 1 шт", "від 2 шт", "від 3 шт"],
+    "stock": ["100 шт","200 шт","300 шт"]
+    
+  }
+
+]
