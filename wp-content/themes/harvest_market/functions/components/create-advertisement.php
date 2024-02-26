@@ -342,33 +342,6 @@ function create_advertisements() {
 							<?php endfor; endif; ?>
                         </div>
                     </div>
-                    <div class="cabinet-item pad_bot_15 ">
-                        <div class="cabinet-item__title"> Ваші контактні дані</div>
-                        <div class="form-horizontal">
-                            <div class="form-group half">
-                                <input class="input_st" type="text" name="user_name"
-                                       placeholder="Контактна особа*"
-                                       value="<?php echo $first_name ?: ''; ?>"
-                                       required="required"/>
-                            </div>
-                            <div class="form-group half">
-                                <input class="input_st" type="text" name="company_name"
-                                       placeholder="Назва підприємства"
-                                       value="<?php echo $user_company_name; ?>"
-                                       required="required"/></div>
-                            <div class="form-group half">
-                                <input class="input_st" type="tel" name="phone"
-                                       value="<?php echo $user_company_phone; ?>"
-                                       placeholder="Номер телефону" required="required"/>
-                            </div>
-                            <div class="form-group half">
-                                <input class="input_st" type="email" name="email"
-                                       value="<?php echo $email; ?>"
-                                       data-reg="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])"
-                                       placeholder="Email-адреса" required="required"/>
-                            </div>
-                        </div>
-                    </div>
                     <div class="cabinet-item">
                         <div class="continue-group">
                             <div class="continue-group__text">
