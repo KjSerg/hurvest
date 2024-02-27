@@ -372,6 +372,25 @@ $doc.ready(function () {
             $t.closest('form').trigger('submit');
         }
     });
+    $doc.on('change', '.company-address-checkbox', function (e) {
+        var $t = $(this);
+        var val = $t.val();
+        var el = $t.attr('data-element');
+        if (el !== undefined) {
+
+            var $el = $doc.find(el);
+            if ($el.length === 0) return;
+            var isChecked = $t.prop('checked') === true;
+            if (!isChecked) {
+                $el.removeClass('hidden');
+                $el.find('input').attr('required', 'required');
+            } else {
+                $el.addClass('hidden');
+                $el.find('input').removeAttr('required');
+            }
+        }
+
+    });
     $doc.on('input', '.filter-place-input', function (e) {
         var $t = $(this);
         var val = $t.val();
@@ -535,7 +554,7 @@ $doc.ready(function () {
         var test = true,
             thsInputs = $form.find('input, textarea'),
             $select = $form.find('select[required]');
-        var $address = $form.find('input.address-js');
+        var $address = $form.find('input.address-js[required]');
         $thanks.find('.modal-title__subtitle').text('');
         $thanks.find('.modal-title__main').text('');
         $select.each(function () {

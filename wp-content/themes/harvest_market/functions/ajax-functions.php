@@ -403,49 +403,51 @@ function get_product_filters() {
 add_action( 'wp_ajax_nopriv_new_product', 'new_product' );
 add_action( 'wp_ajax_new_product', 'new_product' );
 function new_product() {
-	$user_id           = get_current_user_id();
-	$res               = array();
-	$post              = $_POST;
-	$ID                = $_POST['ID'] ?? '';
-	$user_name         = $post['user_name'] ?? '';
-	$company_name      = $post['company_name'] ?? '';
-	$phone             = $post['phone'] ?? '';
-	$email             = $post['email'] ?? '';
-	$user_postcode     = $post['user_postcode'] ?? '';
-	$user_country      = $post['user_country'] ?? '';
-	$user_country_code = $post['user_country_code'] ?? '';
-	$user_city         = $post['user_city'] ?? '';
-	$lat               = $post['lat'] ?? '';
-	$lng               = $post['lng'] ?? '';
-	$title             = $post['title'] ?? '';
-	$content           = $post['content'] ?? '';
-	$price             = $post['price'] ?? '';
-	$address           = $post['address'] ?? '';
-	$pick_up_address   = $post['pick_up_address'] ?? '';
-	$pick_up_work_time = $post['pick_up_work_time'] ?? '';
-	$product_type      = $post['product_type'] ?? '';
-	$categories        = $post['categories'] ?? '';
-	$certificates      = $post['certificates'] ?? '';
-	$processing_type   = $post['processing_type'] ?? '';
-	$units_measurement = $post['units_measurement'] ?? '';
-	$product_max_value = $post['product_max_value'] ?? '';
-	$delivery_types    = $post['delivery_types'] ?? '';
-	$year              = $post['year'] ?? '';
-	$products          = $post['products'] ?? '';
-	$package           = $post['package'] ?? '';
-	$automatically     = $post['automatically_continue'] ?? '';
-	$product_min_order = $post['product_min_order'] ?? '';
-	$user_region       = $post['user_region'] ?? '';
-	$management_user   = $post['management_user'] ?? '';
-	$author_id         = $post['author_id'] ?? '';
-	$category_name     = $post['category_name'] ?? '';
-	$filters           = $post['filters'] ?? '';
-	$test_management   = true;
+	$user_id            = get_current_user_id();
+	$product_author_ID  = $user_id;
+	$res                = array();
+	$post               = $_POST;
+	$ID                 = $_POST['ID'] ?? '';
+	$is_company_address = $_POST['is_company_address'] ?? '';
+	$user_name          = $post['user_name'] ?? '';
+	$company_name       = $post['company_name'] ?? '';
+	$phone              = $post['phone'] ?? '';
+	$email              = $post['email'] ?? '';
+	$user_postcode      = $post['user_postcode'] ?? '';
+	$user_country       = $post['user_country'] ?? '';
+	$user_country_code  = $post['user_country_code'] ?? '';
+	$user_city          = $post['user_city'] ?? '';
+	$lat                = $post['lat'] ?? '';
+	$lng                = $post['lng'] ?? '';
+	$title              = $post['title'] ?? '';
+	$content            = $post['content'] ?? '';
+	$price              = $post['price'] ?? '';
+	$address            = $post['address'] ?? '';
+	$pick_up_address    = $post['pick_up_address'] ?? '';
+	$pick_up_work_time  = $post['pick_up_work_time'] ?? '';
+	$product_type       = $post['product_type'] ?? '';
+	$categories         = $post['categories'] ?? '';
+	$certificates       = $post['certificates'] ?? '';
+	$processing_type    = $post['processing_type'] ?? '';
+	$units_measurement  = $post['units_measurement'] ?? '';
+	$product_max_value  = $post['product_max_value'] ?? '';
+	$delivery_types     = $post['delivery_types'] ?? '';
+	$year               = $post['year'] ?? '';
+	$products           = $post['products'] ?? '';
+	$package            = $post['package'] ?? '';
+	$automatically      = $post['automatically_continue'] ?? '';
+	$product_min_order  = $post['product_min_order'] ?? '';
+	$user_region        = $post['user_region'] ?? '';
+	$management_user    = $post['management_user'] ?? '';
+	$author_id          = $post['author_id'] ?? '';
+	$category_name      = $post['category_name'] ?? '';
+	$filters            = $post['filters'] ?? '';
+	$test_management    = true;
 	if ( $management_user ) {
 		$test_management = is_active_manager( $user_id, $management_user );
 	}
 	if ( $test_management ) {
-		if ( $title && $lat && $lng && $address && $user_city && $categories && $price && $email && $user_name && $_FILES ) {
+		if ( $title && $categories && $price && $_FILES ) {
 			$var       = variables();
 			$set       = $var['setting_home'];
 			$assets    = $var['assets'];
@@ -459,11 +461,13 @@ function new_product() {
 			);
 			if ( $author_id ) {
 				$post_data['post_author'] = $author_id;
+				$product_author_ID        = $author_id;
 			} elseif ( $user_id ) {
 				$post_data['post_author'] = $user_id;
 			} else {
 				if ( $user = get_user_by( 'email', $email ) ) {
 					$post_data['post_author'] = $user->ID;
+					$product_author_ID        = $user->ID;
 				}
 			}
 			if ( $ID ) {
@@ -477,20 +481,11 @@ function new_product() {
 			$_id  = $ID ? wp_update_post( $post_data, true ) : wp_insert_post( $post_data );
 			$post = get_post( $_id );
 			if ( ! is_wp_error( $_id ) && $post ) {
+				$price = str_replace(',', '.', $price);
+				$price = (float)$price;
 				carbon_set_post_meta( $_id, 'product_custom_category', $category_name );
 				carbon_set_post_meta( $_id, 'product_min_order', $product_min_order );
-				carbon_set_post_meta( $_id, 'product_user_name', $user_name );
-				carbon_set_post_meta( $_id, 'product_company_name', $company_name );
-				carbon_set_post_meta( $_id, 'product_user_phone', $phone );
-				carbon_set_post_meta( $_id, 'product_user_email', $email );
-				carbon_set_post_meta( $_id, 'product_user_postcode', $user_postcode );
-				carbon_set_post_meta( $_id, 'product_user_country', $user_country );
-				carbon_set_post_meta( $_id, 'product_user_country_code', $user_country_code );
-				carbon_set_post_meta( $_id, 'product_city', $user_city );
-				carbon_set_post_meta( $_id, 'product_latitude', $lat );
-				carbon_set_post_meta( $_id, 'product_longitude', $lng );
 				carbon_set_post_meta( $_id, 'product_price', $price );
-				carbon_set_post_meta( $_id, 'product_address', $address );
 				carbon_set_post_meta( $_id, 'product_max_value', $product_max_value );
 				carbon_set_post_meta( $_id, 'product_year', $year );
 				carbon_set_post_meta( $_id, 'product_unit', $units_measurement );
@@ -499,6 +494,60 @@ function new_product() {
 				wp_set_post_terms( $_id, array(), 'categories', false );
 				wp_set_post_terms( $_id, array(), 'product_type', false );
 				wp_set_post_terms( $_id, array(), 'regions', true );
+				$product_author = get_user_by( 'id', $product_author_ID );
+				carbon_set_post_meta( $_id, 'product_company_name', carbon_get_user_meta( $product_author_ID, 'user_company_name' ) );
+				carbon_set_post_meta( $_id, 'product_user_name', $product_author->first_name );
+				carbon_set_post_meta( $_id, 'product_user_phone', carbon_get_user_meta( $product_author_ID, 'user_company_phone' ) );
+				carbon_set_post_meta( $_id, 'product_user_email', $product_author->user_email );
+				if ( $is_company_address == 'true' || $is_company_address == 'on' ) {
+					carbon_set_post_meta( $_id, 'product_address', carbon_get_user_meta( $product_author_ID, 'user_company_address' ) );
+					carbon_set_post_meta( $_id, 'product_user_postcode', carbon_get_user_meta( $product_author_ID, 'user_company_postcode' ) );
+					carbon_set_post_meta( $_id, 'product_user_country', carbon_get_user_meta( $product_author_ID, 'user_company_country' ) );
+					carbon_set_post_meta( $_id, 'product_user_country_code', carbon_get_user_meta( $product_author_ID, 'user_company_country' ) );
+					carbon_set_post_meta( $_id, 'product_city', carbon_get_user_meta( $product_author_ID, 'user_company_city' ) );
+					carbon_set_post_meta( $_id, 'product_latitude', carbon_get_user_meta( $product_author_ID, 'user_company_latitude' ) );
+					carbon_set_post_meta( $_id, 'product_longitude', carbon_get_user_meta( $product_author_ID, 'user_company_longitude' ) );
+					carbon_set_post_meta( $_id, 'product_region', carbon_get_user_meta( $product_author_ID, 'user_company_region' ) );
+					$res['$product_author_ID'] = $product_author_ID;
+				} else {
+					carbon_set_post_meta( $_id, 'product_user_postcode', $user_postcode );
+					carbon_set_post_meta( $_id, 'product_user_country', $user_country );
+					carbon_set_post_meta( $_id, 'product_user_country_code', $user_country_code );
+					carbon_set_post_meta( $_id, 'product_city', $user_city );
+					carbon_set_post_meta( $_id, 'product_latitude', $lat );
+					carbon_set_post_meta( $_id, 'product_longitude', $lng );
+					carbon_set_post_meta( $_id, 'product_address', $address );
+					if ( $pick_up_address ) {
+						$pick_up_address_arr = array();
+						if ( is_array( $pick_up_address ) ) {
+							foreach ( $pick_up_address as $i => $item ) {
+								$wt = '';
+								if ( $pick_up_work_time ) {
+									if ( is_array( $pick_up_work_time ) ) {
+										if ( isset( $pick_up_work_time[ $i ] ) ) {
+											$wt = $pick_up_work_time[ $i ];
+										}
+									} else {
+										if ( $i == 0 ) {
+											$wt = $pick_up_work_time;
+										}
+									}
+								}
+								$pick_up_address_arr[] = array(
+									'address'   => $item,
+									'work_time' => $wt,
+								);
+							}
+						} else {
+							$pick_up_address_arr[] = array(
+								'address'   => $pick_up_address,
+								'work_time' => $pick_up_work_time,
+							);
+						}
+						carbon_set_post_meta( $_id, 'pick_up_address', $pick_up_address_arr );
+					}
+				}
+
 				if ( $user_region ) {
 					if ( is_array( $user_region ) ) {
 						foreach ( $user_region as $user_region_item ) {
@@ -587,35 +636,7 @@ function new_product() {
 					$products = is_array( $products ) ? implode( ',', $products ) : $products;
 					carbon_set_post_meta( $_id, 'product_products', $products );
 				}
-				if ( $pick_up_address ) {
-					$pick_up_address_arr = array();
-					if ( is_array( $pick_up_address ) ) {
-						foreach ( $pick_up_address as $i => $item ) {
-							$wt = '';
-							if ( $pick_up_work_time ) {
-								if ( is_array( $pick_up_work_time ) ) {
-									if ( isset( $pick_up_work_time[ $i ] ) ) {
-										$wt = $pick_up_work_time[ $i ];
-									}
-								} else {
-									if ( $i == 0 ) {
-										$wt = $pick_up_work_time;
-									}
-								}
-							}
-							$pick_up_address_arr[] = array(
-								'address'   => $item,
-								'work_time' => $wt,
-							);
-						}
-					} else {
-						$pick_up_address_arr[] = array(
-							'address'   => $pick_up_address,
-							'work_time' => $pick_up_work_time,
-						);
-					}
-					carbon_set_post_meta( $_id, 'pick_up_address', $pick_up_address_arr );
-				}
+
 				if ( $ID ) {
 					$gallery = carbon_get_post_meta( $ID, 'product_gallery' );
 					if ( $gallery ) {
@@ -657,7 +678,7 @@ function new_product() {
 				$personal_page = carbon_get_theme_option( 'personal_area_page' );
 				if ( $personal_page ) {
 					$_url       = get_the_permalink( $personal_page[0]['id'] );
-					$res['url'] = $_url . '?route=advertisement';
+//					$res['url'] = $_url . '?route=advertisement';
 				}
 				set_product_status( $_id, get_the_date( 'U', $_id ) );
 			} else {
@@ -668,20 +689,7 @@ function new_product() {
 				}
 				$res['type'] = 'error';
 			}
-			if ( $user_id == $author_id ) {
-				$current_user = get_user_by( 'ID', $user_id );
-				$first_name   = $current_user->first_name ?: '';
-				$last_name    = $current_user->last_name ?: '';
-				$user_phone   = carbon_get_user_meta( $user_id, 'user_phone' ) ?: '';
-				$_args        = array();
-				if ( $first_name != $user_name ) {
-					$_args['first_name'] = $first_name;
-					wp_update_user( $_args );
-				}
-				if ( $user_phone != $phone ) {
-					carbon_set_user_meta( $user_id, 'user_phone', $phone );
-				}
-			}
+
 		} else {
 			$res['type'] = 'error';
 			$res['msg']  = 'Заповніть обовязкові поля';
@@ -1417,6 +1425,13 @@ function add_enterprise() {
 			$_id       = wp_insert_post( $post_data );
 			$post      = get_post( $_id );
 			if ( $post ) {
+				carbon_set_post_meta( $_id, 'application_company_postcode', $postcode );
+				carbon_set_post_meta( $_id, 'application_company_country', $country );
+				carbon_set_post_meta( $_id, 'application_company_country_code', $country_code );
+				carbon_set_post_meta( $_id, 'application_company_latitude', $lat );
+				carbon_set_post_meta( $_id, 'application_company_longitude', $lng );
+				carbon_set_post_meta( $_id, 'application_company_region', $region );
+
 				carbon_set_post_meta( $_id, 'application_address', $address );
 				carbon_set_post_meta( $_id, 'application_city', $city );
 				carbon_set_post_meta( $_id, 'application_phone', $phone );
@@ -1469,14 +1484,31 @@ function add_enterprise() {
 					}
 					carbon_set_user_meta( $user_id, 'user_company_gallery', array() );
 				}
+
+				carbon_set_post_meta( $_id, 'application_company_postcode', $postcode );
+				carbon_set_post_meta( $_id, 'application_company_country', $country );
+				carbon_set_post_meta( $_id, 'application_company_country_code', $country_code );
+				carbon_set_post_meta( $_id, 'application_company_latitude', $lat );
+				carbon_set_post_meta( $_id, 'application_company_longitude', $lng );
+				carbon_set_post_meta( $_id, 'application_company_region', $region );
+
 				carbon_set_post_meta( $_id, 'application_address', $address );
 				carbon_set_post_meta( $_id, 'application_city', $city );
 				carbon_set_post_meta( $_id, 'application_phone', $phone );
+
 				carbon_set_user_meta( $user_id, 'user_company_address', $address );
 				carbon_set_user_meta( $user_id, 'user_company_city', $city );
 				carbon_set_user_meta( $user_id, 'user_company_phone', $phone );
 				carbon_set_user_meta( $user_id, 'user_company_name', $name );
 				carbon_set_user_meta( $user_id, 'user_company_description', $text );
+
+				carbon_set_user_meta( $user_id, 'user_company_postcode', $postcode );
+				carbon_set_user_meta( $user_id, 'user_company_country', $country );
+				carbon_set_user_meta( $user_id, 'user_company_country_code', $country_code );
+				carbon_set_user_meta( $user_id, 'user_company_latitude', $lat );
+				carbon_set_user_meta( $user_id, 'user_company_longitude', $lng );
+				carbon_set_user_meta( $user_id, 'user_company_region', $region );
+
 				$res['msg']    = 'Інформацію змінено';
 				$files         = $_FILES["upfile"];
 				$arr           = array();

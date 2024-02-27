@@ -495,7 +495,7 @@ function crb_attach_in_products() {
 		         array(
 			         Field::make( "separator", "crb_style_inform", "Основна інформація" ),
 			         Field::make( 'text', 'product_price', 'Ціна' )->set_width( 40 )
-			              ->set_attribute( 'type', 'number' ),
+			              ->set_attribute( 'type', 'number' )->set_attribute( 'step', '0.01' ),
 			         Field::make( "html", "crb_information_text", 'Активна валюта' )->set_width( 20 )
 			              ->set_html( 'get_currency_string' ),
 			         Field::make( 'select', 'product_unit', 'Одиниця виміру товару' )->set_width( 40 )
@@ -764,6 +764,14 @@ function crb_attach_in_applications() {
 	Container::make( 'post_meta', 'Інформація' )
 	         ->show_on_post_type( 'applications' )
 	         ->add_fields( array(
+
+		         Field::make( 'text', 'application_company_postcode', 'Індекс' ),
+		         Field::make( 'text', 'application_company_country', 'Країна' ),
+		         Field::make( 'text', 'application_company_country_code', 'Код країни' ),
+		         Field::make( 'text', 'application_company_latitude', 'Широта' ),
+		         Field::make( 'text', 'application_company_longitude', 'Довгота' ),
+		         Field::make( 'text', 'application_company_region', 'Регіон' ),
+
 		         Field::make( "text", "application_address", "Місцезнаходження" ),
 		         Field::make( "text", "application_city", "Місто" ),
 		         Field::make( "text", "application_phone", "Телефон" ),
@@ -945,6 +953,12 @@ function crb_attach_in_users() {
 			         Field::make( 'checkbox', 'user_verification', 'Верифікований' ),
 			         Field::make( 'checkbox', 'user_fop', 'ФОП' ),
 			         Field::make( 'text', 'user_company_phone', 'Номер телефону компанії' ),
+			         Field::make( 'text', 'user_company_postcode', 'Індекс' ),
+			         Field::make( 'text', 'user_company_country', 'Країна' ),
+			         Field::make( 'text', 'user_company_country_code', 'Код країни' ),
+			         Field::make( 'text', 'user_company_latitude', 'Широта' ),
+			         Field::make( 'text', 'user_company_longitude', 'Довгота' ),
+			         Field::make( 'text', 'user_company_region', 'Регіон' ),
 			         Field::make( 'text', 'user_company_city', 'Місто' ),
 			         Field::make( 'text', 'user_company_address', 'Адрес' ),
 			         Field::make( 'text', 'user_company_name', 'Назва компанії або господарства' ),

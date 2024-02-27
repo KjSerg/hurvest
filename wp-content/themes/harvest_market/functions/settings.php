@@ -44,18 +44,30 @@ function post_unpublished( $new_status, $old_status, $post ) {
 	if ( $post_type == 'applications' && $old_status != 'publish' && $new_status == 'publish' ) {
 		$user_seller = carbon_get_user_meta( $author_id, 'user_seller' );
 		if ( ! $user_seller ) {
-			$application_address = carbon_get_post_meta( $id, 'application_address' ) ?: '';
-			$application_city    = carbon_get_post_meta( $id, 'application_city' ) ?: '';
-			$application_phone   = carbon_get_post_meta( $id, 'application_phone' ) ?: '';
-			$company_name        = get_the_title( $id ) ?: '';
-			$company_name = str_replace('[edit]', '', $company_name);
-			$text                = get_content_by_id( $id ) ?: '';
+			$application_company_postcode     = carbon_get_post_meta( $id, 'application_company_postcode' ) ?: '';
+			$application_company_country      = carbon_get_post_meta( $id, 'application_company_country' ) ?: '';
+			$application_company_country_code = carbon_get_post_meta( $id, 'application_company_country_code' ) ?: '';
+			$application_company_latitude     = carbon_get_post_meta( $id, 'application_company_latitude' ) ?: '';
+			$application_company_longitude    = carbon_get_post_meta( $id, 'application_company_longitude' ) ?: '';
+			$application_company_region       = carbon_get_post_meta( $id, 'application_company_region' ) ?: '';
+			$application_address              = carbon_get_post_meta( $id, 'application_address' ) ?: '';
+			$application_city                 = carbon_get_post_meta( $id, 'application_city' ) ?: '';
+			$application_phone                = carbon_get_post_meta( $id, 'application_phone' ) ?: '';
+			$company_name                     = get_the_title( $id ) ?: '';
+			$company_name                     = str_replace( '[edit]', '', $company_name );
+			$text                             = get_content_by_id( $id ) ?: '';
 			carbon_set_user_meta( $author_id, 'user_seller', true );
 			carbon_set_user_meta( $author_id, 'user_company_phone', $application_phone );
 			carbon_set_user_meta( $author_id, 'user_company_city', $application_city );
 			carbon_set_user_meta( $author_id, 'user_company_address', $application_address );
 			carbon_set_user_meta( $author_id, 'user_company_name', $company_name );
 			carbon_set_user_meta( $author_id, 'user_company_description', $text );
+			carbon_set_user_meta( $author_id, 'user_company_postcode', $application_company_postcode );
+			carbon_set_user_meta( $author_id, 'user_company_country', $application_company_country );
+			carbon_set_user_meta( $author_id, 'user_company_country_code', $application_company_country_code );
+			carbon_set_user_meta( $author_id, 'user_company_latitude', $application_company_latitude );
+			carbon_set_user_meta( $author_id, 'user_company_longitude', $application_company_longitude );
+			carbon_set_user_meta( $author_id, 'user_company_region', $application_company_region );
 			$post_author        = get_user_by( 'ID', $author_id );
 			$var                = variables();
 			$set                = $var['setting_home'];
@@ -73,10 +85,10 @@ function post_unpublished( $new_status, $old_status, $post ) {
 			$_id                = wp_insert_post( $post_data );
 			$post               = get_post( $_id );
 			if ( $post ) {
-				carbon_set_user_meta($author_id, 'user_post', $_id);
-				$_permalink   = get_the_permalink( $_id );
-				carbon_set_post_meta($_id, 'author_id', $author_id);
-				$post_slug = get_post_field( 'post_name', $_id);
+				carbon_set_user_meta( $author_id, 'user_post', $_id );
+				$_permalink = get_the_permalink( $_id );
+				carbon_set_post_meta( $_id, 'author_id', $author_id );
+				$post_slug    = get_post_field( 'post_name', $_id );
 				$link         = "<a href='$permalink' target='_blank'>Створити оголошення</a>";
 				$link_seller  = "<a href='$_permalink' target='_blank'>Ваша сторінка продавця</a>";
 				$message_text = "Вітаємо! <br> Ви стали продавцем у нас на сайті. <br> $link <br> $link_seller";

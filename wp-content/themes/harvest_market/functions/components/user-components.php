@@ -181,7 +181,7 @@ function the_user_data_editing() {
                     <div class="faq-item__content js-collapse-content">
                         <form class="form-js add-enterprise-form" id="add-enterprise-form" novalidate method="post">
                             <input type="hidden" name="action" value="add_enterprise">
-                            <input type="hidden" id="user_post_code" name="postcode">
+                            <input type="hidden" id="user_post_code" name="postcode" value="">
                             <input type="hidden" id="user_country" name="country">
                             <input type="hidden" id="user_country_code" name="country_code">
                             <input type="hidden" id="user_city" name="city">
@@ -262,13 +262,13 @@ function the_user_data_editing() {
                         <form class="form-js add-enterprise-form" id="add-enterprise-form" novalidate method="post">
                             <input type="hidden" name="action" value="add_enterprise">
                             <input type="hidden" name="type" value="edit">
-                            <input type="hidden" id="user_post_code" name="postcode">
-                            <input type="hidden" id="user_country" name="country">
-                            <input type="hidden" id="user_country_code" name="country_code">
+                            <input type="hidden" id="user_post_code" name="postcode" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_postcode' ) ?>">
+                            <input type="hidden" id="user_country" name="country" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country' ) ?>">
+                            <input type="hidden" id="user_country_code" name="country_code" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country_code' ) ?>">
                             <input type="hidden" id="user_city" name="city" value="<?php echo $company_city; ?>">
-                            <input type="hidden" id="user_region" name="region">
-                            <input type="hidden" id="lat" name="lat">
-                            <input type="hidden" id="lng" name="lng">
+                            <input type="hidden" id="user_region" name="region" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_region' ) ?>">
+                            <input type="hidden" id="lat" name="lat"  value="<?php echo carbon_get_user_meta( $user_id, 'user_company_latitude' ) ?>">
+                            <input type="hidden" id="lng" name="lng" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_longitude' ) ?>">
                             <div class="form-horizontal">
                                 <div class="form-group quarter">
                                     <input class="input_st" type="text"
