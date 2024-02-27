@@ -66,9 +66,9 @@ $_url                = $personal_page ? get_the_permalink( $personal_page[0]['id
 $product_views ++;
 carbon_set_post_meta( $id, 'product_views', $product_views );
 $author_link = '#';
-$user_post = carbon_get_user_meta($author_id, 'user_post');
-if($user_post && get_post($user_post)){
-	$author_link = get_the_permalink($user_post);
+$user_post   = carbon_get_user_meta( $author_id, 'user_post' );
+if ( $user_post && get_post( $user_post ) ) {
+	$author_link = get_the_permalink( $user_post );
 }
 ?>
 
@@ -363,52 +363,32 @@ wp_reset_postdata();
 wp_reset_query(); ?>
 
 <?php
-$cat_ids   = array();
-if ( $categories ):
-	foreach ( $categories as $category ) {
-		$cat_ids[] = $category->term_id;
-	}
-	$args  = array(
-		'post_type'      => 'products',
-		'post_status'    => 'publish',
-		'posts_per_page' => 5,
-		'post__not_in'   => array( $id ),
-		'tax_query'      => array(
-			array(
-				'taxonomy' => 'categories',
-				'field'    => 'id',
-				'terms'    => $cat_ids,
-			)
-		)
-	);
-	$query = new WP_Query( $args );
-	if ( $query->have_posts() ) :
-		?>
-        <section class="section-slider line_top pad_section">
-            <div class="container">
-                <div class="title-section-group">
-                    <div class="title-sm">
-                        Схожі оголошення
-                    </div>
-                    <div class="nav-slider">
-                        <button class="slick-prev"></button>
-                        <button class="slick-next"></button>
-                    </div>
+
+$closest   = get_closest( $id );
+if ( $closest ) :
+	?>
+    <section class="section-slider line_top pad_section">
+        <div class="container">
+            <div class="title-section-group">
+                <div class="title-sm">
+                    Схожі оголошення
                 </div>
-                <div class="similar-slider">
-					<?php while ( $query->have_posts() ) : $query->the_post(); ?>
-                        <div>
-							<?php the_product(); ?>
-                        </div>
-					<?php endwhile; ?>
+                <div class="nav-slider">
+                    <button class="slick-prev"></button>
+                    <button class="slick-next"></button>
                 </div>
             </div>
-        </section>
-	<?php endif; ?>
-<?php endif;
-wp_reset_postdata();
-wp_reset_query();
-?>
+            <div class="similar-slider">
+				<?php foreach ( $closest as $item ) : ?>
+                    <div>
+						<?php the_product( $item ); ?>
+                    </div>
+				<?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>
+
 
 <?php
 if ( $products ):

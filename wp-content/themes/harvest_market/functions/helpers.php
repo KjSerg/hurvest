@@ -2036,3 +2036,8 @@ function transliterate( $textcyr = null, $textlat = null ) {
 		return null;
 	}
 }
+
+function get_closest($productID){
+    $res = array();
+    return $res;
+}
