@@ -483,6 +483,7 @@ function new_product() {
 			if ( ! is_wp_error( $_id ) && $post ) {
 				$price = str_replace(',', '.', $price);
 				$price = (float)$price;
+				carbon_set_post_meta( $_id, 'is_company_address', ($is_company_address == 'true' || $is_company_address == 'on')  );
 				carbon_set_post_meta( $_id, 'product_custom_category', $category_name );
 				carbon_set_post_meta( $_id, 'product_min_order', $product_min_order );
 				carbon_set_post_meta( $_id, 'product_price', $price );

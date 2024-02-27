@@ -548,6 +548,7 @@ function crb_attach_in_products() {
 		         Field::make( 'text', 'product_user_postcode', 'Поштовий індекс місця' )->set_width( 33 ),
 		         Field::make( 'text', 'product_user_country', 'Країна' )->set_width( 33 ),
 		         Field::make( 'text', 'product_user_country_code', 'Код країни' )->set_width( 33 ),
+		         Field::make( 'checkbox', 'is_company_address', 'Адреса компанії' )
 	         ) )
 	         ->add_tab( 'Галерея', array(
 		         Field::make( "separator", "crb_style_inform3", "Галерея" ),
