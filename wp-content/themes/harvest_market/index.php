@@ -153,4 +153,6 @@ if ( $get_type == 'map' ):
 endif;
 ?>
 
+
+
 <?php get_footer(); ?>

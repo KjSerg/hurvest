@@ -491,7 +491,7 @@ function new_product() {
 				carbon_set_post_meta( $_id, 'product_year', $year );
 				carbon_set_post_meta( $_id, 'product_unit', $units_measurement );
 				carbon_set_post_meta( $_id, 'product_region', $user_region );
-				carbon_set_post_meta( $_id, 'product_auto_continue', (bool) $automatically );
+				carbon_set_post_meta( $_id, 'product_auto_continue', false );
 				wp_set_post_terms( $_id, array(), 'categories', false );
 				wp_set_post_terms( $_id, array(), 'product_type', false );
 				wp_set_post_terms( $_id, array(), 'regions', true );
@@ -679,7 +679,7 @@ function new_product() {
 				$personal_page = carbon_get_theme_option( 'personal_area_page' );
 				if ( $personal_page ) {
 					$_url       = get_the_permalink( $personal_page[0]['id'] );
-//					$res['url'] = $_url . '?route=advertisement';
+					$res['url'] = $_url . '?route=advertisement';
 				}
 				set_product_status( $_id, get_the_date( 'U', $_id ) );
 			} else {

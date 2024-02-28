@@ -742,8 +742,8 @@ function initMapList() {
         var mapOptions = {
             zoom: 14,
             styles: style,
-            center: center // disableDefaultUI: true,
-
+            center: center, // disableDefaultUI: true,
+            scrollwheel: true
         };
         var lastMapZoom = localStorage.getItem('lastMapZoom');
         if (lastMapZoom && saveCenter === 'true') {

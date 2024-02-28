@@ -362,9 +362,7 @@ if ( $query->have_posts() ) :
 wp_reset_postdata();
 wp_reset_query(); ?>
 
-<?php
-
-$closest   = get_closest( $id );
+<?php $closest   = get_closest( $id );
 if ( $closest ) :
 	?>
     <section class="section-slider line_top pad_section">
@@ -379,11 +377,11 @@ if ( $closest ) :
                 </div>
             </div>
             <div class="similar-slider">
-				<?php foreach ( $closest as $item ) : ?>
+				<?php foreach ( $closest as $distance => $items ) : foreach ($items as $item): ?>
                     <div>
 						<?php the_product( $item ); ?>
                     </div>
-				<?php endforeach; ?>
+				<?php endforeach; endforeach; ?>
             </div>
         </div>
     </section>

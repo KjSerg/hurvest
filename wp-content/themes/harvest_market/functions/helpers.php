@@ -847,9 +847,8 @@ function get_query_index_data( $array = array() ) {
 		$args = array_merge( $array, $args );
 	}
 	$arr = array_merge( $wp_query->query, $args );
-	if(isset($arr['name']))
-	{
-		unset($arr['name']);
+	if ( isset( $arr['name'] ) ) {
+		unset( $arr['name'] );
 	}
 //	v( $arr );
 //	echo "</pre>";
@@ -2037,7 +2036,103 @@ function transliterate( $textcyr = null, $textlat = null ) {
 	}
 }
 
-function get_closest($productID){
-    $res = array();
-    return $res;
+function get_closest( $productID ) {
+	$res              = array();
+	$user_location    = get_user_location();
+	$user_coordinates = get_user_location_coordinates();
+	$user_lat         = $user_coordinates['lat'] ?? ( $user_location['lat'] ?? '' );
+	$user_lon         = $user_coordinates['lon'] ?? ( $user_location['lon'] ?? '' );
+	$product_city     = carbon_get_post_meta( $productID, 'product_city' );
+	$categories       = get_the_terms( $productID, 'categories' );
+	$categories_ids   = array();
+	$city             = $user_location['city'];
+	$city             = getLocaleCity( $city );
+	if ( $city ) {
+		$city = explode( ',', $city )[0];
+	}
+//    echo '<pre>';
+//    var_dump($city);
+//    var_dump($categories);
+//	echo '</pre>';
+	if ( $categories ) {
+		foreach ( $categories as $category ) {
+			$categories_ids[] = $category->term_id;
+		}
+	}
+	$args  = array(
+		'post_type'      => 'products',
+		'post_status'    => 'publish',
+		'posts_per_page' => 20,
+		'meta_key'       => '_product_city',
+		'meta_value'     => $city,
+		'post__not_in'   => array( $productID ),
+		'tax_query'      => array(
+			array(
+				'taxonomy' => 'categories',
+				'field'    => 'id',
+				'terms'    => $categories_ids
+			)
+		)
+	);
+	$query = new WP_Query( $args );
+	if ( $query->have_posts() ) {
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$id                = get_the_ID();
+			$distance          = 0;
+			$product_latitude  = carbon_get_post_meta( $id, 'product_latitude' );
+			$product_longitude = carbon_get_post_meta( $id, 'product_longitude' );
+			$address           = carbon_get_post_meta( $id, 'product_address' );
+			if ( $product_latitude && $product_longitude && $user_lat && $user_lon ) {
+				$distance = getDistanceByCoordinates( array(
+					'location_from' => array(
+						'lat' => $user_lat,
+						'lng' => $user_lon,
+					),
+					'location_to'   => array(
+						'lat' => $product_latitude,
+						'lng' => $product_longitude,
+					),
+					'unit'          => "K",
+					'unit_show'     => false
+				) );
+			} else {
+				$user_address = ( $user_location['country'] ?? '' ) . ' ' . ( $user_location['regionName'] ?? '' ) . ' ' . ( $user_location['city'] ?? '' );
+				$distance     = getDistance( $user_address, $address, "K" );
+			}
+			$distance = floatval( $distance );
+			if ( isset( $res[ $distance ] ) ) {
+				$res[ $distance ][] = $id;
+			} else {
+				$res[ $distance ] = array( $id );
+			}
+		}
+	}
+	wp_reset_postdata();
+	wp_reset_query();
+	$res = array_filter( $res, 'filterNumericKeys', ARRAY_FILTER_USE_KEY );
+
+	return $res;
+}
+
+function filterNumericKeys( $key ) {
+	return is_int( $key ) || is_float( $key );
+}
+
+function count_products( $args ) {
+	$res             = 0;
+	$post_status     = $args['post_status'];
+	$management_user = $args['management_user'] ?: get_current_user_id();
+	$args            = array(
+		'post_type'      => 'products',
+		'post_status'    => $post_status,
+		'posts_per_page' => - 1,
+		'author__in'     => array( $management_user )
+	);
+	$query           = new WP_Query( $args );
+	$res             = $query->found_posts;
+	wp_reset_postdata();
+	wp_reset_query();
+
+	return $res;
 }

@@ -367,13 +367,11 @@ function create_advertisements() {
                     <div class="cabinet-item">
                         <div class="continue-group">
                             <div class="continue-group__text">
-                                <div class="form-description__item-title">Автопродовження</div>
-                                <div class="cabinet-item__text">Автоматично продовжувати оголошення кожні 30 днів
+                                <div class="form-description__item-title">Автовидалення</div>
+                                <div class="cabinet-item__text">Ваш товар буде видалено автоматично через 30 днів
                                 </div>
                             </div>
-                            <label class="switch_st">
-                                <input name="automatically_continue" type="checkbox"/><span></span>
-                            </label>
+
                         </div>
                     </div>
                 </div>
@@ -953,20 +951,7 @@ function edit_advertisement() {
 							<?php endif; ?>
                         </div>
                     </div>
-                    <div class="cabinet-item">
-                        <div class="continue-group">
-                            <div class="continue-group__text">
-                                <div class="form-description__item-title">Автопродовження</div>
-                                <div class="cabinet-item__text">Автоматично продовжувати оголошення кожні 30 днів
-                                </div>
-                            </div>
-                            <label class="switch_st">
-                                <input name="automatically_continue"
-									<?php echo carbon_get_post_meta( $ID, 'product_auto_continue' ) ? 'checked' : ''; ?>
-                                       type="checkbox"/><span></span>
-                            </label>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 			<?php

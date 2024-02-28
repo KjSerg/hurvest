@@ -479,7 +479,7 @@ function the_user_advertisement() {
                             <input type="hidden" name="order" value="desc">
                             <input type="hidden" name="post_status" value="<?php echo $post_status; ?>">
                             <select class="select_st trigger-on-change" name="management_user">
-                                <option value="">Виберіть користувача</option>
+                                <option value="">	<?php echo carbon_get_user_meta($user_id, 'user_company_name'); ?></option>
 								<?php foreach ( $management_users as $user ):
 									$ID = $user->ID;
 									$is_active_manager = is_active_manager( $user_id, $ID );
@@ -489,7 +489,7 @@ function the_user_advertisement() {
 											<?php echo ( $management_user == $ID ) ? 'selected' : ''; ?>
                                                 data-is_active="<?php echo $is_active_manager; ?>"
                                                 data-val="<?php echo $user->allcaps['edit_posts']; ?>">
-											<?php echo $user->first_name ? $user->first_name . ' ' . $user->last_name : $user->user_nicename; ?>
+											<?php echo carbon_get_user_meta($ID, 'user_company_name'); ?>
                                         </option>
 									<?php endif; endforeach; ?>
                             </select>
@@ -501,25 +501,37 @@ function the_user_advertisement() {
                 <li>
                     <a <?php echo $post_status == 'publish' ? 'class="active"' : ''; ?>
                             href="<?php echo $permalink . '?route=' . $route . '&post_status=publish&management_user=' . $management_user; ?>">
-                        Активні
+                        Активні (<?php echo count_products(array(
+                                'post_status' => 'publish',
+                                'management_user' => $management_user,
+                        )); ?>)
                     </a>
                 </li>
                 <li>
                     <a <?php echo $post_status == 'pending' ? 'class="active"' : ''; ?>
                             href="<?php echo $permalink . '?route=' . $route . '&post_status=pending&management_user=' . $management_user; ?>">
-                        Очікуючі
+                        Очікуючі (<?php echo count_products(array(
+		                    'post_status' => 'pending',
+		                    'management_user' => $management_user,
+	                    )); ?>)
                     </a>
                 </li>
                 <li>
                     <a <?php echo $post_status == 'archive' ? 'class="active"' : ''; ?>
                             href="<?php echo $permalink . '?route=' . $route . '&post_status=archive&management_user=' . $management_user; ?>">
-                        Неактивні
+                        Неактивні (<?php echo count_products(array(
+		                    'post_status' => 'archive',
+		                    'management_user' => $management_user,
+	                    )); ?>)
                     </a>
                 </li>
                 <li>
                     <a <?php echo $post_status == 'draft' ? 'class="active"' : ''; ?>
                             href="<?php echo $permalink . '?route=' . $route . '&post_status=draft&management_user=' . $management_user; ?>">
-                        Відхилені
+                        Відхилені (<?php echo count_products(array(
+		                    'post_status' => 'draft',
+		                    'management_user' => $management_user,
+	                    )); ?>)
                     </a>
                 </li>
             </ul>
