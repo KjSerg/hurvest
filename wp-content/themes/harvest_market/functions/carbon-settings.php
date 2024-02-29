@@ -618,12 +618,12 @@ function crb_attach_in_products() {
 }
 
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_post' );
-function crb_attach_in_post(){
+function crb_attach_in_post() {
 	Container::make( 'post_meta', 'Інформація' )
 	         ->show_on_post_type( 'post' )
 	         ->add_fields( array(
 		         Field::make( "text", "author_id" )
-	         ));
+	         ) );
 }
 
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_orders' );
@@ -797,40 +797,54 @@ function crb_attach_in_services() {
 	);
 	Container::make( 'post_meta', 'Інформація' )
 	         ->show_on_post_type( 'services' )
-	         ->add_fields( array(
+	         ->add_tab( 'Налаштування', array(
 		         Field::make( "separator", "crb_style_inform", "Налаштування" ),
-		         Field::make( "text", "service_price", "Ціна одиниці пакета для області" )
-		              ->set_required( true )->set_width( 50 )
+		         Field::make( "text", "service_price", "Ціна одиниці пакета для області на 1 день" )
+		              ->set_required( true )
 		              ->set_attribute( 'type', 'number' ),
-		         Field::make( "text", "service_full_price", "Ціна одиниці пакета для країни" )
-		              ->set_required( true )->set_width( 50 )
-		              ->set_attribute( 'type', 'number' ),
-		         Field::make( "select", "service_term", "Термін роботи пакета" )
-		              ->add_options(
-			              array(
-				              1  => '1 день',
-				              30 => '30 днів',
-			              )
-		              )->set_help_text( 'Діє для опцій: <br><strong>"Додати в ТОП", "Додати в VIP", "Додати в Терміново"</strong>' ),
-		         Field::make( "text", "service_regions_qnt", "Кількість доступних регіонів" )
-		              ->set_attribute( 'min', '2' )
-		              ->set_attribute( 'type', 'number' ),
-		         Field::make( "text", "service_hint", "Підказка" )->set_width( 50 ),
-		         Field::make( "text", "service_qnt_suffix", "Суфікс кількості" )->set_width( 50 ),
-		         Field::make( "separator", "crb_style_options", "Опції" ),
-		         Field::make( "checkbox", "service_top", "Додати в ТОП" ),
-		         Field::make( "checkbox", "service_vip", "Додати в VIP" ),
-		         Field::make( "checkbox", "service_urgently", "Додати в Терміново" ),
-		         Field::make( "checkbox", "service_boost", "Підняти оголошення" )
-		              ->set_help_text( 'Діє одноразово. Оновляє дату публікації і тим самим піднімає оголошення в каталозі. <strong>Не працює із другими послугами в одному пакеті</strong>' ),
-		         Field::make( "checkbox", "service_telegram", "Добавити telegram" )
-		              ->set_help_text( 'Відповідає повідомлення через telegram-бот' ),
-		         Field::make( "separator", "crb_style_inform_list", "Список текстової інформації" ),
-		         Field::make( 'complex', 'service_list', 'Список текстової інформації' )
+		         Field::make( "text", "service_term", "Термін роботи пакета, днів" )
+		              ->set_attribute( 'type', 'number' )
+		              ->set_attribute( 'step', '1' )
+		              ->set_attribute( 'min', '1' ),
+		         Field::make( "text", "service_up", "Підняття в гору, кількість" )
+		              ->set_attribute( 'type', 'number' )
+		              ->set_attribute( 'step', '1' )
+		              ->set_attribute( 'min', '0' ),
+		         Field::make( "checkbox", "service_urgently", "Позначка Терміново" ),
+		         Field::make( "checkbox", "service_date", "Дата запуску реклами" ),
+
+	         ) )
+	         ->add_tab( 'Ціноутворення', array(
+		         Field::make( "separator", "crb_style_inform2", "Ціноутворення" ),
+		         Field::make( 'complex', 'service_prices', 'Знижки і ціни' )
 		              ->setup_labels( $labels )
 		              ->add_fields( array(
-			              Field::make( "text", "text", "Текст" )->set_required( true ),
+			              Field::make( 'text', 'qnt', 'Кількість областей' )->set_width( 50 )
+			                   ->set_attribute( 'type', 'number' )
+			                   ->set_attribute( 'min', '1' )
+			                   ->set_attribute( 'step', '1' )
+			                   ->set_required( true ),
+			              Field::make( 'text', 'percent', 'Знижка,%' )->set_width( 50 )
+			                   ->set_attribute( 'type', 'number' )
+			                   ->set_attribute( 'min', '0' )
+			                   ->set_attribute( 'max', '100' )
+			                   ->set_attribute( 'step', '1' )->set_required( true ),
 		              ) )
+		              ->set_help_text( 'Розмістіть в порядку зростання' )
+		              ->set_header_template( '
+                        <%- $_index + 1 %>.
+                        <% if (qnt) { %>
+                            <%- qnt %> областей
+                        <% } %> <% if (percent) { %>
+                            -<%- percent %>%
+                        <% } %>
+                    ' ),
+	         ) )
+	         ->add_tab( 'Підсказки і текста', array(
+		         Field::make( "text", "service_hint1", "Підсказка для топ" ),
+		         Field::make( "text", "service_hint2", "Підсказка для підйому" ),
+		         Field::make( "text", "service_hint3", "Підсказка для терміново" ),
+		         Field::make( "text", "service_text", "Текст" ),
 	         ) );
 }
 
@@ -910,7 +924,7 @@ function crb_attach_in_categories() {
 	         ->add_fields( array(
 		         Field::make( "image", "category_image", "Зображення категорії" ),
 		         Field::make( "multiselect", "category_filters", "Фільтри для категорії" )
-			         ->add_options('get_filter_list')
+		              ->add_options( 'get_filter_list' )
 		              ->set_help_text( 'та всіх її дочірніх елементів' )
 	         ) );
 }
