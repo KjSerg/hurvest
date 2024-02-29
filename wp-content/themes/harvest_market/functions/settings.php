@@ -19,7 +19,7 @@ get_template_part( 'functions/components/user-components' );
 get_template_part( 'functions/components/create-advertisement' );
 get_template_part( 'functions/components/the-chat-page' );
 get_template_part( 'functions/components/notifications' );
-get_template_part( 'functions/components/packages' );
+get_template_part( 'functions/components/promo' );
 
 add_filter( 'get_the_archive_title', function ( $title ) {
 	return preg_replace( '~^[^:]+: ~', '', $title );
