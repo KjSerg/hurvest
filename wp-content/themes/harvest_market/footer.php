@@ -551,6 +551,7 @@ $user_location = get_user_location();
     var userID = <?php echo $user_id;  ?>;
     var admin_ajax = '<?php echo $var['admin_ajax']; ?>';
     var inCartStr = "У кошик";
+    var currency = "<?php echo carbon_get_theme_option( 'currency' ); ?>";
     var inCartAddedStr = "Додано";
     var verifiedSTR = "Верифікований";
     var locationErrorString = "Виберіть локацію зі списку запропонованих варіантів";

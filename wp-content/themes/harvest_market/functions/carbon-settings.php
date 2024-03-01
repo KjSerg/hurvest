@@ -802,7 +802,7 @@ function crb_attach_in_services() {
 		         Field::make( "text", "service_price", "Ціна одиниці пакета для області на 1 день" )
 		              ->set_required( true )
 		              ->set_attribute( 'type', 'number' ),
-		         Field::make( "text", "service_term", "Термін роботи пакета, днів" )
+		         Field::make( "text", "service_term", "Термін роботи ТОП-пакета, днів" )
 		              ->set_attribute( 'type', 'number' )
 		              ->set_attribute( 'step', '1' )
 		              ->set_attribute( 'min', '1' ),
@@ -832,7 +832,6 @@ function crb_attach_in_services() {
 		              ) )
 		              ->set_help_text( 'Розмістіть в порядку зростання' )
 		              ->set_header_template( '
-                        <%- $_index + 1 %>.
                         <% if (qnt) { %>
                             <%- qnt %> областей
                         <% } %> <% if (percent) { %>

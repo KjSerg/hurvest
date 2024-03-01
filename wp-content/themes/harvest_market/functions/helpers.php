@@ -1847,6 +1847,29 @@ function get_user_products() {
 	return $res;
 }
 
+function get_user_products_ids( $user_id ) {
+	$res   = array();
+	$args  = array(
+		'post_type'      => 'products',
+		'post_status'    => 'publish',
+		'posts_per_page' => - 1,
+		'author__in'     => array( $user_id )
+	);
+	$query = new WP_Query( $args );
+	if ( $query->have_posts() ) {
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$id    = get_the_ID();
+			$title = get_the_title( $id );
+			$res[] = $id;
+		}
+	}
+	wp_reset_postdata();
+	wp_reset_query();
+
+	return $res;
+}
+
 function string_length( $string ) {
 	return mb_strlen( $string, 'UTF-8' );
 }

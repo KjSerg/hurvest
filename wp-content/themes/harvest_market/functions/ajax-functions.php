@@ -481,9 +481,9 @@ function new_product() {
 			$_id  = $ID ? wp_update_post( $post_data, true ) : wp_insert_post( $post_data );
 			$post = get_post( $_id );
 			if ( ! is_wp_error( $_id ) && $post ) {
-				$price = str_replace(',', '.', $price);
-				$price = (float)$price;
-				carbon_set_post_meta( $_id, 'is_company_address', ($is_company_address == 'true' || $is_company_address == 'on')  );
+				$price = str_replace( ',', '.', $price );
+				$price = (float) $price;
+				carbon_set_post_meta( $_id, 'is_company_address', ( $is_company_address == 'true' || $is_company_address == 'on' ) );
 				carbon_set_post_meta( $_id, 'product_custom_category', $category_name );
 				carbon_set_post_meta( $_id, 'product_min_order', $product_min_order );
 				carbon_set_post_meta( $_id, 'product_price', $price );
@@ -2569,6 +2569,47 @@ function change_user_color() {
 		carbon_set_user_meta( $current_user_id, 'user_company_color', $color );
 		echo $color;
 	}
+	die();
+}
+
+add_action( 'wp_ajax_nopriv_get_service_prices', 'get_service_prices' );
+add_action( 'wp_ajax_get_service_prices', 'get_service_prices' );
+function get_service_prices() {
+	$res   = array();
+	$arg   = array(
+		'post_type'      => 'services',
+		'posts_per_page' => - 1,
+		'post_status'    => 'publish'
+	);
+	$query = new WP_Query( $arg );
+	if ( $query->have_posts() ) {
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$temp           = array();
+			$_id            = get_the_ID();
+			$service_price  = carbon_get_post_meta( $_id, 'service_price' ) ?: 0;
+			$service_prices = carbon_get_post_meta( $_id, 'service_prices' );
+			$temp[1]        = array(
+				'sum'   => (float) $service_price,
+				'price' => (float) $service_price,
+			);
+			if ( $service_prices ) {
+				foreach ( $service_prices as $item ) {
+					$qnt          = (int) $item['qnt'];
+					$percent      = (int) $item['percent'];
+					$sub_price    = $service_price - ( ( $percent * $service_price ) / 100 );
+					$temp[ $qnt ] = array(
+						'sum'   => round( $sub_price * $qnt, 1 ),
+						'price' => round( $sub_price, 1 ),
+					);
+				}
+			}
+			$res[ $_id ] = $temp;
+		}
+	}
+	wp_reset_postdata();
+	wp_reset_query();
+	echo json_encode( $res );
 	die();
 }
 

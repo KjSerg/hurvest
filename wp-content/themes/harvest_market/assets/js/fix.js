@@ -12,6 +12,7 @@ var correspondence = 0;
 var storage = {};
 var labelIndex = 0;
 var uploadingFiles = 0;
+var prices = {};
 
 $doc.ready(function () {
     setCorrespondenceID();
@@ -1624,7 +1625,80 @@ $doc.ready(function () {
         }
 
     });
+    $(document).find('.js-range-period').each(function () {
+        $(this).daterangepicker({
+            // opens: 'ri'
+            "singleDatePicker": true,
+            "autoApply": true,
+            minDate: new Date(),
+            locale: {
+                "format": "DD.MM.YYYY",
+                // maxDays: 7,
+                // minDays: 3,
+                "autoApply": true,
+                "daysOfWeek": ["Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                "monthNames": ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"],
+                firstDay: 1
+            }
+        }); // $(this).on('apply.daterangepicker', function (ev, picker) {
+        //     $(this).val(picker.startDate.format('MM.DD.YYYY') + ' - ' + picker.endDate.format('MM.DD.YYYY'));
+        // });
+    });
+    initPromoPackages();
 });
+
+function initPromoPackages() {
+    var items = [];
+    var test = false;
+    $doc.find('.advertise-item').each(function () {
+        var $item = $(this);
+        var id = $item.attr('data-id');
+        var $regions = $item.find('.select-region');
+        var $products = $item.find('.select-product');
+        test = true;
+        var regions = [];
+        var products = [];
+        $regions.on('change', function () {
+            var $select = $(this);
+            regions = $select.val();
+            calculate(id, regions, products);
+        });
+        $products.on('change', function () {
+            var $select = $(this);
+            products = $select.val();
+            calculate(id, regions, products);
+        });
+    });
+    if (test) {
+        $doc.find('.advertise-item').addClass('not-active');
+        setPrices();
+    }
+}
+
+function setPrices() {
+    showPreloader();
+    $.ajax({
+        type: 'POST',
+        url: admin_ajax,
+        data: {
+            action: 'get_service_prices'
+        }
+    }).done(function (r) {
+        prices = JSON.parse(r);
+        hidePreloader();
+        $doc.find('.advertise-item').removeClass('not-active');
+    });
+}
+
+function calculate(id, regions, products) {
+    if (regions.length === 0 || products.length === 0) {
+        var price = prices[id].price;
+        $doc.find('.advertise-item[data-id="' + id + '"] .advertise-new-price').html(price + ' ' + currncy);
+        return;
+    }
+    var price = prices[id][regions.length].price;
+    console.log(price);
+}
 
 function initCalendar() {
     $doc.find('.js-range-period').not('.range-period-current').each(function () {
