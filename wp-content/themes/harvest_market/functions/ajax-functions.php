@@ -2590,17 +2590,21 @@ function get_service_prices() {
 			$service_price  = carbon_get_post_meta( $_id, 'service_price' ) ?: 0;
 			$service_prices = carbon_get_post_meta( $_id, 'service_prices' );
 			$temp[1]        = array(
-				'sum'   => (float) $service_price,
-				'price' => (float) $service_price,
+				'sum'     => (float) $service_price,
+				'price'   => (float) $service_price,
+				'qnt'     => (int) 1,
+				'percent' => (int) 0,
 			);
 			if ( $service_prices ) {
 				foreach ( $service_prices as $item ) {
 					$qnt          = (int) $item['qnt'];
 					$percent      = (int) $item['percent'];
 					$sub_price    = $service_price - ( ( $percent * $service_price ) / 100 );
-					$temp[ $qnt ] = array(
-						'sum'   => round( $sub_price * $qnt, 1 ),
-						'price' => round( $sub_price, 1 ),
+					$temp["$qnt"] = array(
+						'sum'     => round( $sub_price * $qnt, 1 ),
+						'price'   => round( $sub_price, 1 ),
+						'qnt'     => (int) $qnt,
+						'percent' => (int) $percent,
 					);
 				}
 			}
@@ -2611,6 +2615,219 @@ function get_service_prices() {
 	wp_reset_query();
 	echo json_encode( $res );
 	die();
+}
+
+add_action( 'wp_ajax_nopriv_checkout_service', 'checkout_service' );
+add_action( 'wp_ajax_checkout_service', 'checkout_service' );
+function checkout_service() {
+	$res        = array();
+	$user_id    = get_current_user_id();
+	$regions    = $_POST['regions'] ?? '';
+	$products   = $_POST['products'] ?? '';
+	$start_date = $_POST['start_date'] ?? '';
+	$id         = $_POST['id'] ?? '';
+	if ( $id && get_post( $id ) && $user_id ) {
+		if ( $regions && $products ) {
+			$post_data = array(
+				'post_type'   => 'purchased',
+				'post_title'  => 'Замовлення послуги ' . get_the_title( $id ),
+				'post_status' => 'publish',
+				'post_author' => $user_id,
+			);
+			$_id       = wp_insert_post( $post_data );
+			if ( $post = get_post( $_id ) ) {
+				$time           = time();
+				$id             = (int) $id;
+				$term           = carbon_get_post_meta( $id, 'service_term' ) ?: 1;
+				$is_urgently    = carbon_get_post_meta( $id, 'service_urgently' );
+				$service_date   = carbon_get_post_meta( $id, 'service_date' );
+				$count_up       = carbon_get_post_meta( $id, 'service_up' ) ?: 0;
+				$count_products = count( $products );
+				$count_regions  = count( $regions );
+				$service_price  = get_service_price( $id, $regions );
+				if ( $start_date ) {
+					$start_date = strtotime( "$start_date 00:00" );
+					$start_date = $start_date <= $time ? $time : $start_date;
+				} else {
+					$start_date = time();
+				}
+				if ( $service_date && $start_date ) {
+					$term_number       = $term * 86400;
+					$term_end          = $start_date + $term_number;
+					$res['start_date'] = date( 'd.m.Y H:i', $start_date );
+					$res['term_end']   = date( 'd.m.Y H:i', $term_end );
+					if ( $products ) {
+						foreach ( $products as $product ) {
+							$product_id = (int) $product;
+							if ( $product && get_post( $product_id ) ) {
+								carbon_set_post_meta( $product_id, 'product_is_top', 'top' );
+								carbon_set_post_meta( $product_id, 'product_start_top', $start_date );
+								carbon_set_post_meta( $product_id, 'product_end_top', $term_end );
+								if ( $regions ) {
+									wp_set_post_terms( $product_id, [], 'regions', false );
+									if ( in_array( 'country', $regions ) ) {
+										$_regions      = array();
+										$regions_terms = get_terms( array(
+											'hide_empty' => false,
+											'taxonomy'   => 'regions',
+										) );
+										if ( $regions_terms ) {
+											foreach ( $regions_terms as $region ) {
+												$_regions[] = $region->term_id;
+											}
+											wp_set_post_terms( $product_id, $_regions, 'regions', true );
+										}
+									} else {
+										$_regions = array();
+										foreach ( $regions as $place ) {
+											if ( get_term_by( 'id', (int) $place, 'regions' ) ) {
+												$_regions[] = (int) $place;
+											}
+										}
+										wp_set_post_terms( $product_id, $_regions, 'regions', true );
+									}
+								}
+								if ( $count_up > 0 ) {
+									$current_datetime = current_time( 'mysql', false );
+									$update_post_data = array(
+										'ID'            => $product_id,
+										'post_date'     => $current_datetime,
+										'post_date_gmt' => get_gmt_from_date( $current_datetime ),
+									);
+									wp_update_post( $update_post_data );
+									$count_up = $count_up - 1;
+									if ( $count_up > 0 ) {
+										carbon_set_post_meta( $_id, 'purchased_up_qnt', $count_up );
+									}
+								}
+								if ( $is_urgently ) {
+									carbon_set_post_meta( $product_id, 'product_is_urgently', 'urgently' );
+									carbon_set_post_meta( $product_id, 'product_start_urgently', $start_date );
+									carbon_set_post_meta( $product_id, 'product_end_urgently', $term_end );
+								}
+							}
+						}
+						if ( $count_up > 0 ) {
+							$next_event_time = $start_date + ( ( $term / $count_up ) * 86400 );
+							$hook            = 'products_boost_hook';
+							$args            = array( $_id );
+							if ( ! wp_next_scheduled( $hook, $args ) ) {
+								wp_schedule_single_event( $next_event_time, $hook, $args );
+							}
+						}
+					}
+				}
+
+
+				$sum = $service_price * $count_products;
+				carbon_set_post_meta( $_id, 'purchased_sum', $sum );
+				carbon_set_post_meta( $_id, 'purchased_name', get_the_title( $id ) );
+				carbon_set_post_meta( $_id, 'purchased_date', $start_date );
+				carbon_set_post_meta( $_id, 'purchased_service_id', $id );
+				carbon_set_post_meta( $_id, 'purchased_product_ids', implode( ',', $products ) );
+				carbon_set_post_meta( $_id, 'purchased_regions', implode( ',', $regions ) );
+				carbon_set_post_meta( $_id, 'purchased_regions', implode( ',', $regions ) );
+				$res['type'] = 'success';
+				if ( $personal_area_page = carbon_get_theme_option( 'personal_area_page' ) ) {
+					$personal_area_page = $personal_area_page[0]['id'];
+					$res['url']         = get_the_permalink( $personal_area_page ) . '?route=advertisement';
+				}
+			} else {
+				$res['msg']  = 'Помилка, спробуйте ще раз! ';
+				$res['type'] = 'error';
+			}
+		} else {
+			$res['type'] = 'error';
+			$res['msg']  = 'Виберіть регіон і/або оголошення';
+		}
+	} else {
+		$res['type'] = 'error';
+		$res['msg']  = 'Помилка';
+	}
+	echo json_encode( $res );
+	die();
+}
+
+add_action( 'products_boost_hook', 'products_boost_action', 10, 1 );
+function products_boost_action( $order_id ) {
+	if ( $order_id && get_post( $order_id ) ) {
+		$time             = time();
+		$purchased_up_qnt = carbon_get_post_meta( $order_id, 'purchased_up_qnt' ) ?: 0;
+		$service_id       = carbon_get_post_meta( $order_id, 'purchased_service_id' ) ?: 0;
+		$term             = carbon_get_post_meta( $service_id, 'service_term' ) ?: 1;
+		$start_date       = carbon_get_post_meta( $order_id, 'purchased_date' );
+		$term_number      = $term * 86400;
+		$term_end         = $start_date + $term_number;
+		$count_up         = $purchased_up_qnt;
+		if ( $count_up > 0 ) {
+			$purchased_product_ids = carbon_get_post_meta( $order_id, 'purchased_product_ids' );
+			if ( $purchased_product_ids ) {
+				$purchased_product_ids = explode( ',', $purchased_product_ids );
+				if ( $purchased_product_ids ) {
+					foreach ( $purchased_product_ids as $product_id ) {
+						$product_id = (int) $product_id;
+						if ( $product_id && get_post( $product_id ) ) {
+							if ( $count_up > 0 ) {
+								$current_datetime = current_time( 'mysql', false );
+								$update_post_data = array(
+									'ID'            => $product_id,
+									'post_date'     => $current_datetime,
+									'post_date_gmt' => get_gmt_from_date( $current_datetime ),
+								);
+								wp_update_post( $update_post_data );
+								$count_up = $count_up - 1;
+								carbon_set_post_meta( $order_id, 'purchased_up_qnt', $count_up );
+							}
+						}
+					}
+				}
+			}
+		}
+		if ( $count_up > 0 ) {
+			$last_time       = $term_end - $time;
+			$last_days       = $last_time / 86400;
+			$next_event_time = $time + ( ( $last_days / $count_up ) * 86400 );
+			$hook            = 'products_boost_hook';
+			$args            = array( $order_id );
+			if ( ! wp_next_scheduled( $hook, $args ) ) {
+				wp_schedule_single_event( $next_event_time, $hook, $args );
+			}
+		}
+	}
+}
+
+function get_service_price( $id, $regions ) {
+	$res            = 0;
+	$count_regions  = count( $regions );
+	$is_country     = in_array( 'country', $regions );
+	$service_price  = carbon_get_post_meta( $id, 'service_price' ) ?: 0;
+	$service_prices = carbon_get_post_meta( $id, 'service_prices' );
+	if ( $service_prices ) {
+		$max = 0;
+		foreach ( $service_prices as $item ) {
+			$qnt       = (int) $item['qnt'];
+			$percent   = (int) $item['percent'];
+			$sub_price = $service_price - ( ( $percent * $service_price ) / 100 );
+			$sum       = round( $sub_price * $qnt, 1 );
+			$price     = round( $sub_price, 1 );
+			$qnt       = (int) $qnt;
+			$percent   = (int) $percent;
+			if ( $is_country ) {
+				if ( $qnt > $max ) {
+					$max = $qnt;
+					$res = $sum;
+				}
+			} else {
+				if ( $count_regions >= $qnt ) {
+					$res = $price * $count_regions;
+				}
+			}
+		}
+	} else {
+		$res = $service_price * $count_regions;
+	}
+
+	return (float) round( $res, 1 );
 }
 
 function set_notification( $array = array() ) {

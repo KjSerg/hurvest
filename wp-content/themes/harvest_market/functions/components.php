@@ -93,16 +93,10 @@ function the_product( $id = false ) {
 function the_product_labels( $id ) {
 	$html            = '<div class="product-labels">';
 	$time            = time();
-	$product_is_vip  = carbon_get_post_meta( $id, 'product_is_vip' );
-	$product_end_vip = carbon_get_post_meta( $id, 'product_end_vip' );
-	if ( $product_is_vip == 'vip' && $product_end_vip > $time ) {
-		$image      = _i( 'vip' );
-		$image_html = '<span class="product-label__image"><img src="' . $image . '" alt=""></span>';
-		$html       .= '<div data-end="' . $product_end_vip . '" class="product-label product-label--vip">' . $image_html . 'VIP</div>';
-	}
 	$product_is_top  = carbon_get_post_meta( $id, 'product_is_top' );
 	$product_end_top = carbon_get_post_meta( $id, 'product_end_top' );
-	if ( $product_is_top == 'top' && $product_end_top > $time ) {
+	$product_start_top = carbon_get_post_meta( $id, 'product_start_top' );
+	if ( $product_is_top == 'top' && $product_end_top > $time && $time > $product_start_top ) {
 		$image      = _i( 'top' );
 		$image_html = '<span class="product-label__image"><img src="' . $image . '" alt=""></span>';
 		$html       .= '<div data-end="' . $product_end_top . '" class="product-label product-label--top">' . $image_html . 'TOP</div>';

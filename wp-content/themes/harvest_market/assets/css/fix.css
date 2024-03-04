@@ -464,6 +464,16 @@ main.content.showing {
     align-items: center;
 }
 
+.selected-country .selectric-scroll ul {
+
+    cursor: no-drop;
+}
+.selected-country .selectric-scroll li:not(.selected) {
+    pointer-events: none;
+    opacity: 0.8;
+    cursor: no-drop;
+}
+
 @media (max-width: 460px) {
     .header-search-form {
         width: 3.9rem;

@@ -566,14 +566,13 @@ $doc.ready(function () {
                 test = false;
                 $label.addClass('error');
             } else {
+                $label.removeClass('error');
                 if (val === null || val === undefined) {
                     test = false;
                     $label.addClass('error');
-                } else {
-                    $label.removeClass('error');
+                    console.log($ths);
                 }
             }
-
         });
         thsInputs.each(function () {
             var thsInput = $(this),
@@ -1656,17 +1655,25 @@ function initPromoPackages() {
         var $regions = $item.find('.select-region');
         var $products = $item.find('.select-product');
         test = true;
-        var regions = [];
-        var products = [];
+        var regions = $regions.val();
+        var products = $products.val();
         $regions.on('change', function () {
             var $select = $(this);
+            if ($select.val().includes('country')) {
+                $select.prop('selectedIndex', $select.find('option[data-all="data-all"]').index()).selectric('refresh').selectric('open');
+                $select.closest('.selectric-wrapper').addClass('selected-country');
+            } else {
+                $select.closest('.selectric-wrapper').removeClass('selected-country');
+            }
             regions = $select.val();
             calculate(id, regions, products);
+            activatedButton(id, regions, products);
         });
         $products.on('change', function () {
             var $select = $(this);
             products = $select.val();
             calculate(id, regions, products);
+            activatedButton(id, regions, products);
         });
     });
     if (test) {
@@ -1690,14 +1697,79 @@ function setPrices() {
     });
 }
 
-function calculate(id, regions, products) {
+function activatedButton(id, regions, products) {
+    var $button = $doc.find('.checkout-service-js[data-id="' + id + '"]');
     if (regions.length === 0 || products.length === 0) {
-        var price = prices[id].price;
-        $doc.find('.advertise-item[data-id="' + id + '"] .advertise-new-price').html(price + ' ' + currncy);
+        $button.addClass('not-active');
+    } else {
+        $button.removeClass('not-active');
+    }
+}
+
+function calculate(id, regions, products) {
+    var $item = $doc.find('.advertise-item[data-id="' + id + '"]');
+    var $price = $item.find('.advertise-new-price');
+    var $oldPrice = $item.find('.advertise-old-price');
+    var $title = $item.find('.advertise-item__title');
+    $title.removeClass('has-discount');
+    $title.find('span').html('');
+    var defaultPrice = prices[id]['1'].price;
+    if (regions.length === 0 || products.length === 0) {
+        defaultPrice = defaultPrice.toFixed(2);
+        $price.html(defaultPrice + ' ' + currency);
+        $oldPrice.html('');
         return;
     }
-    var price = prices[id][regions.length].price;
-    console.log(price);
+    var item = prices[id][regions.length];
+    var sum = 0;
+    var price = 0;
+    var oldPrice = 0;
+    if (item === undefined) {
+        item = getPricesItem(id, regions.length);
+        price = item.price;
+        sum = price * regions.length * products.length;
+    } else {
+        if (regions.includes('country')) {
+            item = getPricesItem(id, -1);
+        }
+        sum = item.sum;
+    }
+    var percent = item.percent;
+    sum = sum * products.length;
+    sum = sum.toFixed(2);
+    $price.html(sum + ' ' + currency);
+    if (percent !== undefined && percent > 0) {
+        $title.addClass('has-discount');
+        $title.find('span').html('-' + percent + '%');
+        oldPrice = defaultPrice * regions.length * products.length;
+        if (regions.includes('country')) {
+            oldPrice = defaultPrice * item.qnt * products.length;
+        }
+        oldPrice = oldPrice.toFixed(2);
+        $oldPrice.html(oldPrice + ' ' + currency);
+    }
+}
+
+function getPricesItem(id, numberOfRegions) {
+    var item = prices[id]['1'];
+    var elements = prices[id];
+    var max = 0;
+    for (var key in elements) {
+        var element = elements[key];
+        var qnt = element.qnt;
+        if (numberOfRegions === -1) {
+            if (qnt > max) {
+                max = qnt;
+                item = element;
+            }
+        } else {
+            if (numberOfRegions >= qnt) {
+                item = element;
+            }
+        }
+
+    }
+    return item;
 }
 
 function initCalendar() {

@@ -13,7 +13,8 @@ function the_promo_page() {
 	the_header_cabinet();
 	$regions      = get_terms( array(
 		'taxonomy'   => 'regions',
-		'hide_empty' => false
+		'hide_empty' => false,
+		'parent' => 0
 	) );
 	$user_id      = get_current_user_id();
 	$current_user = get_user_by( 'ID', $user_id );
@@ -56,11 +57,16 @@ function the_promo_package( $args = array() ) {
 	$formatted_price   .= " $currency";
 	$regions           = $args['regions'] ?? get_terms( array(
 			'taxonomy'   => 'regions',
-			'hide_empty' => false
+			'hide_empty' => false,
+            'parent' => 0
 		) );
 	if ( $user_products_ids || ( $product_ID && get_post( $product_ID ) ) ):
 		?>
-        <div class="advertise-item advertise-buy" data-id="<?php echo $id; ?>">
+        <form novalidate id="checkout-service-<?php echo $id ?>"
+              class="advertise-item advertise-buy form-js" method="post"
+              data-id="<?php echo $id; ?>">
+            <input type="hidden" value="checkout_service" name="action">
+            <input type="hidden" value="<?php echo $id ?>" name="id">
             <div class="advertise-item__content">
                 <div class="advertise-item__title ">
 					<?php echo get_the_title( $id ); ?><span></span>
@@ -68,29 +74,29 @@ function the_promo_package( $args = array() ) {
                 <div class="advertise-item__price-main">
 					<?php echo $formatted_price; ?> <span>/ область</span>
                 </div>
-                <div class="advertise-item__select">
+                <div class="advertise-item__select form-group">
                     <div class="advertise-item__select-item">
                         <div class="advertise-item__select-text">Вибір області</div>
-                        <select class="select_st select-region" multiple="multiple">
+                        <select class="select_st select-region" name="regions[]" required multiple="multiple">
                             <option disabled value="">
                                 Зробіть вибір областей
                             </option>
+                            <option data-all="data-all" value="country">Вся Україна</option>
 							<?php if ( $regions ): foreach ( $regions as $region ): ?>
                                 <option value="<?php echo $region->term_id; ?>">
 									<?php echo $region->name; ?>
                                 </option>
 							<?php endforeach; endif; ?>
-                            <option data-all="data-all" value="country">Вся Україна</option>
                         </select>
                     </div>
-                    <div class="advertise-item__select-item">
+                    <div class="advertise-item__select-item form-group">
                         <div class="advertise-item__select-text">Виберіть оголошення</div>
-                        <select class="select_st select-product" multiple="multiple">
+                        <select class="select_st select-product" name="products[]" required multiple="multiple">
                             <option disabled value="">
                                 Зробіть вибір оголошень
                             </option>
 							<?php if ( $product_ID ): ?>
-                                <option value="<?php echo $product_ID ?>">
+                                <option selected value="<?php echo $product_ID ?>">
 									<?php echo get_the_title( $product_ID ); ?>
                                 </option>
 							<?php endif; ?>
@@ -103,7 +109,7 @@ function the_promo_package( $args = array() ) {
                     </div>
                 </div>
 				<?php if ( $is_date ): ?>
-                    <div class="package-service__cart-item-calendar">
+                    <div class="package-service__cart-item-calendar form-group">
                         <div class="package-service__cart-item-calendar-title"> Дата запуску реклами</div>
                         <div class="package-service__cart-item-calendar-main">
                             <input class="input_st js-range-period"
@@ -179,9 +185,11 @@ function the_promo_package( $args = array() ) {
                         <span class="advertise-old-price"></span>
                     </div>
                 </div>
-                <a class="btn_st" href="#"><span> Сплатити </span></a>
+                <button type="submit" class="btn_st checkout-service-js " data-id="<?php echo $id; ?>">
+                    <span> Сплатити </span>
+                </button>
             </div>
-        </div>
+        </form>
 	<?php
 	endif;
 }

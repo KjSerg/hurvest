@@ -856,36 +856,12 @@ function crb_attach_in_purchased() {
 	Container::make( 'post_meta', 'Інформація' )
 	         ->show_on_post_type( 'purchased' )
 	         ->add_fields( array(
-		         Field::make( 'complex', 'purchased_order', 'Замовлення' )
-		              ->setup_labels( $labels )
-		              ->set_layout( 'tabbed-vertical' )
-		              ->add_fields(
-			              array(
-				              Field::make( "text", "name", "Назва послуги" )->set_width( 33 ),
-				              Field::make( "date", "date", "Дата початку" )->set_width( 33 )->set_storage_format( 'U' ),
-				              Field::make( "text", "sub_sum", "Підсумок" )->set_width( 33 ),
-				              Field::make( "text", "service_id", "ID послуги" )->set_width( 10 ),
-				              Field::make( "text", "qnt", "Кількість" )->set_width( 10 ),
-				              Field::make( "text", "product_id", "ID товару" )->set_width( 10 ),
-				              Field::make( "text", "regions", "Області" )->set_width( 10 ),
-				              Field::make( "checkbox", "is_not_active", "Неактивне" )->set_width( 10 ),
-				              Field::make( "checkbox", "auto_continue", "Продовження" )->set_width( 10 ),
-				              Field::make( 'complex', 'stops', 'Зупинки' )
-				                   ->setup_labels( $labels )
-				                   ->add_fields(
-					                   array(
-						                   Field::make( "date_time", "date_stop", "Дата зупинки" )->set_width( 33 )->set_storage_format( 'U' ),
-						                   Field::make( "date_time", "date_start", "Дата запуску" )->set_width( 33 )->set_storage_format( 'U' ),
-						                   Field::make( "text", "remains", "Залишилось часу" )->set_width( 33 )->set_attribute( 'type', 'number' ),
-					                   )
-				                   )
-			              )
-		              )->set_header_template( '
-                        <%- $_index + 1 %>.
-                        <% if (name) { %>
-                            <%- name %>
-                        <% } %>
-                    ' ),
+		         Field::make( "text", "purchased_name", "Назва послуги" )->set_width( 50 ),
+		         Field::make( "date", "purchased_date", "Дата початку" )->set_width( 50 )->set_storage_format( 'U' ),
+		         Field::make( "text", "purchased_up_qnt", "Залишилось підняття оголошення" ),
+		         Field::make( "text", "purchased_service_id", "ID послуги" ),
+		         Field::make( "text", "purchased_product_ids", "ID товарів" ),
+		         Field::make( "text", "purchased_regions", "Області" ),
 		         Field::make( 'text', 'purchased_sum', 'Сума Замовлення' )
 	         ) );
 }
