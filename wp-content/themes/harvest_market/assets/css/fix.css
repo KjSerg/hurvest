@@ -77,7 +77,7 @@ span.wpcf7-list-item {
     opacity: 0;
     transition: 0.1s ease;
     pointer-events: none;
-    z-index: 1000;
+    z-index: 9999;
 }
 
 .preloader.active {
@@ -96,8 +96,8 @@ span.wpcf7-list-item {
     display: none;
 }
 
-.footer {
-    /*background: #014433;*/
+.pac-container {
+    z-index: 99999;
 }
 
 .form-group.error .selectric {

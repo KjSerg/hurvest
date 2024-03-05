@@ -30,6 +30,32 @@ $doc.ready(function () {
     checkingNotificationsSchedules();
     checkingStorage();
     $('input[type=tel]').mask("+99(999) 999-99-99");
+    $doc.on('submit', '.google-places-form', function (e) {
+        e.preventDefault();
+        var user_confirm_city_old = getCookie('user_confirm_city') || '';
+        var $t = $(this);
+        var $inp = $t.find('.address-js');
+        if ($inp.val() === '' || ($inp.val() !== $inp.attr('data-selected'))) {
+            showMassage(locationErrorString);
+            return;
+        }
+        var city = $('#confirm-user-city').val();
+        var region = $('#confirm-user-region').val();
+        var lat = $('#lat').val() || '';
+        var lon = $('#lng').val() || '';
+        var str = city || '';
+        str += region ? ', ' + region : '';
+        setCookie('user_confirm_city', str, 7);
+        if (lat && lon) {
+            setCookie('latitude', lat, 1);
+            setCookie('longitude', lon, 1);
+        }
+        if (user_confirm_city_old !== city) {
+            showPreloader();
+            localStorage.setItem('lastMapZoom', '10');
+            window.location.href = $t.attr('action') + '?' + $t.serialize();
+        }
+    });
     $doc.on('click', '.move-to-element', function (e) {
         e.preventDefault();
         var $t = $(this);
@@ -1604,7 +1630,7 @@ $doc.ready(function () {
             // enable autoplay
             playsinline: 1
         },
-        afterShow: function(instance, current) {
+        afterShow: function (instance, current) {
             current.$content.append('<button data-fancybox-close="" class="fancybox-button fancybox-button--close" title="Close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 10.6L6.6 5.2 5.2 6.6l5.4 5.4-5.4 5.4 1.4 1.4 5.4-5.4 5.4 5.4 1.4-1.4-5.4-5.4 5.4-5.4-1.4-1.4-5.4 5.4z"></path></svg></button>');
         }
     });
@@ -2759,11 +2785,20 @@ function initAutocomplete() {
             id = $t.attr('id');
         }
         var addressField = document.querySelector('#' + id);
-        var autocomplete = new google.maps.places.Autocomplete(addressField, {
+        var options = {
             fields: ["formatted_address", "address_components", "geometry", "name"],
             strictBounds: false,
             types: [],
-        });
+        };
+        if ($t.hasClass('is-cities')) {
+            options = {
+                fields: ["formatted_address", "address_components", "geometry", "name"],
+                strictBounds: false,
+                types: ['(cities)'],
+                componentRestrictions: {country: 'ua'}
+            };
+        }
+        var autocomplete = new google.maps.places.Autocomplete(addressField, options);
         autocomplete.addListener("place_changed", function () {
             addressField.removeAttribute('data-selected');
             fillInAddress(autocomplete, addressField);
@@ -2803,22 +2838,24 @@ function fillInAddress(autocomplete, addressField) {
             }
             case "locality":
                 address1 += ' ' + component.long_name;
-                document.getElementById('user_city').value = component.long_name;
+                $('#user_city').val(component.long_name);
+                $('#confirm-user-city').val(component.long_name);
                 break;
             case "administrative_area_level_1": {
                 address1 += ' ' + component.short_name;
-                document.getElementById('user_region').value = component.long_name;
+                $('#user_region').val(component.long_name);
+                $('#confirm-user-region').val(component.long_name);
                 break;
             }
             case "country":
                 address1 += ' ' + component.long_name;
-                document.getElementById('user_country').value = component.long_name;
-                document.getElementById('user_country_code').value = component.short_name;
+                $('#user_country').val(component.long_name);
+                $('#user_country_code').val(component.short_name);
                 break;
         }
     }
     addressField.value = formatted_address;
     addressField.setAttribute('data-selected', formatted_address);
-    document.getElementById('user_post_code').value = postcode;
+    $('#user_post_code').val(postcode);
 }
 

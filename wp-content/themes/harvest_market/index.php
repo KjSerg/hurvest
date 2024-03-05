@@ -16,6 +16,10 @@ if ( $get_type == 'get_products_container' ) {
 	the_home_catalog();
 	die();
 }
+if ( $get_type == 'local_ads' ) {
+	check_products_address();
+
+}
 get_header();
 $var                  = variables();
 $set                  = $var['setting_home'];
@@ -63,7 +67,7 @@ if ( $get_type == 'map' ):
              data-map="4504f8b37365c3d0"></div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-marker-clusterer/1.0.0/markerclusterer_compiled.js"></script>
 		<?php if ( $map_api_url ): ?>
-            <script src="<?php echo $map_api_url; ?>" defer></script>
+
 		<?php endif; ?>
     </section>
     <div class="map-btn">

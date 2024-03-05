@@ -572,23 +572,29 @@ $user_location = get_user_location();
                 <div class="modal-title">
                     <div class="modal-title__main">Або вкажіть свою локацію</div>
                 </div>
-                <form class="products-places-form" method="post">
-                    <input type="hidden" name="action" value="get_products_places">
+                <form class="google-places-form" method="get" action="<?php echo $url; ?>">
+                    <input type="hidden"  name="type" value="local_ads">
+                    <input type="hidden" id="lat" name="lat">
+                    <input type="hidden" id="lng" name="lng">
+                    <input type="hidden" id="confirm-user-city" name="confirm_user_city">
+                    <input type="hidden" id="confirm-user-region" name="confirm_user_region">
                     <div class="form-group">
-                        <input class="input_st products-places-autocomplete"
+                        <input class="input_st address-js is-cities"
                                type="text"
                                autocomplete="off"
                                name="city"
                                placeholder="Ваше місто" required="required"/>
-                        <ul class="products-places-list"></ul>
                     </div>
-                    <a class="btn_st w100 confirm-city hidden" href="#">
+                    <button type="submit" class="btn_st w100  ">
                         <span>Підтвердити </span>
-                    </a>
+                    </button>
                 </form>
             </div>
         </div>
     </div>
+	<?php if ( $map_api_url = carbon_get_theme_option( 'autocomplete_api_url' ) ): ?>
+        <script src="<?php echo $map_api_url; ?>" id="google-map-api" defer></script>
+	<?php endif; ?>
 <?php endif; ?>
 <div class="modal modal-sm" id="dialog">
     <div class="modal-content text-center">
@@ -599,6 +605,7 @@ $user_location = get_user_location();
     </div>
 </div>
 <script>
+    var URL = '<?php echo $url;  ?>';
     var userID = <?php echo $user_id;  ?>;
     var admin_ajax = '<?php echo $var['admin_ajax']; ?>';
     var inCartStr = "У кошик";

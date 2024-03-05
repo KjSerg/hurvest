@@ -731,7 +731,7 @@ function initMapList() {
             scrollwheel: true
         };
         var lastMapZoom = localStorage.getItem('lastMapZoom');
-        if (lastMapZoom && saveCenter === 'true') {
+        if (lastMapZoom) {
             mapOptions.zoom = parseInt(lastMapZoom);
         }
         map = new google.maps.Map(document.getElementById('map-list'), mapOptions);

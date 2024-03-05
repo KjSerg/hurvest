@@ -1794,18 +1794,48 @@ function get_user_region_id() {
 		if ( $region ) {
 			if ( $region_object = get_term_by( 'name', $region, 'regions' ) ) {
 				return $region_object->term_id;
-			}else{
+			} else {
 				$region = getLocaleCity( $region );
 				if ( $region ) {
 					if ( $region_object = get_term_by( 'name', $region, 'regions' ) ) {
 						return $region_object->term_id;
 					}
 				}
-            }
+			}
 		}
 	}
 
 	return $res;
+}
+
+function check_products_address() {
+	$city   = $_GET['confirm_user_city'] ?? '';
+	$region = $_GET['confirm_user_region'] ?? '';
+	if ( $city ) {
+		$args  = array(
+			'post_type'      => 'products',
+			'post_status'    => 'publish',
+			'posts_per_page' => 10,
+			'meta_key'       => '_product_city',
+			'meta_value'     => $city,
+			'meta_compare'   => 'LIKE'
+		);
+		$query = new WP_Query( $args );
+
+		$var      = variables();
+		$set      = $var['setting_home'];
+		$assets   = $var['assets'];
+		$url      = $var['url'];
+		$url_home = $var['url_home'];
+		if ( $query->found_posts === 0 ) {
+			header( 'Location: ' . $url . '?type=map' );
+            die();
+		}else{
+			header( 'Location: ' . $url );
+        }
+		wp_reset_postdata();
+		wp_reset_query();
+	}
 }
 
 function get_purchased_number() {
