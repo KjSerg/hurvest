@@ -60,8 +60,6 @@ $route              = $_GET['route'] ?? '';
 			the_notifications_page();
 		} elseif ( $route == 'packages' ) {
 			the_promo_page();
-		} elseif ( $route == 'purchased' ) {
-			the_purchased_page();
 		}
 		?>
     </div>

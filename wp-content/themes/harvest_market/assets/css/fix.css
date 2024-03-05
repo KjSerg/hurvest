@@ -77,13 +77,19 @@ span.wpcf7-list-item {
     opacity: 0;
     transition: 0.1s ease;
     pointer-events: none;
-    z-index: 10;
+    z-index: 1000;
 }
 
 .preloader.active {
     transform: translate(-50%, -50%);
     opacity: 1;
     z-index: 20;
+}
+
+.fancybox-content .fancybox-button--close{
+    position: absolute;
+    left: auto;
+    right: 0;
 }
 
 .hidden {

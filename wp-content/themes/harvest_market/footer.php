@@ -538,6 +538,57 @@ $user_location = get_user_location();
             </div>
         </div>
     </footer>
+    <div class="modal modal-sm" id="modal_place">
+        <div class="modal-content">
+            <div class="modal-title">
+                <div class="modal-title__main">Місцезнаходження</div>
+                <div class="modal-title__subtitle">
+                    Ваше місцезнаходження
+					<?php if ( $_user_city ): ?>
+                        <span style="color:#4D76FF" class="confirmed-city-js"><?php echo $_user_city; ?></span>
+					<?php else: ?>
+                        <span style="color:#4D76FF" class="city-js"></span>
+					<?php endif; ?>
+                </div>
+            </div>
+            <a class="btn_st b_yelloow w100 confirm-city" href="#"
+               data-city="<?php echo trim( $_user_city ); ?>"
+               data-lat="<?php echo trim( $user_location['lat'] ); ?>"
+               data-lon="<?php echo trim( $user_location['lon'] ); ?>"
+            >
+                <span>Підтвердити</span>
+            </a>
+			<?php if ( $_user_confirm_city ): ?>
+                <a class="btn_st b_yelloow w100 confirm-city" href="#"
+                   style="margin-top: 2rem;"
+                   data-city=""
+                   data-lat="<?php echo trim( $user_location['lat'] ); ?>"
+                   data-lon="<?php echo trim( $user_location['lon'] ); ?>"
+                >
+                    <span>Вся Україна</span>
+                </a>
+			<?php endif; ?>
+            <div class="change-place">
+                <div class="modal-title">
+                    <div class="modal-title__main">Або вкажіть свою локацію</div>
+                </div>
+                <form class="products-places-form" method="post">
+                    <input type="hidden" name="action" value="get_products_places">
+                    <div class="form-group">
+                        <input class="input_st products-places-autocomplete"
+                               type="text"
+                               autocomplete="off"
+                               name="city"
+                               placeholder="Ваше місто" required="required"/>
+                        <ul class="products-places-list"></ul>
+                    </div>
+                    <a class="btn_st w100 confirm-city hidden" href="#">
+                        <span>Підтвердити </span>
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
 <?php endif; ?>
 <div class="modal modal-sm" id="dialog">
     <div class="modal-content text-center">
@@ -560,57 +611,7 @@ $user_location = get_user_location();
     var monthNames = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
     var minDate = '<?php echo date( "d/m/Y", time() + strtotime( '1 day', 0 ) ); ?>';
 </script>
-<div class="modal modal-sm" id="modal_place">
-    <div class="modal-content">
-        <div class="modal-title">
-            <div class="modal-title__main">Місцезнаходження</div>
-            <div class="modal-title__subtitle">
-                Ваше місцезнаходження
-				<?php if ( $_user_city ): ?>
-                    <span style="color:#4D76FF" class="confirmed-city-js"><?php echo $_user_city; ?></span>
-				<?php else: ?>
-                    <span style="color:#4D76FF" class="city-js"></span>
-				<?php endif; ?>
-            </div>
-        </div>
-        <a class="btn_st b_yelloow w100 confirm-city" href="#"
-           data-city="<?php echo trim( $_user_city ); ?>"
-           data-lat="<?php echo trim( $user_location['lat'] ); ?>"
-           data-lon="<?php echo trim( $user_location['lon'] ); ?>"
-        >
-            <span>Підтвердити</span>
-        </a>
-		<?php if ( $_user_confirm_city ): ?>
-            <a class="btn_st b_yelloow w100 confirm-city" href="#"
-               style="margin-top: 2rem;"
-               data-city=""
-               data-lat="<?php echo trim( $user_location['lat'] ); ?>"
-               data-lon="<?php echo trim( $user_location['lon'] ); ?>"
-            >
-                <span>Вся Україна</span>
-            </a>
-		<?php endif; ?>
-        <div class="change-place">
-            <div class="modal-title">
-                <div class="modal-title__main">Або вкажіть свою локацію</div>
-            </div>
-            <form class="products-places-form" method="post">
-                <input type="hidden" name="action" value="get_products_places">
-                <div class="form-group">
-                    <input class="input_st products-places-autocomplete"
-                           type="text"
-                           autocomplete="off"
-                           name="city"
-                           placeholder="Ваше місто" required="required"/>
-                    <ul class="products-places-list"></ul>
-                </div>
-                <a class="btn_st w100 confirm-city hidden" href="#">
-                    <span>Підтвердити </span>
-                </a>
-            </form>
-        </div>
-    </div>
-</div>
+
 <?php if ( ! $isLighthouse ): ?>
     <div class="preloader">
         <img src="<?php echo $assets; ?>img/loading.gif" alt="loading.gif">

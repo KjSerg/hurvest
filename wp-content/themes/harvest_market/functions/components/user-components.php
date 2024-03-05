@@ -30,10 +30,10 @@ function the_user_data_editing() {
 	$REDIRECT_URI        = get_the_permalink() ?: $url;
 	$map_api_url         = carbon_get_theme_option( 'autocomplete_api_url' );
 	$image_count         = carbon_get_theme_option( 'image_count' ) ?: 1;
-	$user_post = carbon_get_user_meta($user_id, 'user_post');
-	$author_link = false;
-	if($user_post && get_post($user_post)){
-		$author_link = get_the_permalink($user_post);
+	$user_post           = carbon_get_user_meta( $user_id, 'user_post' );
+	$author_link         = false;
+	if ( $user_post && get_post( $user_post ) ) {
+		$author_link = get_the_permalink( $user_post );
 	}
 	require_once ABSPATH . 'wp-admin/includes/image.php';
 	require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -175,10 +175,10 @@ function the_user_data_editing() {
 		<?php if ( ! $user_seller ): ?>
             <div class="cabinet-item js-collapse">
                 <div class="faq-item js-collapse-item">
-                    <div class="faq-item__title js-collapse-title">
-                        Створити фермерське господарство <span></span>
+                    <div class="faq-item__title ">
+                        Створити фермерське господарство
                     </div>
-                    <div class="faq-item__content js-collapse-content">
+                    <div class="faq-item__content js-collapse-content" style="display: block">
                         <form class="form-js add-enterprise-form" id="add-enterprise-form" novalidate method="post">
                             <input type="hidden" name="action" value="add_enterprise">
                             <input type="hidden" id="user_post_code" name="postcode" value="">
@@ -211,10 +211,12 @@ function the_user_data_editing() {
                                            required="required"/>
                                 </div>
                                 <div class="form-group">
-                            <textarea class="input_st" name="text"
+                            <textarea class="input_st content-field" name="text"
                                       placeholder="Опис фермерського господарства*"
+                                      data-number="500"
                                       title="Обовʼязкове поле"
                                       required="required"></textarea>
+                                    <div class="form-group__info content-count-js">0/500</div>
                                 </div>
                                 <div class="cabinet-item" title="Загрузіть що найменше 1 фото">
                                     <div class="cabinet-item__title">Фото*</div>
@@ -255,20 +257,26 @@ function the_user_data_editing() {
 			?>
             <div class="cabinet-item js-collapse">
                 <div class="faq-item js-collapse-item">
-                    <div class="faq-item__title js-collapse-title">
-                        Редагувати фермерське господарство <span></span>
+                    <div class="faq-item__title ">
+                        Редагувати фермерське господарство
                     </div>
-                    <div class="faq-item__content js-collapse-content">
+                    <div class="faq-item__content js-collapse-content" style="display:block;">
                         <form class="form-js add-enterprise-form" id="add-enterprise-form" novalidate method="post">
                             <input type="hidden" name="action" value="add_enterprise">
                             <input type="hidden" name="type" value="edit">
-                            <input type="hidden" id="user_post_code" name="postcode" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_postcode' ) ?>">
-                            <input type="hidden" id="user_country" name="country" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country' ) ?>">
-                            <input type="hidden" id="user_country_code" name="country_code" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country_code' ) ?>">
+                            <input type="hidden" id="user_post_code" name="postcode"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_postcode' ) ?>">
+                            <input type="hidden" id="user_country" name="country"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country' ) ?>">
+                            <input type="hidden" id="user_country_code" name="country_code"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country_code' ) ?>">
                             <input type="hidden" id="user_city" name="city" value="<?php echo $company_city; ?>">
-                            <input type="hidden" id="user_region" name="region" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_region' ) ?>">
-                            <input type="hidden" id="lat" name="lat"  value="<?php echo carbon_get_user_meta( $user_id, 'user_company_latitude' ) ?>">
-                            <input type="hidden" id="lng" name="lng" value="<?php echo carbon_get_user_meta( $user_id, 'user_company_longitude' ) ?>">
+                            <input type="hidden" id="user_region" name="region"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_region' ) ?>">
+                            <input type="hidden" id="lat" name="lat"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_latitude' ) ?>">
+                            <input type="hidden" id="lng" name="lng"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_longitude' ) ?>">
                             <div class="form-horizontal">
                                 <div class="form-group quarter">
                                     <input class="input_st" type="text"
@@ -296,10 +304,12 @@ function the_user_data_editing() {
                                            placeholder="Місцезнаходження (Місто, індекс)*" required="required"/>
                                 </div>
                                 <div class="form-group">
-                            <textarea class="input_st" name="text"
+                            <textarea class="input_st content-field" name="text"
                                       placeholder="Опис фермерського господарства*"
+                                      data-number="500"
                                       title="Обовʼязкове поле"
                                       required="required"><?php echo trim( strip_tags( $company_description ) ); ?></textarea>
+                                    <div class="form-group__info content-count-js">0/500</div>
                                 </div>
                                 <div class="cabinet-item">
                                     <div class="cabinet-item__title">Фото*</div>
@@ -333,11 +343,11 @@ function the_user_data_editing() {
                                     <button class="btn_st" type="submit">
                                         <span>Редагувати господарство </span>
                                     </button>
-                                    <?php if($author_link): ?>
+									<?php if ( $author_link ): ?>
                                         <a href="<?php echo $author_link; ?>" class="btn_st">
                                             <span>Сторінка господарства</span>
                                         </a>
-                                    <?php endif; ?>
+									<?php endif; ?>
                                 </div>
                         </form>
                     </div>
@@ -358,31 +368,31 @@ function the_user_advertisement() {
 		the_user_history();
 	} else {
 		the_header_cabinet();
-		$var              = variables();
-		$set              = $var['setting_home'];
-		$assets           = $var['assets'];
-		$url              = $var['url'];
-		$url_home         = $var['url_home'];
-		$admin_ajax       = $var['admin_ajax'];
-		$permalink        = get_the_permalink() ?: $url;
-		$route            = $_GET['route'] ?? '';
-		$management_user  = $_GET['management_user'] ?? '';
-		$categories       = get_terms( array(
+		$var               = variables();
+		$set               = $var['setting_home'];
+		$assets            = $var['assets'];
+		$url               = $var['url'];
+		$url_home          = $var['url_home'];
+		$admin_ajax        = $var['admin_ajax'];
+		$permalink         = get_the_permalink() ?: $url;
+		$route             = $_GET['route'] ?? '';
+		$management_user   = $_GET['management_user'] ?? '';
+		$categories        = get_terms( array(
 			'taxonomy'   => 'categories',
 			'hide_empty' => false,
 			'parent'     => 0,
 		) );
-		$_order           = $_GET['order'] ?? '';
-		$_orderby         = $_GET['orderby'] ?? '';
-		$_title           = $_GET['title'] ?? '';
-		$_categories      = $_GET['categories'] ?? '';
-		$days_count       = carbon_get_theme_option( 'days_count' ) ?: 30;
-		$posts_per_page   = get_option( 'posts_per_page' );
-		$paged            = $_GET['pagenumber'] ?? 1;
-		$post_status      = $_GET['post_status'] ?? 'publish';
-		$current_url      = get_current_url();
-		$management_users = sellers_management( $user_id );
-		$args             = array(
+		$_order            = $_GET['order'] ?? '';
+		$_orderby          = $_GET['orderby'] ?? '';
+		$_title            = $_GET['title'] ?? '';
+		$_categories       = $_GET['categories'] ?? '';
+		$days_count        = carbon_get_theme_option( 'days_count' ) ?: 30;
+		$posts_per_page    = get_option( 'posts_per_page' );
+		$paged             = $_GET['pagenumber'] ?? 1;
+		$post_status       = $_GET['post_status'] ?? 'publish';
+		$current_url       = get_current_url();
+		$management_users  = sellers_management( $user_id );
+		$args              = array(
 			'post_type'      => 'products',
 			'posts_per_page' => (int) $posts_per_page,
 			'posts_status'   => 'publish',
@@ -422,6 +432,33 @@ function the_user_advertisement() {
 		$query = new WP_Query( $args );
 		?>
         <div class="create-item-main">
+	        <?php if ( $management_users ): ?>
+                <div class="sort-users">
+                    <div class="form-description__item-title">Керування господарством</div>
+                    <div class="sort-users__form">
+                        <form action="<?php echo $permalink; ?>" method="get">
+                            <input type="hidden" name="route" value="<?php echo $route; ?>">
+                            <input type="hidden" name="order" value="desc">
+                            <input type="hidden" name="post_status" value="<?php echo $post_status; ?>">
+                            <select class="select_st trigger-on-change" name="management_user">
+                                <option value="">    <?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?></option>
+						        <?php foreach ( $management_users as $user ):
+							        $ID = $user->ID;
+							        $is_active_manager = is_active_manager( $user_id, $ID );
+							        if ( $user->allcaps['edit_posts'] && $is_active_manager ):
+								        ?>
+                                        <option value="<?php echo $ID; ?>"
+									        <?php echo ( $management_user == $ID ) ? 'selected' : ''; ?>
+                                                data-is_active="<?php echo $is_active_manager; ?>"
+                                                data-val="<?php echo $user->allcaps['edit_posts']; ?>">
+									        <?php echo carbon_get_user_meta( $ID, 'user_company_name' ); ?>
+                                        </option>
+							        <?php endif; endforeach; ?>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+	        <?php endif; ?>
             <form action="<?php echo $permalink; ?>" method="get" class="sort-wrap ">
                 <input type="hidden" name="route" value="<?php echo $route; ?>">
                 <input type="hidden" name="management_user" value="<?php echo $management_user; ?>">
@@ -470,68 +507,41 @@ function the_user_advertisement() {
                     </div>
                 </div>
             </form>
-			<?php if ( $management_users ): ?>
-                <div class="sort-users">
-                    <div class="form-description__item-title">Керування господарством</div>
-                    <div class="sort-users__form">
-                        <form action="<?php echo $permalink; ?>" method="get">
-                            <input type="hidden" name="route" value="<?php echo $route; ?>">
-                            <input type="hidden" name="order" value="desc">
-                            <input type="hidden" name="post_status" value="<?php echo $post_status; ?>">
-                            <select class="select_st trigger-on-change" name="management_user">
-                                <option value="">	<?php echo carbon_get_user_meta($user_id, 'user_company_name'); ?></option>
-								<?php foreach ( $management_users as $user ):
-									$ID = $user->ID;
-									$is_active_manager = is_active_manager( $user_id, $ID );
-									if ( $user->allcaps['edit_posts'] && $is_active_manager ):
-										?>
-                                        <option value="<?php echo $ID; ?>"
-											<?php echo ( $management_user == $ID ) ? 'selected' : ''; ?>
-                                                data-is_active="<?php echo $is_active_manager; ?>"
-                                                data-val="<?php echo $user->allcaps['edit_posts']; ?>">
-											<?php echo carbon_get_user_meta($ID, 'user_company_name'); ?>
-                                        </option>
-									<?php endif; endforeach; ?>
-                            </select>
-                        </form>
-                    </div>
-                </div>
-			<?php endif; ?>
             <ul class="nav-announcement">
                 <li>
                     <a <?php echo $post_status == 'publish' ? 'class="active"' : ''; ?>
                             href="<?php echo $permalink . '?route=' . $route . '&post_status=publish&management_user=' . $management_user; ?>">
-                        Активні (<?php echo count_products(array(
-                                'post_status' => 'publish',
-                                'management_user' => $management_user,
-                        )); ?>)
+                        Активні (<?php echo count_products( array(
+							'post_status'     => 'publish',
+							'management_user' => $management_user,
+						) ); ?>)
                     </a>
                 </li>
                 <li>
                     <a <?php echo $post_status == 'pending' ? 'class="active"' : ''; ?>
                             href="<?php echo $permalink . '?route=' . $route . '&post_status=pending&management_user=' . $management_user; ?>">
-                        Очікуючі (<?php echo count_products(array(
-		                    'post_status' => 'pending',
-		                    'management_user' => $management_user,
-	                    )); ?>)
+                        Очікуючі (<?php echo count_products( array(
+							'post_status'     => 'pending',
+							'management_user' => $management_user,
+						) ); ?>)
                     </a>
                 </li>
                 <li>
                     <a <?php echo $post_status == 'archive' ? 'class="active"' : ''; ?>
                             href="<?php echo $permalink . '?route=' . $route . '&post_status=archive&management_user=' . $management_user; ?>">
-                        Неактивні (<?php echo count_products(array(
-		                    'post_status' => 'archive',
-		                    'management_user' => $management_user,
-	                    )); ?>)
+                        Неактивні (<?php echo count_products( array(
+							'post_status'     => 'archive',
+							'management_user' => $management_user,
+						) ); ?>)
                     </a>
                 </li>
                 <li>
                     <a <?php echo $post_status == 'draft' ? 'class="active"' : ''; ?>
                             href="<?php echo $permalink . '?route=' . $route . '&post_status=draft&management_user=' . $management_user; ?>">
-                        Відхилені (<?php echo count_products(array(
-		                    'post_status' => 'draft',
-		                    'management_user' => $management_user,
-	                    )); ?>)
+                        Відхилені (<?php echo count_products( array(
+							'post_status'     => 'draft',
+							'management_user' => $management_user,
+						) ); ?>)
                     </a>
                 </li>
             </ul>
@@ -630,7 +640,7 @@ function the_user_product( $id = false ) {
 	if ( $post_status != 'publish' ) {
 		$cls .= ' no-active';
 	}
-	if ( $post_status == 'draft'  ) {
+	if ( $post_status == 'draft' ) {
 		$cls .= ' not-active';
 	}
 	$personal_page = carbon_get_theme_option( 'personal_area_page' );

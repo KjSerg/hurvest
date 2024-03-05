@@ -452,17 +452,18 @@ $doc.ready(function () {
     });
     $doc.on('input', '.content-field', function (e) {
         var $t = $(this);
+        var number = $t.attr('data-number') || 9000;
         var $wrapper = $t.closest('.form-group');
         var $counter = $wrapper.find('.content-count-js');
         var val = $t.val();
         var l = val.length;
-        $counter.html(l + '/9000');
-        if (l >= 8999) {
+        $counter.html(l + '/' + number);
+        if (l >= (number - 1)) {
             e.preventDefault();
-            $t.val(val.slice(0, 9000));
+            $t.val(val.slice(0, number));
             val = $t.val();
             l = val.length;
-            $counter.html(l + '/9000');
+            $counter.html(l + '/' + number);
             return;
         }
     });
@@ -1588,6 +1589,25 @@ $doc.ready(function () {
     });
     showElements();
     showingContent();
+    $('.farming-gal__item').fancybox({
+        autoFocus: false,
+        clickOutside: true,
+        buttons: [],
+        // closeBtn: true,
+        backFocus: false,
+        loop: true,
+        touch: false,
+        hideScrollbar: false,
+        swipe: false,
+        youtube: {
+            autoplay: 1,
+            // enable autoplay
+            playsinline: 1
+        },
+        afterShow: function(instance, current) {
+            current.$content.append('<button data-fancybox-close="" class="fancybox-button fancybox-button--close" title="Close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 10.6L6.6 5.2 5.2 6.6l5.4 5.4-5.4 5.4 1.4 1.4 5.4-5.4 5.4 5.4 1.4-1.4-5.4-5.4 5.4-5.4-1.4-1.4-5.4 5.4z"></path></svg></button>');
+        }
+    });
     $(document).on('click', '[data-gallery]', function (e) {
         e.preventDefault();
         var $t = $(this);
@@ -1603,7 +1623,8 @@ $doc.ready(function () {
             ],
             loop: false,
             protect: true,
-            backFocus: false
+            backFocus: false,
+
         });
     });
     $(document).on('click', '.iw-container .product-item__slider, .iw-content', function (e) {

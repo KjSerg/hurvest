@@ -186,22 +186,7 @@ $(document).ready(function () {
             }]
         });
     });
-    $('.farming-gal__item').fancybox({
-        autoFocus: false,
-        clickOutside: true,
-        buttons: ["close"],
-        // closeBtn: true,
-        backFocus: false,
-        loop: true,
-        touch: false,
-        hideScrollbar: false,
-        swipe: false,
-        youtube: {
-            autoplay: 1,
-            // enable autoplay
-            playsinline: 1
-        }
-    });
+
     $('.category-list').each(function () {
         $(this).slick({
             slidesToShow: 8,
