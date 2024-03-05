@@ -1792,12 +1792,16 @@ function get_user_region_id() {
 	if ( $user_confirm_city ) {
 		$region = explode( ",", $user_confirm_city )[1] ?? '';
 		if ( $region ) {
-			$region = getLocaleCity( $region );
-			if ( $region ) {
-				if ( $region_object = get_term_by( 'name', $region, 'regions' ) ) {
-					return $region_object->term_id;
+			if ( $region_object = get_term_by( 'name', $region, 'regions' ) ) {
+				return $region_object->term_id;
+			}else{
+				$region = getLocaleCity( $region );
+				if ( $region ) {
+					if ( $region_object = get_term_by( 'name', $region, 'regions' ) ) {
+						return $region_object->term_id;
+					}
 				}
-			}
+            }
 		}
 	}
 

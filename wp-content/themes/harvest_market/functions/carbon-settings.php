@@ -556,19 +556,9 @@ function crb_attach_in_products() {
 	         ) )
 	         ->add_tab( 'Додаткові налаштування', array(
 		         Field::make( 'checkbox', 'product_auto_continue', 'Автопродовження' ),
-		         Field::make( 'select', 'product_is_vip', 'VIP-оголошення' )->set_width( 50 )
-		              ->add_options( array(
-			              ''    => '',
-			              'vip' => 'VIP-оголошення активоване',
-		              ) ),
-		         Field::make( 'date_time', 'product_start_vip', 'Початок VIP-оголошення' )
-		              ->set_storage_format( 'U' )
-		              ->set_width( 25 ),
-		         Field::make( 'date_time', 'product_end_vip', 'Закінчення VIP-оголошення' )
-		              ->set_storage_format( 'U' )
-		              ->set_width( 25 ),
 
-		         Field::make( 'select', 'product_is_top', 'TOP-оголошення' )
+
+		         Field::make( 'select', 'product_is_top', 'TOP-оголошення активне' )
 		              ->set_width( 50 )
 		              ->add_options( array(
 			              ''    => '',
@@ -581,7 +571,7 @@ function crb_attach_in_products() {
 		              ->set_storage_format( 'U' )
 		              ->set_width( 25 ),
 
-		         Field::make( 'select', 'product_is_urgently', 'Термінове оголошення' )
+		         Field::make( 'select', 'product_is_urgently', 'Термінове оголошення активне' )
 		              ->set_width( 50 )
 		              ->add_options( array(
 			              ''         => '',
@@ -803,7 +793,7 @@ function crb_attach_in_services() {
 		              ->set_required( true )
 		              ->set_attribute( 'type', 'number' ),
 		         Field::make( "text", "service_term", "Термін роботи ТОП-пакета, днів" )
-		              ->set_attribute( 'type', 'number' )
+		              ->set_attribute( 'type', 'number' )->set_required( true )
 		              ->set_attribute( 'step', '1' )
 		              ->set_attribute( 'min', '1' ),
 		         Field::make( "text", "service_up", "Підняття в гору, кількість" )

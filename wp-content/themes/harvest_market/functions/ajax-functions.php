@@ -2720,12 +2720,14 @@ function checkout_service() {
 
 
 				$sum = $service_price * $count_products;
+				$res['service_price'] =$service_price;
+				$res['count_products'] =$count_products;
+				$res['sum'] =$sum;
 				carbon_set_post_meta( $_id, 'purchased_sum', $sum );
 				carbon_set_post_meta( $_id, 'purchased_name', get_the_title( $id ) );
 				carbon_set_post_meta( $_id, 'purchased_date', $start_date );
 				carbon_set_post_meta( $_id, 'purchased_service_id', $id );
 				carbon_set_post_meta( $_id, 'purchased_product_ids', implode( ',', $products ) );
-				carbon_set_post_meta( $_id, 'purchased_regions', implode( ',', $regions ) );
 				carbon_set_post_meta( $_id, 'purchased_regions', implode( ',', $regions ) );
 				$res['type'] = 'success';
 				if ( $personal_area_page = carbon_get_theme_option( 'personal_area_page' ) ) {

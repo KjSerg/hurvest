@@ -91,7 +91,6 @@ if ( $get_type == 'map' ):
                         </svg>
                 </a>
             </div>
-			<?php the_vip_catalog(); ?>
 			<?php the_top_catalog(); ?>
             <div class="catalog-group">
                 <div class="title-sm">
