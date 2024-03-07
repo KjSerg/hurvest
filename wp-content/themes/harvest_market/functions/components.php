@@ -1,25 +1,29 @@
 <?php
 
 function the_product( $id = false ) {
-	$id                = $id ?: get_the_ID();
-	$gallery           = carbon_get_post_meta( $id, 'product_gallery' );
-	$address           = carbon_get_post_meta( $id, 'product_address' );
-	$city              = carbon_get_post_meta( $id, 'product_city' );
-	$price             = carbon_get_post_meta( $id, 'product_price' );
-	$unit              = carbon_get_post_meta( $id, 'product_unit' );
-	$rating            = carbon_get_post_meta( $id, 'product_rating' );
-	$product_latitude  = carbon_get_post_meta( $id, 'product_latitude' );
-	$product_longitude = carbon_get_post_meta( $id, 'product_longitude' );
-	$img               = get_the_post_thumbnail_url( $id );
-	$title             = get_the_title( $id );
-	$is_favorite       = is_in_favorite( $id );
-	$reviews_count     = review_count( $id );
-	$cls               = $is_favorite ? 'active' : '';
-	$user_location     = get_user_location();
-	$user_coordinates  = get_user_location_coordinates();
-	$user_lat          = $user_coordinates['lat'] ?? ( $user_location['lat'] ?? '' );
-	$user_lon          = $user_coordinates['lon'] ?? ( $user_location['lon'] ?? '' );
-	$distance          = 0;
+	$id                  = $id ?: get_the_ID();
+	$gallery             = carbon_get_post_meta( $id, 'product_gallery' );
+	$address             = carbon_get_post_meta( $id, 'product_address' );
+	$city                = carbon_get_post_meta( $id, 'product_city' );
+	$price               = carbon_get_post_meta( $id, 'product_price' );
+	$unit                = carbon_get_post_meta( $id, 'product_unit' );
+	$rating              = carbon_get_post_meta( $id, 'product_rating' );
+	$product_latitude    = carbon_get_post_meta( $id, 'product_latitude' );
+	$product_longitude   = carbon_get_post_meta( $id, 'product_longitude' );
+	$author_id           = get_post_field( 'post_author', $id );
+	$seller_rating       = get_seller_rating( $author_id );
+	$seller_count_review = get_seller_count_review( $author_id );
+	$user_company_name   = carbon_get_user_meta( $author_id, 'user_company_name' ) ?: '';
+	$img                 = get_the_post_thumbnail_url( $id );
+	$title               = get_the_title( $id );
+	$is_favorite         = is_in_favorite( $id );
+	$reviews_count       = review_count( $id );
+	$cls                 = $is_favorite ? 'active' : '';
+	$user_location       = get_user_location();
+	$user_coordinates    = get_user_location_coordinates();
+	$user_lat            = $user_coordinates['lat'] ?? ( $user_location['lat'] ?? '' );
+	$user_lon            = $user_coordinates['lon'] ?? ( $user_location['lon'] ?? '' );
+	$distance            = 0;
 	if ( $product_latitude && $product_longitude && $user_lat && $user_lon ) {
 		$distance = getDistanceByCoordinates( array(
 			'location_from' => array(
@@ -37,6 +41,11 @@ function the_product( $id = false ) {
 		$user_address = ( $user_location['country'] ?? '' ) . ' ' . ( $user_location['regionName'] ?? '' ) . ' ' . ( $user_location['city'] ?? '' );
 		$distance     = getDistance( $user_address, $address, "K" );
 
+	}
+	$author_link = '#';
+	$user_post   = carbon_get_user_meta( $author_id, 'user_post' );
+	if ( $user_post && get_post( $user_post ) ) {
+		$author_link = get_the_permalink( $user_post );
 	}
 	?>
 
@@ -62,7 +71,17 @@ function the_product( $id = false ) {
         </div>
         <div class="product-item__content">
             <a class="product-item__title" href="<?php echo get_the_permalink( $id ); ?>">
-				<?php echo $title; ?>
+				<?php echo $title; ?> <span class="reviews-count"><?php echo $seller_count_review ?: 0; ?> відгуків</span>
+            </a>
+            <a class="product-item__title product-item__organization" href="<?php echo $author_link; ?>">
+				<?php echo $user_company_name; ?> <span
+                        class="reviews-rating">  <strong><?php echo $seller_rating ?: 5; ?> <span class="icon-rating"><svg
+                                    xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                    style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
+                                                <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
+                                                      style="fill:#ffc327"/>
+                                            </svg></span></span></strong>
+
             </a>
             <ul class="product-item__place">
                 <li><?php echo $city ?: $address; ?></li>
@@ -72,17 +91,7 @@ function the_product( $id = false ) {
                 <div class="product-item__price">
 					<?php echo get_price_html( $id ); ?>
                 </div>
-                <ul class="product-item__reviews">
-                    <li><?php echo $reviews_count ?: 0; ?> відгуків</li>
-                    <li>
-                        <strong><?php echo $rating ?: 5; ?> </strong>
-                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                             style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                      style="fill:#ffc327"/>
-                                            </svg>
-                    </li>
-                </ul>
+
             </div>
         </div>
     </div>
@@ -91,10 +100,10 @@ function the_product( $id = false ) {
 }
 
 function the_product_labels( $id ) {
-	$html            = '<div class="product-labels">';
-	$time            = time();
-	$product_is_top  = carbon_get_post_meta( $id, 'product_is_top' );
-	$product_end_top = carbon_get_post_meta( $id, 'product_end_top' );
+	$html              = '<div class="product-labels">';
+	$time              = time();
+	$product_is_top    = carbon_get_post_meta( $id, 'product_is_top' );
+	$product_end_top   = carbon_get_post_meta( $id, 'product_end_top' );
 	$product_start_top = carbon_get_post_meta( $id, 'product_start_top' );
 	if ( $product_is_top == 'top' && $product_end_top > $time && $time > $product_start_top ) {
 		$image      = _i( 'top' );

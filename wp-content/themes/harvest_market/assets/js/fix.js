@@ -1344,8 +1344,13 @@ $doc.ready(function () {
         var $t = $(this);
         var div = $(".add-to-favorite");
         if (!div.is(e.target) && div.has(e.target).length === 0) {
-            showPreloader();
-            window.location.href = $t.find('.product-item__title').attr('href');
+            var div = $(".product-item__organization");
+            if (!div.is(e.target) && div.has(e.target).length === 0) {
+                showPreloader();
+                window.location.href = $t.find('.product-item__title').not('.product-item__organization').attr('href');
+            } else {
+                window.location.href = $t.find('.product-item__organization').attr('href');
+            }
         }
     });
     $doc.on('click', ".correspondence-link", function (e) {

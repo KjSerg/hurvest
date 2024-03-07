@@ -9,6 +9,8 @@ $admin_ajax        = $var['admin_ajax'];
 $current_user_id   = get_current_user_id();
 $id                = get_the_ID();
 $author_id         = get_post_field( 'post_author', $id );
+$seller_rating       = get_seller_rating( $author_id );
+$seller_count_review = get_seller_count_review( $author_id );
 $isLighthouse      = isLighthouse();
 $product_latitude  = carbon_get_post_meta( $id, 'product_latitude' );
 $product_longitude = carbon_get_post_meta( $id, 'product_longitude' );
@@ -194,9 +196,9 @@ if ( $user_post && get_post( $user_post ) ) {
                                     <div class="product-card__list-title">Рейтинг:</div>
                                     <div class="product-card__list-main">
                                         <ul class="product-item__reviews">
-                                            <li><?php echo $reviews_count; ?> відгуків</li>
+                                            <li><?php echo $seller_count_review ?: 0; ?> відгуків</li>
                                             <li>
-                                                <strong><?php echo (float) ( $rating ?: 5 ); ?> </strong>
+                                                <strong><?php echo (float) ( $seller_rating ?: 5 ); ?> </strong>
                                                 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                                      style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
                                                         <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
