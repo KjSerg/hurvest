@@ -2272,3 +2272,11 @@ function set_search_query_data() {
 	);
 	query_posts( array_merge( $wp_query->query, $args ) );
 }
+
+function get_product_labels_html( $id ) {
+	ob_start();
+	the_product_labels( $id );
+	$html = ob_get_clean();
+
+	return $html;
+}

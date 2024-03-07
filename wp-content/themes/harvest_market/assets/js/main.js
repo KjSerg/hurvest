@@ -674,7 +674,6 @@ var style = [{
     }]
 }];
 
-
 function initMap() {
     var mapElement = document.getElementById('map-product'),
         map1Latitude = mapElement.getAttribute('data-lat'),
@@ -712,7 +711,7 @@ function initMapList() {
         map; // var jsonStringify = JSON.stringify(json)
     // var jsonParse = JSON.parse(jsonStringify);
     // console.log(jsonParse)
-    if(lastMapCenter && saveCenter === 'true') {
+    if (lastMapCenter && saveCenter === 'true') {
         lastMapCenter = JSON.parse(lastMapCenter);
         map1Latitude = lastMapCenter.lat;
         map1Longtitude = lastMapCenter.lng;
@@ -762,6 +761,7 @@ function initMapList() {
             var ids = data.id;
             var slider = data.slider;
             var favorites = data.favorites;
+            var labels_html = data.labels_html;
             var priceTag = document.createElement("div");
             var text_ = [];
             var t_a = [];
@@ -771,7 +771,7 @@ function initMapList() {
             var img_ = [];
             var img_slider = [];
             var content = '';
-
+            console.log(labels_html)
             for (var i = 0; i < n_; i++) {
                 var str_slider = "";
                 var s_n = slider[i].length;
@@ -782,11 +782,31 @@ function initMapList() {
                     str_slider += img_html;
                 }
 
-                if (verified[i] == 1) {
-                    verified_html = '<div class="iw-product-verified"> <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 15 15" viewBox="0 0 15 15"><path d="M8.2.3C8 .1 7.8 0 7.5 0c-.3 0-.5.1-.7.3l-.9.9h-.2L4.5.9c-.2-.1-.5 0-.7.1-.3.1-.5.4-.5.6l-.4 1.3V3h-.1l-1.2.3c-.2 0-.5.2-.6.4-.1.3-.2.6-.1.8l.3 1.2v.2l-.9.9c-.2.2-.3.4-.3.7 0 .3.1.5.3.7l.9.9v.2l-.3 1.2c-.1.3 0 .5.1.8.1.2.4.4.6.5l1.2.3h.1v.1l.3 1.2c.1.3.2.5.5.6.2.1.5.2.8.1l1.2-.3h.2l.9.9c.2.2.4.3.7.3.3 0 .5-.1.7-.3l.9-.9h.2l1.2.3c.3.1.5 0 .8-.1.2-.1.4-.4.5-.6l.3-1.2v-.1h.1l1.2-.3c.3-.1.5-.2.6-.5.1-.2.2-.5.1-.8l-.3-1.2v-.2l.9-.9c.2-.2.3-.4.3-.7 0-.3-.1-.5-.3-.7l-.9-.9v-.2l.3-1.2c.1-.3 0-.5-.1-.8-.1-.2-.4-.4-.6-.5l-1.2-.3h-.1v-.1l-.3-1.2c-.1-.3-.2-.5-.5-.6-.2-.1-.5-.2-.8-.1l-1.3.3H9L8.2.3zm-1.8 10c.1 0 .2 0 .3-.1L10.9 6c.2-.2.2-.6 0-.8l-.3-.3c-.2-.2-.6-.2-.8 0L6.4 8.4 5.1 7.1c-.2-.2-.6-.2-.8 0l-.2.2c-.2.2-.2.6 0 .8l2 2.1c.1 0 .2.1.3.1z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#4d76ff"/></svg>' + verifiedSTR + '</div>';
+                if (verified[i] === true) {
+                    verified_html = '<div class="iw-product-verified">' + verifiedSvg() + '</div>';
                 }
 
-                t_ = '<div class="iw-wrap">' + '<div class="iw-container-slide">' + '<div class="iw-container">' + '<div class="iw-product-media">' + '<div class="product-item__date">' + date_[i] + '</div>' + '<a data-id="'+ids[i]+'" class="product-item__favorite add-to-favorite '+favorites[i]+'" href="#"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 659.3 578.6" viewBox="0 0 659.3 578.6"><path d="m78 325 231.8 217.7c8 7.5 12 11.2 16.7 12.2 2.1.4 4.3.4 6.4 0 4.7-.9 8.7-4.7 16.7-12.2L581.3 325c65.2-61.3 73.1-162.1 18.3-232.7L589.3 79C523.7-5.6 392 8.6 345.9 105.2c-6.5 13.6-25.9 13.6-32.4 0C267.4 8.6 135.7-5.6 70.1 79L59.7 92.3C4.9 163 12.8 263.8 78 325z" style="fill:none;stroke:#fff;stroke-width:46.6667;stroke-miterlimit:133.3333"></path></svg></a>' + '<div class="product-item__slider">' + str_slider + '</div>' + '</div>' + '<div class="iw-content">' + '<a class="product-item__title" href="' + link[i] + '">' + title[i] + '</a>' + '<a href="' + sellerLink[i] + '" target="_blank" class="iw-product-subtitle">' + subtitle[i] + '</a>' + '<div class="iw-product-provider">' + '<div class="iw-product-delivery">' + delivery[i] + '</div>' + verified_html + '</div>' + '<ul class="iw-product-place"> <li>' + place + '</li><li>' + distance + '</li></ul>' + '<ul class="iw-product-description">' + ' <li><span> Доставка</span> <strong>' + shipping[i] + '</strong></li>' + ' <li><span> Мінімальний заказ</span> <strong>' + order[i] + '</strong></li>' + ' <li><span> В наявност</span> <strong>' + stock[i] + '</strong></li>' + '</ul>' + '<div class="product-item__bot">' + '<div class="product-item__price"> <strong>' + price[i] + ' </strong>' + price_value[i] + '</div>' + '<ul class="product-item__reviews"><li>' + reviews[i] + '</li> <li> <strong>' + rating[i] + '</strong> <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2"><path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z" style="fill:#ffc327"></path></svg></li>' + '</ul>' + '</div>' + '</div>' + '</div>' + '</div>' + '</div>';
+                console.log(labels_html[i])
+                t_ = '<div class="iw-wrap">' +
+                    labels_html[i] +
+                    '<div class="iw-container-slide">' +
+                    '<div class="iw-container">' +
+                    '<div class="iw-product-media">' +
+                    '<a data-id="' + ids[i] + '" class="product-item__favorite add-to-favorite ' + favorites[i] + '" href="#">' + favoriteSvg() + '</a>' +
+                    '<div class="product-item__slider">' + str_slider + '</div>' + '</div>' +
+                    '<div class="iw-content">' + '<a class="product-item__title" href="' + link[i] + '">' + title[i] +  '</a>' +
+                    '<a href="' + sellerLink[i] + '" target="_blank" class="iw-product-subtitle">' + subtitle[i] + verified_html + '</a>' +
+                    '<ul class="product-item__reviews"><li>' + reviews[i] + '</li> <li> <strong>' + rating[i] + '</strong> ' + ratingSvg() + '</li>' + '</ul>' +
+                    '<ul class="iw-product-place"> <li>' + place + '</li><li>' + distance + '</li></ul>' +
+
+                    '<div class="product-item__bot">' +
+                    '<div class="product-item__price"> <strong>' + price[i] + ' </strong>' + price_value[i] + '</div>' +
+
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
                 t_a.push(t_);
             }
 
@@ -819,9 +839,7 @@ function initMapList() {
                 // greater control over the various content elements
                 maxWidth: 700
             });
-            infoWindows.push(infowindow); // google.maps.event.addListener(map, 'click', function () {
-            //         infowindow.close();
-            // });
+            infoWindows.push(infowindow);
 
             google.maps.event.addListener(marker1, 'click', function (marker1, content) {
                 return function () {
@@ -844,7 +862,7 @@ function initMapList() {
                             draggable: false // arrows: false,
 
                         });
-                        if( $(document).find('.iw-product-media .product-item__slider.slick-slider').length > 0){
+                        if ($(document).find('.iw-product-media .product-item__slider.slick-slider').length > 0) {
                             // $(document).find('.iw-product-media .product-item__slider.slick-slider').slick('setPosition');
                         }
                         $('.iw-slider').slick('setPosition');
@@ -853,7 +871,7 @@ function initMapList() {
                     var lat = pos.lat();
                     var lng = pos.lng();
                     map.panTo(pos);
-                    localStorage.setItem('lastMapCenter', JSON.stringify({ lat: lat, lng: lng }));
+                    localStorage.setItem('lastMapCenter', JSON.stringify({lat: lat, lng: lng}));
                 };
             }(marker1, content));
             $(document).on('click', function (e) {
@@ -876,19 +894,19 @@ function initMapList() {
             }]
         });
 
-        map.addListener("center_changed", function (){
+        map.addListener("center_changed", function () {
             var center = map.getCenter();
             var lat = center.lat();
             var lng = center.lng();
-            localStorage.setItem('lastMapCenter', JSON.stringify({ lat: lat, lng: lng }));
+            localStorage.setItem('lastMapCenter', JSON.stringify({lat: lat, lng: lng}));
         });
-        map.addListener("bounds_changed", function (){
+        map.addListener("bounds_changed", function () {
             var center = map.getCenter();
             var lat = center.lat();
             var lng = center.lng();
-            localStorage.setItem('lastMapCenter', JSON.stringify({ lat: lat, lng: lng }));
+            localStorage.setItem('lastMapCenter', JSON.stringify({lat: lat, lng: lng}));
         });
-        google.maps.event.addListener(map, 'zoom_changed', function() {
+        google.maps.event.addListener(map, 'zoom_changed', function () {
             // Отримання поточного значення зуму
             var zoom = map.getZoom();
 
@@ -1001,3 +1019,15 @@ var createHTMLMapMarker = function createHTMLMapMarker(_ref) {
 
     return new HTMLMapMarker();
 };
+
+function ratingSvg() {
+    return '<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2"><path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z" style="fill:#ffc327"></path></svg>';
+}
+
+function favoriteSvg() {
+    return '<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 659.3 578.6" viewBox="0 0 659.3 578.6"><path d="m78 325 231.8 217.7c8 7.5 12 11.2 16.7 12.2 2.1.4 4.3.4 6.4 0 4.7-.9 8.7-4.7 16.7-12.2L581.3 325c65.2-61.3 73.1-162.1 18.3-232.7L589.3 79C523.7-5.6 392 8.6 345.9 105.2c-6.5 13.6-25.9 13.6-32.4 0C267.4 8.6 135.7-5.6 70.1 79L59.7 92.3C4.9 163 12.8 263.8 78 325z" style="fill:none;stroke:#fff;stroke-width:46.6667;stroke-miterlimit:133.3333"></path></svg>';
+}
+
+function verifiedSvg() {
+    return '<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 15 15" viewBox="0 0 15 15"><path d="M8.2.3C8 .1 7.8 0 7.5 0c-.3 0-.5.1-.7.3l-.9.9h-.2L4.5.9c-.2-.1-.5 0-.7.1-.3.1-.5.4-.5.6l-.4 1.3V3h-.1l-1.2.3c-.2 0-.5.2-.6.4-.1.3-.2.6-.1.8l.3 1.2v.2l-.9.9c-.2.2-.3.4-.3.7 0 .3.1.5.3.7l.9.9v.2l-.3 1.2c-.1.3 0 .5.1.8.1.2.4.4.6.5l1.2.3h.1v.1l.3 1.2c.1.3.2.5.5.6.2.1.5.2.8.1l1.2-.3h.2l.9.9c.2.2.4.3.7.3.3 0 .5-.1.7-.3l.9-.9h.2l1.2.3c.3.1.5 0 .8-.1.2-.1.4-.4.5-.6l.3-1.2v-.1h.1l1.2-.3c.3-.1.5-.2.6-.5.1-.2.2-.5.1-.8l-.3-1.2v-.2l.9-.9c.2-.2.3-.4.3-.7 0-.3-.1-.5-.3-.7l-.9-.9v-.2l.3-1.2c.1-.3 0-.5-.1-.8-.1-.2-.4-.4-.6-.5l-1.2-.3h-.1v-.1l-.3-1.2c-.1-.3-.2-.5-.5-.6-.2-.1-.5-.2-.8-.1l-1.3.3H9L8.2.3zm-1.8 10c.1 0 .2 0 .3-.1L10.9 6c.2-.2.2-.6 0-.8l-.3-.3c-.2-.2-.6-.2-.8 0L6.4 8.4 5.1 7.1c-.2-.2-.6-.2-.8 0l-.2.2c-.2.2-.2.6 0 .8l2 2.1c.1 0 .2.1.3.1z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#4d76ff"></path></svg>';
+}

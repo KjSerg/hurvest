@@ -220,12 +220,13 @@ function get_locations() {
 			} else {
 				$distance = getDistance( $user_address, $address, "K" );
 			}
-			$slider            = array();
-			$gallery           = carbon_get_post_meta( $id, 'product_gallery' );
-			$img               = get_the_post_thumbnail_url( $id );
-			$author_id         = get_post_field( 'post_author', $id );
-			$delivery_count    = carbon_get_user_meta( $author_id, 'delivery_count' ) ?: 0;
-			$user_company_name = carbon_get_user_meta( $author_id, 'user_company_name' ) ?: '';
+			$slider              = array();
+			$gallery             = carbon_get_post_meta( $id, 'product_gallery' );
+			$img                 = get_the_post_thumbnail_url( $id );
+			$author_id           = get_post_field( 'post_author', $id );
+			$delivery_count      = carbon_get_user_meta( $author_id, 'delivery_count' ) ?: 0;
+			$user_company_name   = carbon_get_user_meta( $author_id, 'user_company_name' ) ?: '';
+			$product_labels_html = get_product_labels_html( $id );
 			if ( $gallery ): foreach ( $gallery as $j => $image_id ): if ( $j < 3 ):
 				$slider[] = _u( $image_id, 1 );
 			endif; endforeach;
@@ -263,6 +264,7 @@ function get_locations() {
 			}
 			if ( ! $temp_array[ $key ] ) {
 				$temp_array[ $key ] = array(
+					'labels_html' => [ $product_labels_html ],
 					'favorites'   => [ $is_favorite ? 'active' : '' ],
 					'id'          => [ $id ],
 					'seller_link' => [ $author_link ],
@@ -286,6 +288,7 @@ function get_locations() {
 					'stock'       => [ $max_value ? " $max_value  $unit" : '' ],
 				);
 			} else {
+				$temp_array[ $key ]['labels_html'][] = $product_labels_html;
 				$temp_array[ $key ]['favorites'][]   = $is_favorite ? 'active' : '';
 				$temp_array[ $key ]['seller_link'][] = $author_link;
 				$temp_array[ $key ]['id'][]          = $id;
@@ -1560,14 +1563,14 @@ function add_enterprise() {
 				}
 				carbon_set_user_meta( $user_id, 'user_company_gallery', $arr );
 				$res['$arr'] = $arr;
-				$r = edit_zoho_account( array(
+				$r           = edit_zoho_account( array(
 					'name'        => $name,
 					'description' => $text,
 					'region'      => $region,
 					'phone'       => $phone,
 					'user_id'     => $user_id,
 				) );
-				$res['$r'] = $r;
+				$res['$r']   = $r;
 			} else {
 				$res['type'] = 'error';
 				$res['msg']  = 'Помилка';
