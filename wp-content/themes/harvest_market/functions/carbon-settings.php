@@ -145,6 +145,16 @@ function crb_attach_theme_options() {
 		         Field::make( "html", "crb_information_text", '' )
 		              ->set_html( 'telegram_link_html' )
 	         ) );
+
+	Container::make( 'theme_options', "Настройка zoho" )
+	         ->set_page_parent( 'options-general.php' )
+	         ->add_fields( array(
+		         Field::make( 'text', 'zoho_url' )->set_attribute( 'type', 'url' )->set_width( 50 ),
+		         Field::make( 'text', 'zoho_url_token' )->set_attribute( 'type', 'url' )->set_width( 50 ),
+		         Field::make( 'text', 'zoho_refresh_token' ),
+		         Field::make( 'text', 'zoho_client_id' ),
+		         Field::make( 'text', 'zoho_client_secret' ),
+	         ) );
 }
 
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_front_page' );
@@ -854,6 +864,13 @@ function crb_attach_in_purchased() {
 		         Field::make( "text", "purchased_regions", "Області" ),
 		         Field::make( 'text', 'purchased_sum', 'Сума Замовлення' )
 	         ) );
+	Container::make( 'post_meta', 'Zoho' )
+	         ->show_on_post_type( 'purchased' )
+	         ->add_fields(
+		         array(
+			         Field::make( 'text', 'purchased_zoho_id' ),
+		         )
+	         );
 }
 
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_team' );
@@ -955,6 +972,13 @@ function crb_attach_in_users() {
 			         Field::make( 'text', 'telegram_id', 'Telegram ID' ),
 			         Field::make( 'text', 'telegram_image', 'Telegram аватар' ),
 			         Field::make( 'text', 'user_accounts_id', 'ID звязаних акаунтів' ),
+		         )
+	         );
+	Container::make( 'user_meta', 'Zoho' )
+	         ->add_fields(
+		         array(
+			         Field::make( 'text', 'zoho_id' ),
+			         Field::make( 'text', 'zoho_account_id' ),
 		         )
 	         );
 	Container::make( 'user_meta', 'Доставки' )

@@ -94,7 +94,13 @@ function post_unpublished( $new_status, $old_status, $post ) {
 				$message_text = "Вітаємо! <br> Ви стали продавцем у нас на сайті. <br> $link <br> $link_seller";
 				send_message( $message_text, $post_author->user_email, $company_name . ' офіційний продавець на сайті' );
 			}
-
+			$r = create_zoho_account( array(
+				'name'        => $company_name,
+				'description' => $text,
+				'region'      => $application_company_region,
+				'phone'       => $application_phone,
+				'user_id'     => $author_id,
+			) );
 		}
 	}
 	if ( $post_type == 'products' && $old_status != 'publish' && $new_status == 'publish' ) {
@@ -153,3 +159,20 @@ function disable_ajax_on_edit_tags_page( $hook ) {
 	}
 }
 
+add_filter( 'nsl_register_new_user', function ( $user_id, $provider ) {
+	$current_user      = get_user_by( 'ID', $user_id );
+	$email             = $current_user->user_email ?: '';
+	$display_name      = $current_user->display_name ?: '';
+	$first_name        = $current_user->first_name ?: '';
+	$last_name         = $current_user->last_name ?: '';
+	$user_confirm_city = $_COOKIE['user_confirm_city'] ?? '';
+	$user_city         = $_COOKIE['user_city'] ?? '';
+	create_zoho_user( array(
+		'first_name'  => $first_name ?: $email,
+		'last_name'   => $last_name ?: $email,
+		'email'       => $email,
+		'id'          => $user_id,
+		'city'        => $user_confirm_city ?: $user_city,
+		'description' => $provider,
+	) );
+}, 10, 2 );

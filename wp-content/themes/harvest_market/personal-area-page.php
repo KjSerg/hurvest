@@ -32,6 +32,33 @@ $user_city          = carbon_get_user_meta( $user_id, 'user_company_city' ) ?: '
 $user_phone         = carbon_get_user_meta( $user_id, 'user_phone' ) ?: '';
 $form_support       = carbon_get_post_meta( $id, 'short_code_form_support' ) ?: '';
 $route              = $_GET['route'] ?? '';
+link_zoho_account();
+echo '<pre>';
+//var_dump(search_zoho_contact_by_email( $email ));
+//print_r(search_zoho_contact_by_email( 'tim.berloger@gmail.com' ));
+//$r = create_zoho_account( array(
+//	'name'        => carbon_get_user_meta( $user_id, 'user_company_name' ),
+//	'description' => carbon_get_user_meta( $user_id, 'user_company_description' ),
+//	'region'      => carbon_get_user_meta( $user_id, 'user_company_region' ),
+//	'phone'       => carbon_get_user_meta( $user_id, 'user_company_phone' ),
+//	'email'       => $email,
+//	'user_id'     => $user_id,
+//) );
+//var_dump($r);
+//$url = carbon_get_theme_option( 'zoho_url' );
+//if ( $url ) {
+//	$url .= 'Deals/669263000000406401';
+//	$url .= 'Deals/669263000000497014';
+//	$url .= 'Accounts/669263000000498010';
+
+//	var_dump(zoho_request( $url, false, 'GET' ));
+//}
+//edit_zoho_user(array(
+//        'id' => $user_id,
+//        'tag' => 'Seller',
+//));
+//print_r(get_zoho_account_by_user_id());
+echo '</pre>';
 ?>
 
 <section class="main-cabinet">

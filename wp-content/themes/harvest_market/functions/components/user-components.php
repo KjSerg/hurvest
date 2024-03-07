@@ -289,7 +289,7 @@ function the_user_data_editing() {
                                     <input class="input_st"
                                            type="tel"
                                            name="phone"
-                                           value="<?php echo $user_phone; ?>"
+                                           value="<?php echo carbon_get_user_meta( $user_id, 'user_company_phone' ); ?>"
                                            required="required"
                                            title="Обовʼязкове поле"
                                            placeholder="Номер телефону*"/>
@@ -730,10 +730,10 @@ function the_user_product( $id = false ) {
 					<?php echo get_price_html( $id ); ?>
                 </div>
                 <div class="select-product__item-right-bot">
-                    <div class="tog-hide-info"></div>
+                    <div class="tog-hide-info" style="display: none"></div>
                 </div>
             </div>
-            <div class="select-product__item-hide">
+            <div class="select-product__item-hide" style="display: block;">
                 <div class="select-product__item-hide-content">
                     <ul class="management-link">
                         <li>

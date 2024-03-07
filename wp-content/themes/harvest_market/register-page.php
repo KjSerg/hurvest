@@ -23,6 +23,12 @@ $login_page   = carbon_get_theme_option( 'login_page' );
             <form method="post" class="form-js" id="create-user-form" novalidate>
                 <input type="hidden" name="action" value="create_new_user">
                 <div class="form-group">
+                    <input class="input_st" type="text" required name="first_name" placeholder="Імя*">
+                </div>
+                <div class="form-group">
+                    <input class="input_st" type="text" required name="last_name" placeholder="Прізвище*">
+                </div>
+                <div class="form-group">
                     <input class="input_st"
                            type="email"
                            required
@@ -40,7 +46,7 @@ $login_page   = carbon_get_theme_option( 'login_page' );
                         <img src="<?php echo $assets; ?>img/hide_pass.svg" alt="">
                     </div>
                 </div>
-          
+
                 <div class="form-button-group">
                     <button class="btn_st" type="submit">
                         <span>Зареєструватися</span>

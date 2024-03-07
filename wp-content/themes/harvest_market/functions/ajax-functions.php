@@ -1124,10 +1124,12 @@ function get_phone_numbers() {
 add_action( 'wp_ajax_nopriv_create_new_user', 'create_new_user' );
 add_action( 'wp_ajax_create_new_user', 'create_new_user' );
 function create_new_user() {
-	$res      = array();
-	$email    = $_POST['email'] ?? '';
-	$tel      = $_POST['tel'] ?? '';
-	$password = $_POST['password'] ?? '';
+	$res        = array();
+	$first_name = $_POST['first_name'] ?? '';
+	$last_name  = $_POST['last_name'] ?? '';
+	$email      = $_POST['email'] ?? '';
+	$tel        = $_POST['tel'] ?? '';
+	$password   = $_POST['password'] ?? '';
 	if ( $email && $tel && $password ) {
 		if ( $user_id = email_exists( $email ) ) {
 			$res['type']    = 'error';
@@ -1146,7 +1148,13 @@ function create_new_user() {
 			carbon_set_user_meta( $_user_id, 'user_phone', $tel );
 			carbon_set_user_meta( $_user_id, 'user_city', $user_confirm_city ?: $user_city );
 			setcookie( "is_fop", '', time() - 3600, '/' );
-			$route = '?email=' . $email;
+			$route              = '?email=' . $email;
+			$args               = array(
+				'ID' => $user_id,
+			);
+			$args['first_name'] = $first_name;
+			$args['last_name']  = $last_name;
+			wp_update_user( $args );
 			if ( $is_fop == 'true' ) {
 				carbon_set_user_meta( $_user_id, 'user_fop', true );
 			}
@@ -1165,6 +1173,15 @@ function create_new_user() {
 				$m = _t( str_replace( '%url%', $link, $m ), 1 );
 			}
 			send_message( $m, $email, 'Успішна реєстрація на сайті ' . get_bloginfo( 'name' ) );
+			$r           = create_zoho_user( array(
+				'first_name' => $first_name,
+				'last_name'  => $last_name,
+				'email'      => $email,
+				'phone'      => $tel,
+				'id'         => $_user_id,
+				'city'       => $user_confirm_city ?: $user_city,
+			) );
+			$res['zoho'] = $r;
 		}
 	} else {
 		$res['msg']  = 'Всі поля обовязкові для заповнення';
@@ -1344,6 +1361,7 @@ function change_user_data() {
 	$email        = $_POST['email'] ?? '';
 	$res          = array();
 	$result       = array();
+	$change_data  = array();
 	if ( $user_id ) {
 		$user          = get_user_by( 'ID', $user_id );
 		$_first_name   = $user->first_name;
@@ -1358,24 +1376,29 @@ function change_user_data() {
 		if ( $_first_name != $first_name ) {
 			$args['first_name'] = $first_name;
 			wp_update_user( $args );
-			$result[] = 'Імя змінено';
+			$result[]                  = 'Імя змінено';
+			$change_data['first_name'] = $first_name;
 		}
 		if ( $last_name != $_last_name ) {
-			$args['last_name'] = $last_name;
+			$change_data['last_name'] = $last_name;
+			$args['last_name']        = $last_name;
 			wp_update_user( $args );
 			$result[] = "Прізвище змінено";
 		}
 		if ( $_user_surname != $user_surname ) {
 			carbon_set_user_meta( $user_id, 'user_surname', $user_surname );
-			$result[] = "По-батькові змінено";
+			$result[]               = "По-батькові змінено";
+			$change_data['surname'] = $user_surname;
 		}
 		if ( $city != $_user_city ) {
 			carbon_set_user_meta( $user_id, 'user_city', $city );
-			$result[] = "Місто змінено";
+			$result[]            = "Місто змінено";
+			$change_data['city'] = $city;
 		}
 		if ( $tel != $_user_phone ) {
 			carbon_set_user_meta( $user_id, 'user_phone', $tel );
-			$result[] = "Телефон змінено";
+			$result[]             = "Телефон змінено";
+			$change_data['phone'] = $tel;
 		}
 		if ( $email && $email != $_user_email ) {
 			if ( email_exists( $email ) ) {
@@ -1384,10 +1407,16 @@ function change_user_data() {
 				$result[]           = 'Email змінений';
 				$args['user_email'] = $email;
 				wp_update_user( $args );
+				$change_data['email'] = $email;
 			}
 		}
 		$res['msg']  = implode( ', ', $result );
 		$res['type'] = 'success';
+		if ( $change_data ) {
+			$change_data['id'] = $user_id;
+			$result            = edit_zoho_user( $change_data );
+			$res['zoho']       = $result;
+		}
 	} else {
 		$res['type'] = 'error';
 		$res['msg']  = 'Авторизуйтесь';
@@ -1531,6 +1560,14 @@ function add_enterprise() {
 				}
 				carbon_set_user_meta( $user_id, 'user_company_gallery', $arr );
 				$res['$arr'] = $arr;
+				$r = edit_zoho_account( array(
+					'name'        => $name,
+					'description' => $text,
+					'region'      => $region,
+					'phone'       => $phone,
+					'user_id'     => $user_id,
+				) );
+				$res['$r'] = $r;
 			} else {
 				$res['type'] = 'error';
 				$res['msg']  = 'Помилка';
@@ -2626,6 +2663,7 @@ function checkout_service() {
 	$products   = $_POST['products'] ?? '';
 	$start_date = $_POST['start_date'] ?? '';
 	$id         = $_POST['id'] ?? '';
+	$zoho_data  = array();
 	if ( $id && get_post( $id ) && $user_id ) {
 		if ( $regions && $products ) {
 			$post_data = array(
@@ -2716,13 +2754,15 @@ function checkout_service() {
 							}
 						}
 					}
+					$zoho_data['Start_Date']   = date( 'Y-m-d', $start_date );
+					$zoho_data['Closing_Date'] = date( 'Y-m-d', $term_end );
 				}
 
 
-				$sum = $service_price * $count_products;
-				$res['service_price'] =$service_price;
-				$res['count_products'] =$count_products;
-				$res['sum'] =$sum;
+				$sum                   = $service_price * $count_products;
+				$res['service_price']  = $service_price;
+				$res['count_products'] = $count_products;
+				$res['sum']            = $sum;
 				carbon_set_post_meta( $_id, 'purchased_sum', $sum );
 				carbon_set_post_meta( $_id, 'purchased_name', get_the_title( $id ) );
 				carbon_set_post_meta( $_id, 'purchased_date', $start_date );
@@ -2734,6 +2774,21 @@ function checkout_service() {
 					$personal_area_page = $personal_area_page[0]['id'];
 					$res['url']         = get_the_permalink( $personal_area_page ) . '?route=advertisement';
 				}
+				$zoho_data['Stage']           = 'Closed Won';
+				$zoho_data['purchased_id']    = $_id;
+				$zoho_data['user_id']         = $user_id;
+				$zoho_data['Date_of_payment'] = date( 'Y-m-d', $start_date );
+				$zoho_data['Amount']          = round( $sum, 2 );
+				$zoho_data['Name_of_service'] = get_the_title( $id );
+				$zoho_data['Deal_Name']       = get_the_title( $id );
+				$zoho_data['Contact_Name']    = array(
+					'id' => carbon_get_user_meta( $user_id, 'zoho_id' )
+				);
+				$zoho_data['Account_Name']    = array(
+					'id' => carbon_get_user_meta( $user_id, 'zoho_account_id' )
+				);
+				$r                            = create_zoho_deal( $zoho_data );
+				$res['$r']                    = $r;
 			} else {
 				$res['msg']  = 'Помилка, спробуйте ще раз! ';
 				$res['type'] = 'error';

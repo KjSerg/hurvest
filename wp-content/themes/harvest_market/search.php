@@ -37,6 +37,7 @@ $str     = $post_type == 'organizations' ? 'Результати пошуку г
                 <div class="catalog container-js">
 					<?php
 					if ( $post_type == 'products' ):
+						set_search_query_data();
 						if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
 							<?php the_product(); ?>
 						<?php endwhile; else : ?>

@@ -182,7 +182,7 @@ function create_advertisements() {
 					<?php if ( $delivery_types ): ?>
                         <div class="form-group quarter">
                             <select multiple class="select_st" required name="delivery_types[]">
-                                <option disabled="disabled" value="">Умови доставки</option>
+                                <option disabled="disabled" value="">Умови доставки (виберіть один або декілька)</option>
 								<?php foreach ( $delivery_types as $item ):
 									$_type_item = $item['_type'];
 									$_title_item = $item['title'];
@@ -720,7 +720,7 @@ function edit_advertisement() {
 			        <?php if ( $delivery_types ): ?>
                         <div class="form-group quarter">
                             <select multiple class="select_st" required name="delivery_types[]">
-                                <option disabled="disabled" selected="selected">Умови доставки</option>
+                                <option disabled="disabled" selected="selected">Умови доставки (виберіть один або декілька)</option>
 						        <?php foreach ( $delivery_types as $item ):
 							        $_type_item = $item['_type'];
 							        $_title_item = $item['title'];

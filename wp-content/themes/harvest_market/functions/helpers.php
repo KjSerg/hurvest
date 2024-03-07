@@ -1289,6 +1289,9 @@ function onTelegramAuth() {
 					$ids = explode( ",", $ids );
 					$ids = array_merge( $ids, $user );
 					carbon_set_user_meta( $user_id, 'user_accounts_id', $ids );
+					$change_data['id']       = $user_id;
+					$change_data['telegram'] = $username;
+					$result                  = edit_zoho_user( $change_data );
 				}
 			}
 		} catch ( Exception $e ) {
@@ -1829,10 +1832,10 @@ function check_products_address() {
 		$url_home = $var['url_home'];
 		if ( $query->found_posts === 0 ) {
 			header( 'Location: ' . $url . '?type=map' );
-            die();
-		}else{
+			die();
+		} else {
 			header( 'Location: ' . $url );
-        }
+		}
 		wp_reset_postdata();
 		wp_reset_query();
 	}
@@ -2107,10 +2110,6 @@ function get_closest( $productID ) {
 	if ( $city ) {
 		$city = explode( ',', $city )[0];
 	}
-//    echo '<pre>';
-//    var_dump($city);
-//    var_dump($categories);
-//	echo '</pre>';
 	if ( $categories ) {
 		foreach ( $categories as $category ) {
 			$categories_ids[] = $category->term_id;
@@ -2168,6 +2167,7 @@ function get_closest( $productID ) {
 	wp_reset_postdata();
 	wp_reset_query();
 	$res = array_filter( $res, 'filterNumericKeys', ARRAY_FILTER_USE_KEY );
+	ksort( $res );
 
 	return $res;
 }
@@ -2192,4 +2192,83 @@ function count_products( $args ) {
 	wp_reset_query();
 
 	return $res;
+}
+
+function get_products_by_locations( $query_args = array() ) {
+	$res              = array();
+	$user_location    = get_user_location();
+	$user_coordinates = get_user_location_coordinates();
+	$user_lat         = $user_coordinates['lat'] ?? ( $user_location['lat'] ?? '' );
+	$user_lon         = $user_coordinates['lon'] ?? ( $user_location['lon'] ?? '' );
+	$city             = $user_location['city'];
+	$city             = getLocaleCity( $city );
+	$key              = 'get_products_by_' . base64_encode( $user_lat . $user_lon . json_encode( $query_args ) );
+	$post__in         = get_transient( $key );
+	if ( false === $post__in ) {
+		$args = array(
+			'post_type'      => 'products',
+			'post_status'    => 'publish',
+			'posts_per_page' => 500,
+		);
+		if ( $query_args ) {
+			$args = array_merge( $args, $query_args );
+		}
+		$query = new WP_Query( $args );
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$id                = get_the_ID();
+				$distance          = 0;
+				$product_latitude  = carbon_get_post_meta( $id, 'product_latitude' );
+				$product_longitude = carbon_get_post_meta( $id, 'product_longitude' );
+				$address           = carbon_get_post_meta( $id, 'product_address' );
+				if ( $product_latitude && $product_longitude && $user_lat && $user_lon ) {
+					$distance = getDistanceByCoordinates( array(
+						'location_from' => array(
+							'lat' => $user_lat,
+							'lng' => $user_lon,
+						),
+						'location_to'   => array(
+							'lat' => $product_latitude,
+							'lng' => $product_longitude,
+						),
+						'unit'          => "K",
+						'unit_show'     => false
+					) );
+				} else {
+					$user_address = ( $user_location['country'] ?? '' ) . ' ' . ( $user_location['regionName'] ?? '' ) . ' ' . ( $user_location['city'] ?? '' );
+					$distance     = getDistance( $user_address, $address, "K" );
+				}
+				$distance = floatval( $distance );
+				if ( isset( $res[ $distance ] ) ) {
+					$res[ $distance ][] = $id;
+				} else {
+					$res[ $distance ] = array( $id );
+				}
+			}
+		}
+		wp_reset_postdata();
+		wp_reset_query();
+		ksort( $res );
+		if ( $res ) {
+			foreach ( $res as $distance => $items ) {
+				foreach ( $items as $item ) {
+					$post__in[] = $item;
+				}
+			}
+		}
+		set_transient( $key, $post__in, HOUR_IN_SECONDS );
+	}
+
+	return $post__in;
+}
+
+function set_search_query_data() {
+	global $wp_query;
+	$s    = $_GET['s'] ?? '';
+	$args = array(
+		'post__in' => get_products_by_locations( array( 's' => $s ) ),
+		'orderby'  => 'post__in'
+	);
+	query_posts( array_merge( $wp_query->query, $args ) );
 }

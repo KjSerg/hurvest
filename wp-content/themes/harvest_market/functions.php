@@ -38,6 +38,7 @@ get_template_part( 'functions/components' );
 get_template_part( 'functions/google-distance' );
 get_template_part( 'functions/ajax-functions' );
 get_template_part( 'functions/components/mails' );
+get_template_part( 'functions/zoho-crm' );
 
 add_action( 'rest_api_init', function () {
 	register_rest_route( 'harvest_market/v1', '/telegram', [
@@ -92,7 +93,6 @@ function telegram_webhook() {
 
 }
 
-
 add_action( 'admin_menu', 'my_custom_menu_page' );
 
 function my_custom_menu_page() {
@@ -116,7 +116,6 @@ function custom_admin_assets() {
 	wp_enqueue_script( 'custom-admin-scripts', get_template_directory_uri() . '/assets/js/admin.js', array( 'jquery' ), null, true );
 
 }
-
 
 function custom_export_page_html() {
 
