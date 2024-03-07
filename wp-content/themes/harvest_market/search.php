@@ -5,7 +5,7 @@ $set       = $var['setting_home'];
 $assets    = $var['assets'];
 $url       = $var['url'];
 $url_home  = $var['url_home'];
-$post_type = $_GET['post_type'] ?? '';
+$post_type = $_GET['post_type'] ?? 'products';
 $s         = $_GET['s'] ?? '';
 if ( ! $s ) {
 	header( 'Location: ' . $url );
@@ -14,25 +14,24 @@ if ( ! $s ) {
 global $wp_query;
 get_header();
 $screens = carbon_get_post_meta( $set, 'screens' );
-$str     = $post_type == 'organizations' ? 'Результати пошуку господарств' : 'Результати пошуку продукції';
 ?>
     <section class="section-catalog">
         <div class="container">
 			<?php the_vip_catalog(); ?>
-            <div class="catalog-group">
-                <div class="title-sm">
-					<?php echo "$str: $s"; ?>
-                </div>
-                <div class="button-wrapper">
+            <form method="get" action="<?php echo $url; ?>" class="catalog-group">
+                <input type="hidden" name="s" value="<?php echo $s; ?>">
+                <div class="title-sm search-title-wrapper">
+                    Результати пошуку
+                    <div class="search-select-wrapper"><select name="post_type" class="select_st trigger-on-change">
+                            <option <?php echo $post_type == 'products' ? 'selected' : ''; ?> value="products">продукції
+                            </option>
+                            <option <?php echo $post_type == 'organizations' ? 'selected' : ''; ?>
+                                    value="organizations">
+                                господарств
+                            </option>
+                        </select></div>
+                    "<?php echo $s; ?>"
 
-                    <a class="btn_st <?php echo $post_type == 'products' ? 'not-active' : ''; ?> "
-                       href="<?php echo $url . '?s=' . $s . '&post_type=products' ?>">
-                        <span>Пошук продукції</span>
-                    </a>
-                    <a class="btn_st 	<?php echo $post_type == 'organizations' ? 'not-active' : ''; ?>"
-                       href="<?php echo $url . '?s=' . $s . '&post_type=organizations' ?>">
-                        <span>Пошук господарств</span>
-                    </a>
                 </div>
                 <div class="catalog container-js">
 					<?php
@@ -63,22 +62,22 @@ $str     = $post_type == 'organizations' ? 'Результати пошуку г
 						);
 						$user_query = new WP_User_Query( $args );
 						$users = $user_query->get_results();
-                        if($users):
-                        foreach ($users as $user){
-                            the_organization($user->ID);
-                        }
-                        else: ?>
+						if ( $users ):
+							foreach ( $users as $user ) {
+								the_organization( $user->ID );
+							}
+						else: ?>
                             <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
                                 Не знайдено!
                             </div>
-					<?php endif; ?>
+						<?php endif; ?>
 					<?php endif; ?>
                 </div>
 
                 <div class="btn_center pagination-js">
 					<?php echo _get_more_link( $wp_query->max_num_pages ); ?>
                 </div>
-            </div>
+            </form>
 
         </div>
     </section>
