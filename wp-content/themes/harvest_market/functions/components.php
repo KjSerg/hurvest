@@ -359,7 +359,7 @@ function the_filter_categories( $categories ) {
 
 function the_seller_review( $id = false ) {
 	$id            = $id ?: get_the_ID();
-	$review_rating = carbon_get_post_meta( $id, 'review_rating' ) ?: 5;
+	$review_rating = carbon_get_post_meta( $id, 'review_rating' ) ?: 10;
 	$_email        = carbon_get_post_meta( $id, 'review_author_email' );
 	$_user_id      = carbon_get_post_meta( $id, 'review_user_id' );
 	$author_id     = get_post_field( 'post_author', $id );
@@ -386,7 +386,7 @@ function the_seller_review( $id = false ) {
 						<?php echo $title ?: ( $first_name . ' ' . $last_name ); ?>
                     </div>
                     <ul class="rating">
-						<?php for ( $a = 1; $a <= 5; $a ++ ): ?>
+						<?php for ( $a = 1; $a <= 10; $a ++ ): ?>
                             <li class="<?php echo $a <= $review_rating ? 'active' : ''; ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                      style="enable-background:new 0 0 12 11.2"
@@ -729,45 +729,16 @@ function the_user_testimonials( $author_id ) {
                         <div class="feedback-rating">
                             <div class="feedback-rating__text"> Оцініть товар:</div>
                             <div class="rating">
-                                <label class="rating-item"><input type="radio" name="rating"
-                                                                  value="1"/>
-                                    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                         style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
+								<?php for ( $a = 1; $a <= 10; $a ++ ): ?>
+                                    <label class="rating-item">
+                                        <input type="radio" name="rating"  value="<?php echo $a ?>"/>
+                                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                             style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
                                                     <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
                                                           style="fill:#ffc327"/>
                                                 </svg>
-                                </label>
-                                <label class="rating-item">
-                                    <input type="radio" name="rating" value="2"/>
-                                    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                         style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                </label>
-                                <label class="rating-item">
-                                    <input type="radio" name="rating" value="3"/>
-                                    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                         style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                </label>
-                                <label class="rating-item">
-                                    <input type="radio" name="rating" value="4"/>
-                                    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                         style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                </label>
-                                <label class="rating-item"><input type="radio" name="rating" value="5"/>
-                                    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                         style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                </label>
+                                    </label>
+								<?php endfor; ?>
                             </div>
                         </div>
                     </div>
