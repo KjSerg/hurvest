@@ -39,6 +39,7 @@ get_template_part( 'functions/google-distance' );
 get_template_part( 'functions/ajax-functions' );
 get_template_part( 'functions/components/mails' );
 get_template_part( 'functions/zoho-crm' );
+get_template_part( 'functions/nova-post-api' );
 
 add_action( 'rest_api_init', function () {
 	register_rest_route( 'harvest_market/v1', '/telegram', [

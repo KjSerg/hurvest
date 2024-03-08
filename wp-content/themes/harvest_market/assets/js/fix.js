@@ -13,6 +13,7 @@ var storage = {};
 var labelIndex = 0;
 var uploadingFiles = 0;
 var prices = {};
+var ref = '';
 
 $doc.ready(function () {
     setCorrespondenceID();
@@ -589,15 +590,18 @@ $doc.ready(function () {
             var $ths = $(this);
             var $label = $ths.closest('.form-group');
             var val = $ths.val();
+            console.log(val);
             if (Array.isArray(val) && val.length === 0) {
+                console.log(1);
                 test = false;
                 $label.addClass('error');
             } else {
+                console.log(2);
                 $label.removeClass('error');
                 if (val === null || val === undefined) {
+                    console.log(3);
                     test = false;
                     $label.addClass('error');
-                    console.log($ths);
                 }
             }
         });
@@ -1624,8 +1628,6 @@ $doc.ready(function () {
             $b.toggleClass('open_aside');
         }
     });
-    showElements();
-    showingContent();
     $('.farming-gal__item').fancybox({
         autoFocus: false,
         clickOutside: true,
@@ -1703,7 +1705,99 @@ $doc.ready(function () {
     });
     initPromoPackages();
     showDialogModal();
+    initNovaPostAutocomplete();
+    showElements();
+    showingContent();
+    $doc.on('input', '.np-autocomplete__search-input', initNovaPostAutocomplete);
+    $doc.on('focus', '.np-autocomplete__search-input', function () {
+        var $result = $doc.find('.np-autocomplete__result');
+        if ($result.find('li').length > 0) {
+            $result.removeClass('hidden');
+        }
+    });
+    $doc.mouseup(function (e) {
+        var $result = $doc.find('.np-autocomplete__result');
+        var div = $(".np-autocomplete__container");
+        if (!div.is(e.target)
+            && div.has(e.target).length === 0) {
+            $result.addClass('hidden');
+        }
+    });
+    $doc.on('click', '.np-autocomplete__result li', function (e) {
+        e.preventDefault();
+        var $result = $doc.find('.np-autocomplete__result');
+        var $t = $(this);
+        var $input = $doc.find('.np-autocomplete__search-input');
+        var value = $t.attr('data-value');
+        $input.val(value);
+        ref = $t.attr('data-ref') || '';
+        $result.addClass('hidden');
+        setPostOffices();
+    })
 });
+
+function setPostOffices() {
+    showPreloader();
+    var $result = $doc.find('.np-autocomplete__result');
+    var $select = $doc.find('.nova-post-office');
+    $.ajax({
+        type: 'POST',
+        url: admin_ajax,
+        data: {
+            action: 'get_np_offices',
+            ref: ref
+        }
+    }).done(function (r) {
+        if (r) {
+            $select.selectric('destroy')
+            $select.html(r);
+            $select.selectric('init');
+        }
+        hidePreloader();
+    });
+}
+
+function initNovaPostAutocomplete() {
+    var $input = $doc.find('.np-autocomplete__search-input');
+    if ($input.length === 0) return;
+    var $result = $doc.find('.np-autocomplete__result');
+    var val = $input.val();
+    if (val.trim().length > 2) {
+        getNovaPostCities(val);
+    } else {
+        $result.addClass('hidden');
+    }
+}
+
+function getNovaPostCities(val) {
+    showPreloader();
+    var $result = $doc.find('.np-autocomplete__result');
+    $.ajax({
+        type: 'POST',
+        url: admin_ajax,
+        data: {
+            action: 'get_np_cities',
+            val: val
+        }
+    }).done(function (r) {
+        if (r) {
+            $result.html(r);
+            $result.removeClass('hidden');
+        } else {
+            $result.addClass('hidden');
+        }
+        hidePreloader();
+        if ($result.find('li').length > 0) {
+            $result.removeClass('hidden');
+            if ($result.find('li').length === 1) {
+                $result.find('li').eq(0).trigger('click');
+            }
+        } else {
+            $result.addClass('hidden');
+        }
+    });
+}
+
 
 function showDialogModal() {
     if ($doc.find('#dialog-after-pay').length === 0) return;
@@ -2366,7 +2460,7 @@ function triggeredOnSelect($select) {
         $doc.find('.trigger-element').addClass('hidden');
         $doc.find('.trigger-element').find('input, select, textarea').removeAttr('required');
         $doc.find(trigger).removeClass('hidden');
-        $doc.find(trigger).find('input, select, textarea').attr('required', 'required');
+        $doc.find(trigger).find('input, select, textarea').not('.selectric-input').attr('required', 'required');
     }
 }
 

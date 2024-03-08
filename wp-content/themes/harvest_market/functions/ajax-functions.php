@@ -849,7 +849,7 @@ function new_order() {
 	$qnts            = $_POST['qnt'] ?? '';
 	$delivery_method = $_POST['delivery_method'] ?? '';
 	$address         = $_POST['address'] ?? '';
-	$post_office     = $_POST['post_office'] ?? '';
+	$post_office     = $_POST['nova_post_office'] ?? ( $_POST['post_office'] ?? '' );
 	$payment_method  = $_POST['payment_method'] ?? '';
 	$coupon          = $promo;
 	$order_seller_id = $_POST['order_seller_id'] ?? '';
@@ -2757,7 +2757,47 @@ function checkout_service() {
 	die();
 }
 
+add_action( 'wp_ajax_nopriv_get_np_cities', 'get_np_cities' );
+add_action( 'wp_ajax_get_np_cities', 'get_np_cities' );
+function get_np_cities() {
+	$val    = $_POST['val'] ?? '';
+	$cities = get_nova_post_cities( $val );
+	if ( $cities ) {
+		$cities = $cities['data'];
+		foreach ( $cities as $city ) {
+			$Description               = $city['Description'];
+			$DescriptionRu             = $city['DescriptionRu'];
+			$SettlementTypeDescription = $city['SettlementTypeDescription'];
+			$Ref                       = $city['Ref'];
+			echo "<li data-ref='$Ref' data-value='$Description'>$Description [$SettlementTypeDescription]</li>";
+		}
+	}
+	die();
+}
 
+add_action( 'wp_ajax_nopriv_get_np_offices', 'get_np_offices' );
+add_action( 'wp_ajax_get_np_offices', 'get_np_offices' );
+function get_np_offices() {
+	$ref     = $_POST['ref'] ?? '';
+	$offices = get_nova_post_offices( $ref );
+	if ( $offices ) {
+		$offices = $offices['data'];
+		echo '<option value="" disabled>Відділення*</option>';
+		foreach ( $offices as $office ) {
+			$Description           = $office['Description'];
+			$DescriptionRu         = $office['DescriptionRu'];
+			$TotalMaxWeightAllowed = $office['TotalMaxWeightAllowed'];
+			$string                = $Description;
+			if ( $TotalMaxWeightAllowed && $TotalMaxWeightAllowed > 0 ) {
+				$string .= " [Вага: $TotalMaxWeightAllowed кг]";
+			}
+			echo "<option value='$Description'>$string</option>";
+		}
+	} else {
+		echo '<option value="" selected disabled>Відділення відсутні</option>';
+	}
+	die();
+}
 
 function get_service_price( $id, $regions ) {
 	$res            = 0;

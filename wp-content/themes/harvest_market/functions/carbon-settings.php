@@ -42,6 +42,7 @@ function crb_attach_theme_options() {
 			              Field::make( "text", "text", "Текст повідомлення" ),
 		              ) )
 		              ->add_fields( 'delivery_service', 'Служба доставки', array(
+			              Field::make( "checkbox", "is_nova_post", "Підключити поштові відділення НОВОЇ ПОШТИ" ),
 			              Field::make( "text", "title", "Заголовок" )->set_required( true ),
 			              Field::make( "checkbox", "is_error", "Повідомлення помилки" ),
 			              Field::make( "text", "text", "Текст повідомлення" ),
@@ -164,6 +165,13 @@ function crb_attach_theme_options() {
 		         Field::make( "text", "portmone_login" )->set_required( true ),
 		         Field::make( "text", "portmone_password" )->set_required( true ),
 		         Field::make( "hidden", "portmone_debag", '' )
+	         ) );
+
+	Container::make( 'theme_options', "Настройка NovaPoshtaAPI" )
+	         ->set_page_parent( 'options-general.php' )
+	         ->add_fields( array(
+		         Field::make( "text", "novaposhta_api_key", "API-ключ Нової пошти" ),
+		         Field::make( "text", "novaposhta_api_end_point", "Шлюз запитів" )->set_required( true )->set_attribute( 'type', 'url' ),
 	         ) );
 }
 

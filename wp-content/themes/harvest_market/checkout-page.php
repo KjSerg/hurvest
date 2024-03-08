@@ -60,7 +60,7 @@ $first_name = $user_id ? $user->first_name : '';
 $last_name  = $user_id ? $user->last_name : '';
 $user_email = $user_id ? $user->user_email : '';
 $phone      = $user_id ? carbon_get_user_meta( $user_id, 'user_phone' ) : '';
-$user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_company_city' ) : '';
+$user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
 ?>
 
     <section class="section-order pad_section_sm_top pad_section_bot">
@@ -109,12 +109,12 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_company_city' ) :
                                         <input class="input_st" type="text" name="surname" placeholder="По батькові*"
                                                required="required"/>
                                     </div>
-                                    <div class="form-group half">
-                                        <input class="input_st" type="text"
-
-                                               value="<?php echo $user_city; ?>"
+                                    <div class="form-group half np-autocomplete__container">
+                                        <input class="input_st np-autocomplete__search-input" type="text"
+                                               value="<?php echo $user_city; ?>" autocomplete="off"
                                                name="city" placeholder="Місто*"
                                                required="required"/>
+                                        <ul class="hidden np-autocomplete__result"></ul>
                                     </div>
                                     <div class="form-group half">
                                         <input class="input_st" type="tel" name="tel"
@@ -139,9 +139,10 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_company_city' ) :
 													$_delivery_method = get_delivery_method_by_value( $delivery_method, $types );
 													$_type_item = $_delivery_method['_type'];
 													$_title_item = $_delivery_method['title'];
+													$_is_nova_post = $_delivery_method['is_nova_post'];
 													?>
                                                     <option
-                                                            data-trigger=".delivery-method-<?php echo $_type_item; ?>"
+                                                            data-trigger=".delivery-method-<?php echo $_type_item . ( $_is_nova_post ? '-np' : '' ); ?>"
                                                             value="<?php echo $delivery_method; ?>">
 														<?php echo $_title_item; ?>
                                                     </option>
@@ -155,6 +156,11 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_company_city' ) :
                                         <div class="form-group half trigger-element hidden delivery-method-delivery_service">
                                             <input class="input_st" type="text" name="post_office"
                                                    placeholder="Відділення*"/>
+                                        </div>
+                                        <div class="form-group half trigger-element hidden delivery-method-delivery_service-np">
+                                            <select name="nova_post_office" class="nova-post-office">
+                                                <option value="" selected disabled>Відділення*</option>
+                                            </select>
                                         </div>
                                     </div>
 									<?php foreach ( $_delivery_methods as $delivery_method ):

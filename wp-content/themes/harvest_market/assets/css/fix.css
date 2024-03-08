@@ -86,7 +86,7 @@ span.wpcf7-list-item {
     z-index: 20;
 }
 
-.fancybox-content .fancybox-button--close{
+.fancybox-content .fancybox-button--close {
     position: absolute;
     left: auto;
     right: 0;
@@ -474,6 +474,7 @@ main.content.showing {
 
     cursor: no-drop;
 }
+
 .selected-country .selectric-scroll li:not(.selected) {
     pointer-events: none;
     opacity: 0.8;
@@ -500,6 +501,7 @@ main.content.showing {
     padding: 0 4rem;
     justify-content: flex-end;
 }
+
 .iw-wrap {
     position: relative;
     /*-webkit-border-radius: 4rem;*/
@@ -516,20 +518,22 @@ main.content.showing {
     margin-left: 1rem;
     margin-top: 0;
 }
+
 .iw-product-subtitle {
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
 }
 
-.product-item__title .reviews-count{
+.product-item__title .reviews-count {
     font-size: 1.4rem;
     font-weight: normal;
     flex-grow: 0;
     flex-shrink: 0;
     margin-left: 1rem;
 }
-.product-item__organization{
+
+.product-item__organization {
     font-weight: 500;
     margin-top: 1rem;
 }
@@ -560,6 +564,43 @@ main.content.showing {
     align-items: start;
 }
 
+.np-autocomplete__container {
+    position: relative;
+}
+
+.np-autocomplete__result {
+    position: absolute;
+    max-height: 200px;
+    z-index: 1;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    border: 1px solid #E1E1E1;
+    -webkit-border-radius: 2rem;
+    border-radius: 2rem;
+    overflow: auto;
+    padding: 8px;
+    box-shadow: 0 4px 15px 0 rgba(152, 115, 72, .15);
+    background: #fff;
+    -webkit-box-shadow: 0 4px 15px 0 rgba(152, 115, 72, .15);
+}
+
+
+.np-autocomplete__result li {
+    display: block;
+    font-size: 1.4rem;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    color: #444;
+    background: rgba(77, 118, 255, .06) !important;
+    font-weight: 400;
+    -webkit-border-radius: 1.5rem;
+    border-radius: 1.5rem;
+}
+.np-autocomplete__result li:hover {
+    color: #4D76FF;
+}
+
 @media (max-width: 460px) {
     .header-search-form {
         width: 3.9rem;
@@ -569,7 +610,8 @@ main.content.showing {
     .header-search-form.active .header-search-input {
         width: 30rem;
     }
-    .rating .rating-item{
+
+    .rating .rating-item {
         margin-right: 1rem;
         width: 1.8rem;
         height: 1.8rem;
@@ -583,10 +625,11 @@ main.content.showing {
 }
 
 @media (max-width: 660px) {
-    .iw-product-media .product-item__favorite{
+    .iw-product-media .product-item__favorite {
         top: 3rem;
     }
 }
+
 @media (max-width: 767px) {
     .cabinet-item__photo-item.cover-photo {
         height: 250px;
