@@ -72,8 +72,13 @@ $user_post   = carbon_get_user_meta( $author_id, 'user_post' );
 if ( $user_post && get_post( $user_post ) ) {
 	$author_link = get_the_permalink( $user_post );
 }
+$_order               = $_GET['order'] ?? '';
+$_orderby             = $_GET['orderby'] ?? '';
+$pagenum              = $_GET['pagenum'] ?? 1;
+$is_logged            = is_user_logged_in();
+$current_author_id    = $author_id ?: $wp_query->get_queried_object()->ID;
+$user_id              = $current_author_id;
 ?>
-
     <section class="section-product pad_section_bot">
         <div class="container">
             <ul class="breadcrumbs">
@@ -151,7 +156,9 @@ if ( $user_post && get_post( $user_post ) ) {
                             </div>
 						<?php endif; ?>
 					<?php endif; ?>
-					<?php echo comments_template(); ?>
+
+                    <?php the_user_testimonials($author_id); ?>
+
                 </div>
                 <div class="product-group__right">
                     <div class="cabinet-item card-main">
@@ -323,6 +330,9 @@ if ( $user_post && get_post( $user_post ) ) {
             </div>
         </div>
     </section>
+
+
+
 <?php
 $args  = array(
 	'post_type'      => 'products',
@@ -388,8 +398,6 @@ if ( $closest ) :
         </div>
     </section>
 <?php endif; ?>
-
-
 <?php
 if ( $products ):
 	$args = array(

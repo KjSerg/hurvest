@@ -12,6 +12,7 @@ $body_class         = $_COOKIE['body_class'] ?? '';
 $personal_area_page = carbon_get_theme_option( 'personal_area_page' );
 $login_page         = carbon_get_theme_option( 'login_page' );
 $is_personal_area   = $personal_area_page && ( (int) $personal_area_page[0]['id'] == $id );
+get_portmone_post_data();
 onTelegramAuth();
 ?><!DOCTYPE html>
 <html class="no-js  page" <?php language_attributes(); ?>>

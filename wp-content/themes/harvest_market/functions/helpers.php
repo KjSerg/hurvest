@@ -2280,3 +2280,260 @@ function get_product_labels_html( $id ) {
 
 	return $html;
 }
+
+function get_portmone_post_data() {
+	$p = $_POST;
+	if ( $p ) {
+		$personal_area_page = carbon_get_theme_option( 'personal_area_page' );
+		$shop_order_number  = $p['SHOPORDERNUMBER'] ?? '';
+		$SHOPBILLID         = $p['SHOPBILLID'] ?? '';
+		$BILL_AMOUNT        = $p['BILL_AMOUNT'] ?? '';
+		$RECEIPT_URL        = $p['RECEIPT_URL'] ?? '';
+		$ERRORIPSMESSAGE    = $p['ERRORIPSMESSAGE'] ?? '';
+		$hash_service       = $_GET['hash_service'] ?? '';
+		$user               = $_GET['user'] ?? '';
+		$order_ID           = base64_decode( $hash_service );
+		$redirect           = '';
+		if ( $personal_area_page ) {
+			$personal_area_page = $personal_area_page[0]['id'];
+			$redirect           = get_the_permalink( $personal_area_page ) . '?route=advertisement';
+		}
+		if ( $shop_order_number && get_post( $shop_order_number ) ) {
+			$portmone_url      = carbon_get_theme_option( 'portmone_url' );
+			$portmone_payee_id = carbon_get_theme_option( 'portmone_payee_id' );
+			$portmone_login    = carbon_get_theme_option( 'portmone_login' );
+			$portmone_password = carbon_get_theme_option( 'portmone_password' );
+			carbon_set_post_meta( $shop_order_number, 'portmone_id', $SHOPBILLID );
+			carbon_set_post_meta( $shop_order_number, 'portmone_sum', $BILL_AMOUNT );
+			carbon_set_post_meta( $shop_order_number, 'portmone_receipt_url', $RECEIPT_URL );
+			carbon_set_post_meta( $shop_order_number, 'portmone_erroripsmessage', $ERRORIPSMESSAGE );
+			$json_data = array(
+				'method' => 'result',
+				"params" => array(
+					'data' => array(
+						"login"           => $portmone_login,
+						"password"        => $portmone_password,
+						"payeeId"         => $portmone_payee_id,
+						"shopOrderNumber" => $order_ID,
+						"shopbillId"      => $SHOPBILLID,
+					)
+				)
+			);
+			$res       = send_request( $portmone_url, $json_data );
+			$user_id   = get_post_field( 'post_author', $order_ID );
+			if ( $res ) {
+				$res         = $res[0];
+				$status      = $res['status'] ?? '';
+				$description = $res['description'] ?? '';
+				if ( $status === 'PAYED' ) {
+					carbon_set_post_meta( $order_ID, 'purchased_status', 'payed' );
+					create_payment( array(
+						'description' => $description,
+						'user_id'     => $user_id,
+						'sum'         => $BILL_AMOUNT,
+						'order_id'    => $shop_order_number,
+					) );
+					execute_package( $shop_order_number, $BILL_AMOUNT );
+				}
+				if ( $redirect ) {
+					$redirect .= '&purchased_id=' . $order_ID;
+					header( 'Location: ' . $redirect );
+					die();
+				}
+			}
+
+		}
+	}
+}
+
+function execute_package( $id, $sum = 0 ) {
+	$id                   = (int) $id;
+	$time                 = time();
+	$start_date           = carbon_get_post_meta( $id, 'purchased_date' ) ?: $time;
+	$products             = carbon_get_post_meta( $id, 'purchased_product_ids' ) ?: '';
+	$regions              = carbon_get_post_meta( $id, 'purchased_regions' ) ?: '';
+	$purchased_service_id = carbon_get_post_meta( $id, 'purchased_service_id' );
+	$user_id              = get_post_field( 'post_author', $id );
+	$zoho_data            = array();
+	if ( $purchased_service_id && get_post( $purchased_service_id ) ) {
+		$products     = explode( ',', $products );
+		$regions      = explode( ',', $regions );
+		$term         = carbon_get_post_meta( $purchased_service_id, 'service_term' ) ?: 1;
+		$is_urgently  = carbon_get_post_meta( $purchased_service_id, 'service_urgently' );
+		$service_date = carbon_get_post_meta( $purchased_service_id, 'service_date' );
+		$count_up     = carbon_get_post_meta( $purchased_service_id, 'service_up' ) ?: 0;
+		if ( $service_date && $start_date ) {
+			$term_number = $term * 86400;
+			$term_end    = $start_date + $term_number;
+			if ( $products ) {
+				$count_up = $count_up - 1;
+				foreach ( $products as $product ) {
+					$product_id = (int) $product;
+					if ( $product && get_post( $product_id ) ) {
+						carbon_set_post_meta( $product_id, 'product_is_top', 'top' );
+						carbon_set_post_meta( $product_id, 'product_start_top', $start_date );
+						carbon_set_post_meta( $product_id, 'product_end_top', $term_end );
+						if ( $regions ) {
+							wp_set_post_terms( $product_id, [], 'regions', false );
+							if ( in_array( 'country', $regions ) ) {
+								$_regions      = array();
+								$regions_terms = get_terms( array(
+									'hide_empty' => false,
+									'taxonomy'   => 'regions',
+								) );
+								if ( $regions_terms ) {
+									foreach ( $regions_terms as $region ) {
+										$_regions[] = $region->term_id;
+									}
+									wp_set_post_terms( $product_id, $_regions, 'regions', true );
+								}
+							} else {
+								$_regions = array();
+								foreach ( $regions as $place ) {
+									if ( get_term_by( 'id', (int) $place, 'regions' ) ) {
+										$_regions[] = (int) $place;
+									}
+								}
+								wp_set_post_terms( $product_id, $_regions, 'regions', true );
+							}
+						}
+						if ( $count_up > 0 ) {
+							$current_datetime = current_time( 'mysql', false );
+							$update_post_data = array(
+								'ID'            => $product_id,
+								'post_date'     => $current_datetime,
+								'post_date_gmt' => get_gmt_from_date( $current_datetime ),
+							);
+							wp_update_post( $update_post_data );
+						}
+						if ( $is_urgently ) {
+							carbon_set_post_meta( $product_id, 'product_is_urgently', 'urgently' );
+							carbon_set_post_meta( $product_id, 'product_start_urgently', $start_date );
+							carbon_set_post_meta( $product_id, 'product_end_urgently', $term_end );
+						}
+					}
+				}
+				if ( $count_up > 0 ) {
+					carbon_set_post_meta( $id, 'purchased_up_qnt', $count_up );
+					$next_event_time = $start_date + ( ( $term / $count_up ) * 86400 );
+					$hook            = 'products_boost_hook';
+					$args            = array( $id );
+					if ( ! wp_next_scheduled( $hook, $args ) ) {
+						wp_schedule_single_event( $next_event_time, $hook, $args );
+					}
+				}
+			}
+			$zoho_data['Start_Date']      = date( 'Y-m-d', $start_date );
+			$zoho_data['Closing_Date']    = date( 'Y-m-d', $term_end );
+			$zoho_data['Stage']           = 'Closed Won';
+			$zoho_data['purchased_id']    = $id;
+			$zoho_data['user_id']         = $user_id;
+			$zoho_data['Date_of_payment'] = date( 'Y-m-d', $start_date );
+			$zoho_data['Amount']          = round( $sum, 2 );
+			$zoho_data['Name_of_service'] = get_the_title( $id );
+			$zoho_data['Deal_Name']       = get_the_title( $id );
+			$zoho_data['Contact_Name']    = array(
+				'id' => carbon_get_user_meta( $user_id, 'zoho_id' )
+			);
+			$zoho_data['Account_Name']    = array(
+				'id' => carbon_get_user_meta( $user_id, 'zoho_account_id' )
+			);
+			$r                            = create_zoho_deal( $zoho_data );
+		}
+	}
+}
+
+add_action( 'products_boost_hook', 'products_boost_action', 10, 1 );
+function products_boost_action( $order_id ) {
+	if ( $order_id && get_post( $order_id ) ) {
+		$time             = time();
+		$purchased_up_qnt = carbon_get_post_meta( $order_id, 'purchased_up_qnt' ) ?: 0;
+		$service_id       = carbon_get_post_meta( $order_id, 'purchased_service_id' ) ?: 0;
+		$term             = carbon_get_post_meta( $service_id, 'service_term' ) ?: 1;
+		$start_date       = carbon_get_post_meta( $order_id, 'purchased_date' );
+		$term_number      = $term * 86400;
+		$term_end         = $start_date + $term_number;
+		$count_up         = $purchased_up_qnt;
+		if ( $count_up > 0 ) {
+			$purchased_product_ids = carbon_get_post_meta( $order_id, 'purchased_product_ids' );
+			if ( $purchased_product_ids ) {
+				$purchased_product_ids = explode( ',', $purchased_product_ids );
+				if ( $purchased_product_ids ) {
+					foreach ( $purchased_product_ids as $product_id ) {
+						$product_id = (int) $product_id;
+						if ( $product_id && get_post( $product_id ) ) {
+							if ( $count_up > 0 ) {
+								$current_datetime = current_time( 'mysql', false );
+								$update_post_data = array(
+									'ID'            => $product_id,
+									'post_date'     => $current_datetime,
+									'post_date_gmt' => get_gmt_from_date( $current_datetime ),
+								);
+								wp_update_post( $update_post_data );
+								$count_up = $count_up - 1;
+								carbon_set_post_meta( $order_id, 'purchased_up_qnt', $count_up );
+							}
+						}
+					}
+				}
+			}
+		}
+		if ( $count_up > 0 ) {
+			$last_time       = $term_end - $time;
+			$last_days       = $last_time / 86400;
+			$next_event_time = $time + ( ( $last_days / $count_up ) * 86400 );
+			$hook            = 'products_boost_hook';
+			$args            = array( $order_id );
+			if ( ! wp_next_scheduled( $hook, $args ) ) {
+				wp_schedule_single_event( $next_event_time, $hook, $args );
+			}
+		}
+	}
+}
+
+function create_payment( $data ) {
+	$post_data = array(
+		'post_type'   => 'payment',
+		'post_title'  => $data['description'],
+		'post_status' => 'publish',
+		'post_author' => $data['user_id'],
+	);
+	$_id       = wp_insert_post( $post_data );
+	if ( $post = get_post( $_id ) ) {
+		carbon_set_post_meta( $_id, 'payment_sum', $data['sum'] );
+		carbon_set_post_meta( $_id, 'payment_order', $data['order_id'] );
+
+		return $post;
+	}
+
+	return false;
+}
+
+function send_request( $url, $args = array(), $request_type = 'POST' ) {
+
+	if ( $curl = curl_init() ) {
+		$h = array();
+		if ( $args ) {
+			$h[] = 'Content-Type: application/json; charset=utf-8';
+		}
+		curl_setopt( $curl, CURLOPT_URL, $url );
+		curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, true );
+		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false );
+		curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $request_type );
+		if ( $args ) {
+			if ( is_array( $args ) ) {
+				$args = json_encode( $args );
+			}
+			curl_setopt( $curl, CURLOPT_POSTFIELDS, $args );
+		}
+		curl_setopt( $curl, CURLOPT_HTTPHEADER, $h );
+		$out  = curl_exec( $curl );
+		$json = json_decode( $out, true );
+		curl_close( $curl );
+
+		return $json;
+	} else {
+		throw new HttpException( 'Can not create connection to ' . $url . ' with args ' . $args, 404 );
+	}
+}

@@ -113,7 +113,7 @@ $attr                 = $user_company_color ? "style='background-color:$user_com
                                                 </div>
                                             </div>
 										<?php endif; ?>
-										<?php if ( $author_id  == $current_user_id ): ?>
+										<?php if ( $author_id == $current_user_id ): ?>
                                             <div class="farming-info__list-item">
                                                 <div class="farming-info__list-item-title">Колір фону сторінки:</div>
                                                 <div class="farming-info__list-item-main">
@@ -234,130 +234,7 @@ $attr                 = $user_company_color ? "style='background-color:$user_com
 
     <section class="seller-reviews-section pad_top_40" id="reviews-section" <?php echo $attr; ?>>
         <div class="container">
-            <div class="user-testimonials">
-                <div class="product-testimonials__top">
-                    <div class="product-testimonials__top-item">
-                        <img src="<?php echo $assets; ?>img/star-gold.svg" alt=""/><?php echo $seller_rating ?>
-                    </div>
-                    <div class="product-testimonials__top-item">
-						<?php echo $seller_count_review; ?> відгуків
-                    </div>
-                </div>
-                <div class="testimonials container-js">
-					<?php
-					$args  = array(
-						'post_type'   => 'reviews',
-						'post_status' => 'publish',
-						'paged'       => $pagenum,
-						'meta_key'    => '_review_seller_id',
-						'meta_value'  => $user_id
-					);
-					$query = new WP_Query( $args );
-					if ( $query->have_posts() ):
-						while ( $query->have_posts() ) :
-							$query->the_post();
-							the_seller_review();
-						endwhile;
-						wp_reset_postdata();
-						wp_reset_query();
-						?>
-					<?php else: ?>
-                        <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
-							<?php echo $is_logged ? 'Залиште відгук першим!' : 'Відгуки відсутні!'; ?>
-                        </div>
-					<?php endif; ?>
-                </div>
-                <div class="testimonials-pagination pagination-js">
-					<?php echo _get_more_reviews_link( $query->max_num_pages, $author_id ); ?>
-                </div>
-                <div class="cabinet-item">
-                    <div class="cabinet-item__title">Залишити відгук</div>
-                    <form class="form-js seller-comment-form" id="seller-comment-form" method="post" novalidate>
-                        <input type="hidden" name="action" value="new_seller_review">
-                        <input type="hidden" name="seller_id" value="<?php echo $current_author_id; ?>">
-                        <div class="form-horizontal">
-                            <div class="form-group half">
-                                <input class="input_st"
-                                       type="text"
-                                       name="name"
-                                       placeholder="Ім'я" required="required"/>
-                            </div>
-                            <div class="form-group half">
-                                <input class="input_st"
-                                       type="email"
-                                       name="email"
-                                       data-reg="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])"
-                                       placeholder="E-mail" required="required"/>
-                            </div>
-                            <div class="form-group">
-                                <div class="feedback-rating">
-                                    <div class="feedback-rating__text"> Оцініть товар:</div>
-                                    <div class="rating">
-                                        <label class="rating-item"><input type="radio" name="rating"
-                                                                          value="1"/>
-                                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                                 style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                        </label>
-                                        <label class="rating-item">
-                                            <input type="radio" name="rating" value="2"/>
-                                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                                 style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                        </label>
-                                        <label class="rating-item">
-                                            <input type="radio" name="rating" value="3"/>
-                                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                                 style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                        </label>
-                                        <label class="rating-item">
-                                            <input type="radio" name="rating" value="4"/>
-                                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                                 style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                        </label>
-                                        <label class="rating-item"><input type="radio" name="rating" value="5"/>
-                                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                                 style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                          style="fill:#ffc327"/>
-                                                </svg>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <textarea class="input_st" name="text"
-                                          placeholder="Ваш коментар"
-                                          required="required"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-bot">
-                            <div class="form-consent">
-                                <label>
-                                    <input class="check_st" name="consent" type="checkbox"/><span></span>
-                                </label>
-                                <div class="form-consent__text">
-                                    Даю згоду на обробку персональних даних та погоджуюся з <a href="#">політикою
-                                        конфіденційності </a>
-                                </div>
-                            </div>
-                            <button class="btn_st" type="submit">
-                                <span> Відправити відгук </span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+			<?php the_user_testimonials( $user_id ); ?>
         </div>
     </section>
 

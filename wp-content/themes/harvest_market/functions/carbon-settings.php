@@ -155,6 +155,16 @@ function crb_attach_theme_options() {
 		         Field::make( 'text', 'zoho_client_id' ),
 		         Field::make( 'text', 'zoho_client_secret' ),
 	         ) );
+
+	Container::make( 'theme_options', "Настройка Portmone" )
+	         ->set_page_parent( 'options-general.php' )
+	         ->add_fields( array(
+		         Field::make( "text", "portmone_url", "Платіжний шлюз" )->set_required( true )->set_attribute( 'type', 'url' ),
+		         Field::make( "text", "portmone_payee_id" )->set_required( true ),
+		         Field::make( "text", "portmone_login" )->set_required( true ),
+		         Field::make( "text", "portmone_password" )->set_required( true ),
+		         Field::make( "hidden", "portmone_debag", '' )
+	         ) );
 }
 
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_front_page' );
@@ -719,7 +729,8 @@ function crb_attach_in_payment() {
 	         ->show_on_post_type( 'payment' )
 	         ->add_fields( array(
 		         Field::make( "text", "payment_sum", "Сума" )
-		              ->set_attribute( 'type', 'number' )
+		              ->set_attribute( 'type', 'number' ),
+		         Field::make( "text", "payment_order", "ID замовлення" )
 	         ) );
 }
 
@@ -746,10 +757,9 @@ function crb_attach_in_reviews() {
 			         Field::make( "text", "review_seller_id", "ID продавця" ),
 			         Field::make( "text", "review_user_id", "ID користувача" ),
 			         Field::make( "text", "review_rating", "Оцінка" )
-			              ->set_required( true )
 			              ->set_attribute( 'type', 'number' )
 			              ->set_attribute( 'min', '1' )
-			              ->set_attribute( 'max', '5' )
+			              ->set_attribute( 'max', '10' )
 			              ->set_attribute( 'step', '1' ),
 			         Field::make( "text", "review_author_email", "Email" ),
 		         )
@@ -856,6 +866,10 @@ function crb_attach_in_purchased() {
 	Container::make( 'post_meta', 'Інформація' )
 	         ->show_on_post_type( 'purchased' )
 	         ->add_fields( array(
+		         Field::make( "select", "purchased_status", "Статус оплати" )->set_options( array(
+			         'not_pay' => "Не оплачено",
+			         'payed'   => "Оплачено",
+		         ) ),
 		         Field::make( "text", "purchased_name", "Назва послуги" )->set_width( 50 ),
 		         Field::make( "date", "purchased_date", "Дата початку" )->set_width( 50 )->set_storage_format( 'U' ),
 		         Field::make( "text", "purchased_up_qnt", "Залишилось підняття оголошення" ),
@@ -871,6 +885,14 @@ function crb_attach_in_purchased() {
 			         Field::make( 'text', 'purchased_zoho_id' ),
 		         )
 	         );
+	Container::make( 'post_meta', 'Portmone' )
+	         ->show_on_post_type( 'purchased' )
+	         ->add_fields( array(
+		         Field::make( "text", "portmone_id", "Ідентифікатор транзакції (платіжного документу) у системі Portmone.com" ),
+		         Field::make( "text", "portmone_sum", "	Передана у запиті сума транзакції" ),
+		         Field::make( "text", "portmone_receipt_url", "	Посилання для отримання квитанції" ),
+		         Field::make( "text", "portmone_erroripsmessage", "	Текст помилки, якщо токен Visa не був створений" ),
+	         ) );
 }
 
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_team' );
@@ -919,7 +941,7 @@ function crb_attach_in_comments() {
 			         Field::make( 'text', 'comment_rating', 'Оцінка' )
 			              ->set_attribute( 'type', 'number' )
 			              ->set_attribute( 'min', '0' )
-			              ->set_attribute( 'max', '5' )
+			              ->set_attribute( 'max', '10' )
 			              ->set_attribute( 'step', '1' )
 		         )
 	         );

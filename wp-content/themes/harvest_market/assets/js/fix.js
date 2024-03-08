@@ -725,6 +725,12 @@ $doc.ready(function () {
                 if (r) {
                     if (isJsonString(r)) {
                         var res = JSON.parse(r);
+                        if (res.form !== undefined) {
+                            showPreloader();
+                            $doc.find('body').append('<div id="form-container" class="hidden">' + res.form + '</div>');
+                            $doc.find('#form-container form').trigger('submit');
+                            return;
+                        }
                         if ($form.hasClass('upload-avatar-form') && res.type === 'success') {
                             if (res.user_avatar !== undefined) $doc.find('.user-avatar').attr('src', res.user_avatar);
                         }
@@ -1696,7 +1702,14 @@ $doc.ready(function () {
         // });
     });
     initPromoPackages();
+    showDialogModal();
 });
+
+function showDialogModal() {
+    if ($doc.find('#dialog-after-pay').length === 0) return;
+    $.fancybox.open($('#dialog-after-pay'));
+    setCookie('purchased_id', purchased_id);
+}
 
 function initPromoPackages() {
     var items = [];

@@ -32,6 +32,8 @@ $user_city          = carbon_get_user_meta( $user_id, 'user_company_city' ) ?: '
 $user_phone         = carbon_get_user_meta( $user_id, 'user_phone' ) ?: '';
 $form_support       = carbon_get_post_meta( $id, 'short_code_form_support' ) ?: '';
 $route              = $_GET['route'] ?? '';
+$purchased_id       = $_GET['purchased_id'] ?? '';
+$_purchased_id      = $_COOKIE['purchased_id'] ?? '';
 link_zoho_account();
 echo '<pre>';
 //var_dump(search_zoho_contact_by_email( $email ));
@@ -160,5 +162,33 @@ echo '</pre>';
     </div>
 </div>
 
+<?php if ( $purchased_id && get_post( $purchased_id ) && $_purchased_id !== $purchased_id ):
+	$purchased_status     = carbon_get_post_meta( $purchased_id, 'purchased_status' ) ?: 'not_pay';
+	$erroripsmessage      = carbon_get_post_meta( $purchased_id, 'portmone_erroripsmessage' ) ?: '';
+	$portmone_receipt_url = carbon_get_post_meta( $purchased_id, 'portmone_receipt_url' ) ?: '';
+	$str                  = $purchased_status === 'payed' ? ' успішно оплачене' : ' неоплачене';
+	?>
+    <script>
+        var purchased_id = '<?php echo $purchased_id; ?>'
+    </script>
+    <div class="modal modal-sm" id="dialog-after-pay">
+        <div class="modal-content text-center">
+            <div class="modal-title">
+                <div class="modal-title__main">Ваше замовлення <?php echo $str; ?></div>
+                <div class="modal-title__subtitle">
+					<?php echo $purchased_status == 'not_pay' ? $erroripsmessage : ''; ?>
+                </div>
+				<?php if ( $portmone_receipt_url ): ?>
+                    <div class="btn_center ">
+                        <a class="btn_st" target="_blank" rel="nofollow"
+                           href="<?php echo $portmone_receipt_url; ?>">
+                            <span>Скачати чек</span>
+                        </a>
+                    </div>
+				<?php endif; ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <?php get_footer(); ?>

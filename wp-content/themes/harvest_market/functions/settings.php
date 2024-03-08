@@ -13,6 +13,7 @@ get_template_part( 'functions/inclusions/only-admin' );
 get_template_part( 'functions/inclusions/carbon-fields-customize' );
 get_template_part( 'functions/inclusions/add-status-bubble' );
 get_template_part( 'functions/inclusions/add-admin-preview' );
+get_template_part( 'functions/inclusions/admin-columns' );
 get_template_part( 'functions/components/harvy-comment' );
 get_template_part( 'functions/components/the-aside' );
 get_template_part( 'functions/components/user-components' );

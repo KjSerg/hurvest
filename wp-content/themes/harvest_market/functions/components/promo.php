@@ -14,7 +14,7 @@ function the_promo_page() {
 	$regions      = get_terms( array(
 		'taxonomy'   => 'regions',
 		'hide_empty' => false,
-		'parent' => 0
+		'parent'     => 0
 	) );
 	$user_id      = get_current_user_id();
 	$current_user = get_user_by( 'ID', $user_id );
@@ -53,12 +53,13 @@ function the_promo_package( $args = array() ) {
 	$service_hint3     = carbon_get_post_meta( $id, 'service_hint3' );
 	$service_text      = carbon_get_post_meta( $id, 'service_text' );
 	$currency          = carbon_get_theme_option( 'currency' );
+
 	$formatted_price   = number_format( $price, 2 );
 	$formatted_price   .= " $currency";
 	$regions           = $args['regions'] ?? get_terms( array(
 			'taxonomy'   => 'regions',
 			'hide_empty' => false,
-            'parent' => 0
+			'parent'     => 0
 		) );
 	if ( $user_products_ids || ( $product_ID && get_post( $product_ID ) ) ):
 		?>
@@ -67,6 +68,7 @@ function the_promo_package( $args = array() ) {
               data-id="<?php echo $id; ?>">
             <input type="hidden" value="checkout_service" name="action">
             <input type="hidden" value="<?php echo $id ?>" name="id">
+
             <div class="advertise-item__content">
                 <div class="advertise-item__title ">
 					<?php echo get_the_title( $id ); ?><span></span>
