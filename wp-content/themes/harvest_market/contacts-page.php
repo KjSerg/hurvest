@@ -34,39 +34,40 @@ if ( ! empty( $screens ) ) :
                                 <div class="title-sm">
 									<?php _t( $screen['title'] ); ?>
                                 </div>
-								<?php if ( $screen['image'] ): ?>
-                                    <img src="<?php _u( $screen['image'] ); ?>" alt=""/>
-								<?php endif; ?>
+
+	                            <?php if ( $contacts_list = $screen['list'] ): ?>
+                                    <div class="contact-list">
+			                            <?php foreach ( $contacts_list as $item ): if ( $item['_type'] == 'tel_list' ): ?>
+                                            <div class="contact-list__item">
+                                                <div class="contact-list__item-content">
+						                            <?php if ( $list = $item['list'] ): foreach ( $list as $value ): ?>
+                                                        <a href="<?php the_phone_link( $value['tel'] ); ?>">
+								                            <?php echo $value['tel']; ?>
+                                                        </a>
+						                            <?php endforeach; endif; ?>
+                                                </div>
+                                            </div>
+			                            <?php elseif ( $item['_type'] == 'email_list' ): ?>
+                                            <div class="contact-list__item">
+                                                <div class="contact-list__item-content">
+						                            <?php if ( $list = $item['list'] ): foreach ( $list as $value ): ?>
+                                                        <a href="mailto:<?php echo $value['email']; ?>">
+								                            <?php echo $value['email']; ?>
+                                                        </a>
+						                            <?php endforeach; endif; ?>
+                                                </div>
+                                            </div>
+			                            <?php endif; endforeach; ?>
+                                    </div>
+	                            <?php endif; ?>
                             </div>
                             <div class="text-column__right">
-                                <div class="text-group">
+                                <div class="text-group" style="margin-bottom: 2rem;">
 									<?php _t( $screen['text'] ); ?>
                                 </div>
-								<?php if ( $contacts_list = $screen['list'] ): ?>
-                                    <div class="contact-list">
-										<?php foreach ( $contacts_list as $item ): if ( $item['_type'] == 'tel_list' ): ?>
-                                            <div class="contact-list__item">
-                                                <div class="contact-list__item-content">
-													<?php if ( $list = $item['list'] ): foreach ( $list as $value ): ?>
-                                                        <a href="<?php the_phone_link( $value['tel'] ); ?>">
-															<?php echo $value['tel']; ?>
-                                                        </a>
-													<?php endforeach; endif; ?>
-                                                </div>
-                                            </div>
-										<?php elseif ( $item['_type'] == 'email_list' ): ?>
-                                            <div class="contact-list__item">
-                                                <div class="contact-list__item-content">
-													<?php if ( $list = $item['list'] ): foreach ( $list as $value ): ?>
-                                                        <a href="mailto:<?php echo $value['email']; ?>">
-															<?php echo $value['email']; ?>
-                                                        </a>
-													<?php endforeach; endif; ?>
-                                                </div>
-                                            </div>
-										<?php endif; endforeach; ?>
-                                    </div>
-								<?php endif; ?>
+	                            <?php if ( $screen['image'] ): ?>
+                                    <img src="<?php _u( $screen['image'] ); ?>" alt=""/>
+	                            <?php endif; ?>
                             </div>
                         </div>
                     </div>

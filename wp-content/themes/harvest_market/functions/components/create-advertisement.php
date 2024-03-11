@@ -182,7 +182,8 @@ function create_advertisements() {
 					<?php if ( $delivery_types ): ?>
                         <div class="form-group quarter">
                             <select multiple class="select_st" required name="delivery_types[]">
-                                <option disabled="disabled" value="">Умови доставки (виберіть один або декілька)</option>
+                                <option disabled="disabled" value="">Умови доставки (виберіть один або декілька)
+                                </option>
 								<?php foreach ( $delivery_types as $item ):
 									$_type_item = $item['_type'];
 									$_title_item = $item['title'];
@@ -225,21 +226,25 @@ function create_advertisements() {
             <div class="create-item__group">
                 <div class="create-item__group-left">
                     <div class="cabinet-item">
-                        <div class="cabinet-item__title">Опишіть у подробицях</div>
+                        <div class="cabinet-item__title"></div>
                         <div class="form-description">
                             <div class="form-description__item">
                                 <div class="form-group">
-                                    <input class="input_st" type="text" name="title" placeholder="Вкажіть назву*"
+                                    <input class="input_st content-field" type="text"
+
+                                           data-number="65"
+                                           name="title" placeholder="Заголовок продукту"
                                            required="required"/>
-                                    <div class="form-group__info">Наприклад, Яблуко Голден</div>
+                                    <div class="form-group__info content-count-js">0/65</div>
                                 </div>
 
                                 <div class="form-group position-static">
                                         <textarea class="input_st content-field"
                                                   name="content"
+                                                  data-number="1000"
                                                   data-more="<!--more-->"
-                                                  placeholder="Що ви хотіли би додати до оголошення?"></textarea>
-                                    <div class="form-group__info content-count-js">0/9000</div>
+                                                  placeholder="Опишіть продукт"></textarea>
+                                    <div class="form-group__info content-count-js">0/1000</div>
                                     <nav class="context-menu">
                                         <ul class="context-menu__items">
                                             <li class="context-menu__item">
@@ -262,9 +267,9 @@ function create_advertisements() {
 
                                 <div class="continue-group form-group" title="<?php echo $user_company_address; ?>">
                                     <div class="continue-group__text">
-                                        <div class="form-description__item-title">Місцезнаходження оголошення</div>
+
                                         <div class="cabinet-item__text">
-                                            Місцезнаходження оголошення однакове з адресою господарства
+                                            Місцезнаходження оголошення співпадає з адресою господарства
                                         </div>
                                     </div>
                                     <label class="switch_st">
@@ -304,6 +309,19 @@ function create_advertisements() {
                                                         </svg></span>
                                         </a>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="form-description__item">
+
+                                <div class="continue-group form-group" title="<?php echo $user_company_address; ?>">
+                                    <div class="continue-group__text">
+                                        <div class="cabinet-item__text">
+                                            Автопродовження. Продукт автоматично стане неактивним через 30 днів.
+                                        </div>
+                                    </div>
+                                    <label class="switch_st">
+                                        <input name="automatically_continue" type="checkbox"/><span></span>
+                                    </label>
                                 </div>
                             </div>
 							<?php if ( $management_users ): ?>
@@ -362,16 +380,6 @@ function create_advertisements() {
                                     <span class="remove-file"></span>
                                 </div>
 							<?php endfor; endif; ?>
-                        </div>
-                    </div>
-                    <div class="cabinet-item">
-                        <div class="continue-group">
-                            <div class="continue-group__text">
-                                <div class="form-description__item-title">Автовидалення</div>
-                                <div class="cabinet-item__text">Ваш товар буде видалено автоматично через 30 днів
-                                </div>
-                            </div>
-
                         </div>
                     </div>
                 </div>
@@ -578,20 +586,20 @@ function edit_advertisement() {
             <div class="cabinet-item pad_bot_15">
                 <div class="cabinet-item__title">Заповніть будь-ласка інформацію нижче</div>
                 <div class="form-horizontal">
-			        <?php if ( $product_types ): ?>
+					<?php if ( $product_types ): ?>
                         <div class="form-group quarter">
                             <select class="select_st" required name="product_type">
                                 <option disabled="disabled" selected="selected">Тип продукту</option>
-						        <?php foreach ( $product_types as $item ):
-							        ?>
+								<?php foreach ( $product_types as $item ):
+									?>
                                     <option value="<?php echo $item->term_id; ?>" <?php echo $_product_types[0]->term_id == $item->term_id ? "selected" : ''; ?>>
-								        <?php echo $item->name; ?>
+										<?php echo $item->name; ?>
                                     </option>
-						        <?php endforeach; ?>
+								<?php endforeach; ?>
                             </select>
                         </div>
-			        <?php endif; ?>
-			        <?php if ( $categories ): ?>
+					<?php endif; ?>
+					<?php if ( $categories ): ?>
                         <div class="form-group quarter">
                             <select
                                     class="select_st categories-select-js"
@@ -600,23 +608,23 @@ function edit_advertisement() {
                                     required name="categories[]"
                             >
                                 <option disabled="disabled" selected="selected">Категорія продукту</option>
-						        <?php foreach ( $categories as $item ):
-							        $attr = '';
-							        if ( $_categories ) {
-								        foreach ( $_categories as $_category ) {
-									        if ( $_category->term_id == $item->term_id ) {
-										        $attr = 'selected';
-									        }
-								        }
-							        }
-							        ?>
+								<?php foreach ( $categories as $item ):
+									$attr = '';
+									if ( $_categories ) {
+										foreach ( $_categories as $_category ) {
+											if ( $_category->term_id == $item->term_id ) {
+												$attr = 'selected';
+											}
+										}
+									}
+									?>
                                     <option value="<?php echo $item->term_id; ?>" <?php echo $attr; ?>>
-								        <?php echo $item->name; ?>
+										<?php echo $item->name; ?>
                                     </option>
-						        <?php endforeach; ?>
+								<?php endforeach; ?>
                             </select>
                         </div>
-			        <?php endif; ?>
+					<?php endif; ?>
 
                     <div class="form-group quarter not-active">
                         <select class="select_st sub-categories-select-js categories-select-js"
@@ -650,41 +658,41 @@ function edit_advertisement() {
                             <option disabled="disabled">Додаткові фільтри продукту</option>
                         </select>
                     </div>
-			        <?php if ( $processing_types ): ?>
+					<?php if ( $processing_types ): ?>
                         <div class="form-group quarter">
                             <select class="select_st" name="processing_type">
                                 <option disabled="disabled" selected="selected">Тип обробки</option>
-						        <?php foreach ( $processing_types as $item ):
-							        $attr = '';
-							        if ( $_processing_types ) {
-								        foreach ( $_processing_types as $_item ) {
-									        if ( $_item->term_id == $item->term_id ) {
-										        $attr = 'selected';
-									        }
-								        }
-							        }
-							        ?>
+								<?php foreach ( $processing_types as $item ):
+									$attr = '';
+									if ( $_processing_types ) {
+										foreach ( $_processing_types as $_item ) {
+											if ( $_item->term_id == $item->term_id ) {
+												$attr = 'selected';
+											}
+										}
+									}
+									?>
                                     <option value="<?php echo $item->term_id; ?>" <?php echo $attr; ?>>
-								        <?php echo $item->name; ?>
+										<?php echo $item->name; ?>
                                     </option>
-						        <?php endforeach; ?>
+								<?php endforeach; ?>
                             </select>
                         </div>
-			        <?php endif; ?>
-			        <?php if ( $units_measurement ): ?>
+					<?php endif; ?>
+					<?php if ( $units_measurement ): ?>
                         <div class="form-group quarter">
                             <select class="select_st" required name="units_measurement">
                                 <option disabled="disabled" selected="selected">Одиниці вимірювання</option>
-						        <?php foreach ( $units_measurement as $item ):
-							        $attr = $item['unit'] == $_unit ? 'selected' : '';
-							        ?>
+								<?php foreach ( $units_measurement as $item ):
+									$attr = $item['unit'] == $_unit ? 'selected' : '';
+									?>
                                     <option value="<?php echo $item['unit']; ?>" <?php echo $attr; ?>>
-								        <?php echo $item['unit']; ?>
+										<?php echo $item['unit']; ?>
                                     </option>
-						        <?php endforeach; ?>
+								<?php endforeach; ?>
                             </select>
                         </div>
-			        <?php endif; ?>
+					<?php endif; ?>
                     <div class="form-group quarter">
                         <input class="input_st number-input" type="text"
                                name="product_max_value"
@@ -696,64 +704,66 @@ function edit_advertisement() {
                                value="<?php echo carbon_get_post_meta( $ID, 'product_min_order' ); ?>"
                                placeholder="Мінімальне замовлення"/>
                     </div>
-			        <?php if ( $packages ): ?>
+					<?php if ( $packages ): ?>
                         <div class="form-group quarter">
                             <select class="select_st" name="package">
                                 <option disabled="disabled" selected="selected">Упаковка</option>
-						        <?php foreach ( $packages as $item ):
-							        $attr = '';
-							        if ( $_packages ) {
-								        foreach ( $_packages as $_item ) {
-									        if ( $_item->term_id == $item->term_id ) {
-										        $attr = 'selected';
-									        }
-								        }
-							        }
-							        ?>
+								<?php foreach ( $packages as $item ):
+									$attr = '';
+									if ( $_packages ) {
+										foreach ( $_packages as $_item ) {
+											if ( $_item->term_id == $item->term_id ) {
+												$attr = 'selected';
+											}
+										}
+									}
+									?>
                                     <option value="<?php echo $item->term_id; ?>" <?php echo $attr; ?>>
-								        <?php echo $item->name; ?>
+										<?php echo $item->name; ?>
                                     </option>
-						        <?php endforeach; ?>
+								<?php endforeach; ?>
                             </select>
                         </div>
-			        <?php endif; ?>
-			        <?php if ( $delivery_types ): ?>
+					<?php endif; ?>
+					<?php if ( $delivery_types ): ?>
                         <div class="form-group quarter">
                             <select multiple class="select_st" required name="delivery_types[]">
-                                <option disabled="disabled" selected="selected">Умови доставки (виберіть один або декілька)</option>
-						        <?php foreach ( $delivery_types as $item ):
-							        $_type_item = $item['_type'];
-							        $_title_item = $item['title'];
-							        $attr = in_array( $_title_item . "[$_type_item]", $_delivery_methods ) ? 'selected' : '';
-							        ?>
+                                <option disabled="disabled" selected="selected">Умови доставки (виберіть один або
+                                    декілька)
+                                </option>
+								<?php foreach ( $delivery_types as $item ):
+									$_type_item = $item['_type'];
+									$_title_item = $item['title'];
+									$attr = in_array( $_title_item . "[$_type_item]", $_delivery_methods ) ? 'selected' : '';
+									?>
                                     <option value="<?php echo $_title_item . "[$_type_item]"; ?>" <?php echo $attr; ?>>
-								        <?php echo $_title_item; ?>
+										<?php echo $_title_item; ?>
                                     </option>
-						        <?php endforeach; ?>
+								<?php endforeach; ?>
                             </select>
                         </div>
-			        <?php endif; ?>
-			        <?php if ( $certificates ): ?>
+					<?php endif; ?>
+					<?php if ( $certificates ): ?>
                         <div class="form-group quarter">
                             <select class="select_st "
                                     name="certificates[]">
                                 <option disabled="disabled" selected="selected">Сертифікати</option>
-						        <?php foreach ( $certificates as $item ): ?>
+								<?php foreach ( $certificates as $item ): ?>
                                     <option value="<?php echo $item->term_id; ?>">
-								        <?php echo $item->name; ?>
+										<?php echo $item->name; ?>
                                     </option>
-						        <?php endforeach; ?>
+								<?php endforeach; ?>
                             </select>
                         </div>
-			        <?php endif; ?>
+					<?php endif; ?>
                     <div class="form-group quarter">
                         <select class="select_st" name="year">
                             <option disabled="disabled" selected="selected">Якого року врожай</option>
-					        <?php for ( $a = $current_year; $a >= ( $current_year - 60 ); $a -- ):
-						        $attr = $_year == $a ? 'selected' : '';
-						        ?>
+							<?php for ( $a = $current_year; $a >= ( $current_year - 60 ); $a -- ):
+								$attr = $_year == $a ? 'selected' : '';
+								?>
                                 <option <?php echo $attr; ?>><?php echo $a; ?></option>
-					        <?php endfor; ?>
+							<?php endfor; ?>
                         </select>
                     </div>
                 </div>
@@ -761,22 +771,24 @@ function edit_advertisement() {
             <div class="create-item__group">
                 <div class="create-item__group-left">
                     <div class="cabinet-item">
-                        <div class="cabinet-item__title">Опишіть у подробицях</div>
+                        <div class="cabinet-item__title"></div>
                         <div class="form-description">
                             <div class="form-description__item">
                                 <div class="form-group">
-                                    <input class="input_st" type="text" name="title" placeholder="Вкажіть назву*"
+                                    <input class="input_st" type="text" name="title" data-number="65"
+                                           name="title" placeholder="Заголовок продукту"
                                            value="<?php echo get_the_title( $ID ); ?>"
                                            required="required"/>
-                                    <div class="form-group__info">Наприклад, Яблуко Голден</div>
+                                    <div class="form-group__info content-count-js">0/65</div>
                                 </div>
                                 <div class="form-group position-static">
                                         <textarea class="input_st content-field"
                                                   name="content"
+                                                  data-number="1000"
                                                   data-more="<!--more-->"
-                                                  placeholder="Що ви хотіли би додати до оголошення?"
+                                                  placeholder="Опишіть продукт"
                                         ><?php echo strip_tags( get_content_by_id( $ID ) ); ?></textarea>
-                                    <div class="form-group__info content-count-js">-/9000</div>
+                                    <div class="form-group__info content-count-js">-/1000</div>
                                     <nav class="context-menu">
                                         <ul class="context-menu__items">
                                             <li class="context-menu__item">
@@ -803,30 +815,29 @@ function edit_advertisement() {
                             </div>
 
 
-
                             <div class="form-description__item">
 
                                 <div class="continue-group form-group" title="<?php echo $user_company_address; ?>">
                                     <div class="continue-group__text">
-                                        <div class="form-description__item-title">Місцезнаходження оголошення</div>
+
                                         <div class="cabinet-item__text">
-                                            Місцезнаходження оголошення однакове з адресою господарства
+                                            Місцезнаходження оголошення співпадає з адресою господарства
                                         </div>
                                     </div>
                                     <label class="switch_st">
                                         <input name="is_company_address" class="company-address-checkbox"
-	                                        <?php echo carbon_get_post_meta($ID, 'is_company_address') ? 'checked' : ''; ?>
+											<?php echo carbon_get_post_meta( $ID, 'is_company_address' ) ? 'checked' : ''; ?>
                                                value="true"
                                                data-element=".product-custom-address-container"
-                                                type="checkbox"/><span></span>
+                                               type="checkbox"/><span></span>
                                     </label>
                                 </div>
-                                <div class="product-custom-address-container  <?php echo carbon_get_post_meta($ID, 'is_company_address') ? 'hidden' : ''; ?>">
+                                <div class="product-custom-address-container  <?php echo carbon_get_post_meta( $ID, 'is_company_address' ) ? 'hidden' : ''; ?>">
                                     <div class="form-description__item-title">Місцезнаходження</div>
                                     <div class="form-group">
                                         <input class="input_st address-js" type="text"
                                                name="address"
-	                                        <?php echo !carbon_get_post_meta($ID, 'is_company_address') ? 'required' : ''; ?>
+											<?php echo ! carbon_get_post_meta( $ID, 'is_company_address' ) ? 'required' : ''; ?>
                                                id="address-google"
                                                value="<?php echo carbon_get_post_meta( $ID, 'product_address' ); ?>"
                                                placeholder="Місцезнаходження (Місто, індекс)"/>
@@ -847,10 +858,10 @@ function edit_advertisement() {
                                                    placeholder="09:00 - 22:00"/>
                                         </div>
                                     </div>
-	                                <?php if ( $pick_up_address && count( $pick_up_address ) > 1 ): ?>
+									<?php if ( $pick_up_address && count( $pick_up_address ) > 1 ): ?>
                                         <div class="wrap-new-adr">
                                             <div class="wrap-new-adr__hide">
-				                                <?php foreach ( $pick_up_address as $item ): ?>
+												<?php foreach ( $pick_up_address as $item ): ?>
                                                     <div class="wrap-new-adr__hide-item append_item">
                                                         <div class="form-description__item-title">Aдеса самовивозу</div>
                                                         <div class="form-horizontal">
@@ -858,7 +869,8 @@ function edit_advertisement() {
                                                                 <input class="input_st" type="text"
                                                                        name="pick_up_address[]"
                                                                        value="<?php echo $item['address']; ?>"
-                                                                       placeholder="Адреса самовивозу" required="required">
+                                                                       placeholder="Адреса самовивозу"
+                                                                       required="required">
                                                             </div>
                                                             <div class="form-group half">
                                                                 <input class="input_st" type="text"
@@ -869,7 +881,7 @@ function edit_advertisement() {
                                                         </div>
                                                         <div class="remove-adr">Видалити адресу</div>
                                                     </div>
-				                                <?php endforeach; ?>
+												<?php endforeach; ?>
                                             </div>
                                             <a class="btn_st b_yelloow add-new-adr" href="#">
                                             <span>Додати ще адесу самовивозу<svg xmlns="http://www.w3.org/2000/svg"
@@ -881,7 +893,7 @@ function edit_advertisement() {
                                                         </svg></span>
                                             </a>
                                         </div>
-	                                <?php else: ?>
+									<?php else: ?>
                                         <div class="wrap-new-adr">
                                             <div class="wrap-new-adr__hide"></div>
                                             <a class="btn_st b_yelloow add-new-adr" href="#">
@@ -894,7 +906,23 @@ function edit_advertisement() {
                                                         </svg></span>
                                             </a>
                                         </div>
-	                                <?php endif; ?>
+									<?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="form-description__item">
+
+                                <div class="continue-group form-group" title="<?php echo $user_company_address; ?>">
+                                    <div class="continue-group__text">
+
+                                        <div class="cabinet-item__text">
+                                            Автопродовження. Продукт автоматично стане неактивним через 30 днів.
+                                        </div>
+                                    </div>
+                                    <label class="switch_st">
+                                        <input name="automatically_continue"
+											<?php echo carbon_get_post_meta( $ID, 'product_auto_continue' ) ? 'checked' : ''; ?>
+                                               type="checkbox"/><span></span>
+                                    </label>
                                 </div>
                             </div>
                         </div>

@@ -218,6 +218,22 @@ function the_user_data_editing() {
                                       required="required"></textarea>
                                     <div class="form-group__info content-count-js">0/500</div>
                                 </div>
+                                <div class="form-group half">
+                                    <input class="input_st"
+                                           type="text"
+                                           name="work_time_organization"
+                                           required="required"
+                                           title="Обовʼязкове поле"
+                                           placeholder="Дні і години роботи підприємства*"/>
+                                </div>
+                                <div class="form-group half">
+                                    <input class="input_st"
+                                           type="text"
+                                           name="work_time_delivery_organization"
+                                           required="required"
+                                           title="Обовʼязкове поле"
+                                           placeholder="Дні і години роботи доставки підприємства*"/>
+                                </div>
                                 <div class="cabinet-item" title="Загрузіть що найменше 1 фото">
                                     <div class="cabinet-item__title">Фото*</div>
                                     <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
@@ -311,6 +327,23 @@ function the_user_data_editing() {
                                       required="required"><?php echo trim( strip_tags( $company_description ) ); ?></textarea>
                                     <div class="form-group__info content-count-js">0/500</div>
                                 </div>
+                                <div class="form-group half">
+                                    <input class="input_st"
+                                           type="text"
+                                           name="work_time_organization"
+                                           required="required" value="<?php echo carbon_get_user_meta($user_id, 'user_work_time_organization') ?>"
+                                           title="Обовʼязкове поле"
+                                           placeholder="Дні і години роботи підприємства*"/>
+                                </div>
+                                <div class="form-group half">
+                                    <input class="input_st"
+                                           type="text"
+                                           name="work_time_delivery_organization"
+                                           value="<?php echo carbon_get_user_meta($user_id, 'user_work_time_delivery_organization') ?>"
+                                           required="required"
+                                           title="Обовʼязкове поле"
+                                           placeholder="Дні і години роботи доставки підприємства*"/>
+                                </div>
                                 <div class="cabinet-item">
                                     <div class="cabinet-item__title">Фото*</div>
                                     <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
@@ -377,11 +410,8 @@ function the_user_advertisement() {
 		$permalink         = get_the_permalink() ?: $url;
 		$route             = $_GET['route'] ?? '';
 		$management_user   = $_GET['management_user'] ?? '';
-		$categories        = get_terms( array(
-			'taxonomy'   => 'categories',
-			'hide_empty' => false,
-			'parent'     => 0,
-		) );
+		$post_status       = $_GET['post_status'] ?? 'publish';
+		$categories        = get_user_categories( $management_user ?: $user_id, $post_status );
 		$_order            = $_GET['order'] ?? '';
 		$_orderby          = $_GET['orderby'] ?? '';
 		$_title            = $_GET['title'] ?? '';
@@ -389,7 +419,6 @@ function the_user_advertisement() {
 		$days_count        = carbon_get_theme_option( 'days_count' ) ?: 30;
 		$posts_per_page    = get_option( 'posts_per_page' );
 		$paged             = $_GET['pagenumber'] ?? 1;
-		$post_status       = $_GET['post_status'] ?? 'publish';
 		$current_url       = get_current_url();
 		$management_users  = sellers_management( $user_id );
 		$args              = array(
@@ -432,60 +461,59 @@ function the_user_advertisement() {
 		$query = new WP_Query( $args );
 		?>
         <div class="create-item-main">
-	        <?php if ( $management_users ): ?>
-                <div class="sort-users">
-                    <div class="form-description__item-title">Керування господарством</div>
-                    <div class="sort-users__form">
-                        <form action="<?php echo $permalink; ?>" method="get">
-                            <input type="hidden" name="route" value="<?php echo $route; ?>">
-                            <input type="hidden" name="order" value="desc">
-                            <input type="hidden" name="post_status" value="<?php echo $post_status; ?>">
-                            <select class="select_st trigger-on-change" name="management_user">
-                                <option value="">    <?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?></option>
-						        <?php foreach ( $management_users as $user ):
-							        $ID = $user->ID;
-							        $is_active_manager = is_active_manager( $user_id, $ID );
-							        if ( $user->allcaps['edit_posts'] && $is_active_manager ):
-								        ?>
-                                        <option value="<?php echo $ID; ?>"
-									        <?php echo ( $management_user == $ID ) ? 'selected' : ''; ?>
-                                                data-is_active="<?php echo $is_active_manager; ?>"
-                                                data-val="<?php echo $user->allcaps['edit_posts']; ?>">
-									        <?php echo carbon_get_user_meta( $ID, 'user_company_name' ); ?>
-                                        </option>
-							        <?php endif; endforeach; ?>
-                            </select>
-                        </form>
-                    </div>
-                </div>
-	        <?php endif; ?>
+
+
             <form action="<?php echo $permalink; ?>" method="get" class="sort-wrap ">
                 <input type="hidden" name="route" value="<?php echo $route; ?>">
                 <input type="hidden" name="management_user" value="<?php echo $management_user; ?>">
                 <input type="hidden" name="order" value="desc">
                 <input type="hidden" name="post_status" value="<?php echo $post_status; ?>">
-                <div class="search-wrap">
-                    <div>
-                        <input class="input_st search_input"
-                               type="text" required="required"
-                               name="title"
-                               value="<?php echo $_title; ?>"
-                               placeholder="Шукати за заголовком"/>
-                    </div>
-                </div>
+                <select class="select_st trigger-on-change" name="management_user">
+					<?php if ( $management_users ): ?>
+                        <option <?php echo ( $management_user == '' ) ? 'selected' : ''; ?> value="">Обрати
+                            господарство
+                        </option>
+                        <option value=""><?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?></option>
+						<?php foreach ( $management_users as $user ):
+							$ID = $user->ID;
+							$is_active_manager = is_active_manager( $user_id, $ID );
+							if ( $user->allcaps['edit_posts'] && $is_active_manager ):
+								?>
+                                <option value="<?php echo $ID; ?>"
+									<?php echo ( $management_user == $ID ) ? 'selected' : ''; ?>
+                                        data-is_active="<?php echo $is_active_manager; ?>"
+                                        data-val="<?php echo $user->allcaps['edit_posts']; ?>">
+									<?php echo carbon_get_user_meta( $ID, 'user_company_name' ); ?>
+                                </option>
+							<?php endif; endforeach; ?>
+					<?php else: ?>
+                        <option selected
+                                value=""><?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?></option>
+					<?php endif; ?>
+                </select>
                 <div class="sort-group">
                     <div class="form-horizontal">
 						<?php if ( $categories ): ?>
                             <div class="half">
                                 <select title="" class="select_st trigger-on-change" name="categories">
-                                    <option value="">Будь-яка категорія</option>
-									<?php foreach ( $categories as $category ): ?>
-                                        <option
-											<?php echo $category->term_id == $_categories ? 'selected' : ''; ?>
-                                                value="<?php echo $category->term_id; ?>">
-											<?php echo $category->name; ?>
-                                        </option>
-									<?php endforeach; ?>
+									<?php if ( count( $categories ) > 1 ): ?>
+                                        <option value="">Категорія</option>
+										<?php foreach ( $categories as $category ): ?>
+                                            <option
+												<?php echo $category->term_id == $_categories ? 'selected' : ''; ?>
+                                                    value="<?php echo $category->term_id; ?>">
+												<?php echo $category->name; ?>
+                                            </option>
+										<?php endforeach; ?>
+									<?php elseif ( count( $categories ) == 1 ): ?>
+										<?php foreach ( $categories as $category ): ?>
+                                            <option
+                                                    selected
+                                                    value="<?php echo $category->term_id; ?>">
+												<?php echo $category->name; ?>
+                                            </option>
+										<?php endforeach; ?>
+									<?php endif; ?>
                                 </select>
                             </div>
 						<?php endif; ?>
@@ -504,6 +532,15 @@ function the_user_advertisement() {
                                 </option>
                             </select>
                         </div>
+                    </div>
+                </div>
+                <div class="search-wrap">
+                    <div>
+                        <input class="input_st search_input"
+                               type="text" required="required"
+                               name="title"
+                               value="<?php echo $_title; ?>"
+                               placeholder="Шукати за заголовком"/>
                     </div>
                 </div>
             </form>

@@ -2362,7 +2362,8 @@ function execute_package( $id, $sum = 0 ) {
 		$is_urgently  = carbon_get_post_meta( $purchased_service_id, 'service_urgently' );
 		$service_date = carbon_get_post_meta( $purchased_service_id, 'service_date' );
 		$count_up     = carbon_get_post_meta( $purchased_service_id, 'service_up' ) ?: 0;
-		if ( $service_date && $start_date ) {
+		$is_top       = carbon_get_post_meta( $purchased_service_id, 'service_is_top' );
+		if (  $start_date ) {
 			$term_number = $term * 86400;
 			$term_end    = $start_date + $term_number;
 			if ( $products ) {
@@ -2370,9 +2371,11 @@ function execute_package( $id, $sum = 0 ) {
 				foreach ( $products as $product ) {
 					$product_id = (int) $product;
 					if ( $product && get_post( $product_id ) ) {
-						carbon_set_post_meta( $product_id, 'product_is_top', 'top' );
-						carbon_set_post_meta( $product_id, 'product_start_top', $start_date );
-						carbon_set_post_meta( $product_id, 'product_end_top', $term_end );
+						if ( $is_top ) {
+							carbon_set_post_meta( $product_id, 'product_is_top', 'top' );
+							carbon_set_post_meta( $product_id, 'product_start_top', $start_date );
+							carbon_set_post_meta( $product_id, 'product_end_top', $term_end );
+						}
 						if ( $regions ) {
 							wp_set_post_terms( $product_id, [], 'regions', false );
 							if ( in_array( 'country', $regions ) ) {
@@ -2536,4 +2539,33 @@ function send_request( $url, $args = array(), $request_type = 'POST' ) {
 	} else {
 		throw new HttpException( 'Can not create connection to ' . $url . ' with args ' . $args, 404 );
 	}
+}
+
+function get_user_categories( $user_id, $post_status ) {
+	$categories = array();
+	$args       = array(
+		'post_type'      => 'products',
+		'post_status'    => $post_status,
+		'posts_per_page' => - 1,
+		'author__in'     => array( $user_id )
+	);
+	$query      = new WP_Query( $args );
+	if ( $query->have_posts() ) {
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$id   = get_the_ID();
+			$cats = get_the_terms( $id, 'categories' );
+			if ( $cats ) {
+				foreach ( $cats as $cat ) {
+					if ( $cat->parent === 0 && ! in_array( $cat, $categories ) ) {
+						$categories[] = $cat;
+					}
+				}
+			}
+		}
+	}
+	wp_reset_postdata();
+	wp_reset_query();
+
+	return $categories;
 }

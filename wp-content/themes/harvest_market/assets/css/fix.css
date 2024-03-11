@@ -606,6 +606,26 @@ main.content.showing {
     color: #4D76FF;
 }
 
+.faq-item__content .text-group {
+    width: 100%;
+}
+
+.advertise-item__title.has-discount span {
+    display: none;
+}
+
+.advertise-old-price {
+    -webkit-text-decoration-line:  line-through;
+    text-decoration-line: line-through;
+}
+
+.create-item-main .sort-wrap > *:not(:last-child){
+    margin-right: 2rem;
+}
+.create-item-main .sort-wrap{
+    justify-content: flex-start;
+}
+
 @media (max-width: 460px) {
     .header-search-form {
         width: 3.9rem;

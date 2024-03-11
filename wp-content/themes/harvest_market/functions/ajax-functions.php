@@ -494,7 +494,7 @@ function new_product() {
 				carbon_set_post_meta( $_id, 'product_year', $year );
 				carbon_set_post_meta( $_id, 'product_unit', $units_measurement );
 				carbon_set_post_meta( $_id, 'product_region', $user_region );
-				carbon_set_post_meta( $_id, 'product_auto_continue', false );
+				carbon_set_post_meta( $_id, 'product_auto_continue', $automatically == 'on' ?: false );
 				wp_set_post_terms( $_id, array(), 'categories', false );
 				wp_set_post_terms( $_id, array(), 'product_type', false );
 				wp_set_post_terms( $_id, array(), 'regions', true );
@@ -1431,21 +1431,23 @@ function change_user_data() {
 add_action( 'wp_ajax_nopriv_add_enterprise', 'add_enterprise' );
 add_action( 'wp_ajax_add_enterprise', 'add_enterprise' );
 function add_enterprise() {
-	$res          = array();
-	$user_id      = get_current_user_id();
-	$postcode     = $_POST['postcode'] ?? '';
-	$type         = $_POST['type'] ?? '';
-	$country      = $_POST['country'] ?? '';
-	$country_code = $_POST['country_code'] ?? '';
-	$city         = $_POST['city'] ?? '';
-	$region       = $_POST['region'] ?? '';
-	$lat          = $_POST['lat'] ?? '';
-	$lng          = $_POST['lng'] ?? '';
-	$address      = $_POST['address'] ?? '';
-	$name         = $_POST['name'] ?? '';
-	$phone        = $_POST['phone'] ?? '';
-	$text         = $_POST['text'] ?? '';
-	$application  = get_application( $user_id );
+	$res                             = array();
+	$user_id                         = get_current_user_id();
+	$postcode                        = $_POST['postcode'] ?? '';
+	$type                            = $_POST['type'] ?? '';
+	$country                         = $_POST['country'] ?? '';
+	$country_code                    = $_POST['country_code'] ?? '';
+	$city                            = $_POST['city'] ?? '';
+	$region                          = $_POST['region'] ?? '';
+	$lat                             = $_POST['lat'] ?? '';
+	$lng                             = $_POST['lng'] ?? '';
+	$address                         = $_POST['address'] ?? '';
+	$name                            = $_POST['name'] ?? '';
+	$phone                           = $_POST['phone'] ?? '';
+	$text                            = $_POST['text'] ?? '';
+	$work_time_organization          = $_POST['work_time_organization'] ?? '';
+	$work_time_delivery_organization = $_POST['work_time_delivery_organization'] ?? '';
+	$application                     = get_application( $user_id );
 	if ( $application == 0 ) {
 		if ( $user_id && $city && $phone && $name ) {
 			$post_data = array(
@@ -1468,6 +1470,8 @@ function add_enterprise() {
 				carbon_set_post_meta( $_id, 'application_address', $address );
 				carbon_set_post_meta( $_id, 'application_city', $city );
 				carbon_set_post_meta( $_id, 'application_phone', $phone );
+				carbon_set_post_meta( $_id, 'application_work_time_organization', $work_time_organization );
+				carbon_set_post_meta( $_id, 'application_work_time_delivery_organization', $work_time_delivery_organization );
 				$files         = $_FILES["upfile"];
 				$arr           = array();
 				$res['$files'] = $files;
@@ -1529,6 +1533,9 @@ function add_enterprise() {
 				carbon_set_post_meta( $_id, 'application_city', $city );
 				carbon_set_post_meta( $_id, 'application_phone', $phone );
 
+				carbon_set_post_meta( $_id, 'application_work_time_organization', $work_time_organization );
+				carbon_set_post_meta( $_id, 'application_work_time_delivery_organization', $work_time_delivery_organization );
+
 				carbon_set_user_meta( $user_id, 'user_company_address', $address );
 				carbon_set_user_meta( $user_id, 'user_company_city', $city );
 				carbon_set_user_meta( $user_id, 'user_company_phone', $phone );
@@ -1541,6 +1548,9 @@ function add_enterprise() {
 				carbon_set_user_meta( $user_id, 'user_company_latitude', $lat );
 				carbon_set_user_meta( $user_id, 'user_company_longitude', $lng );
 				carbon_set_user_meta( $user_id, 'user_company_region', $region );
+
+				carbon_set_user_meta( $user_id, 'user_work_time_organization', $work_time_organization );
+				carbon_set_user_meta( $user_id, 'user_work_time_delivery_organization', $work_time_delivery_organization );
 
 				$res['msg']    = 'Інформацію змінено';
 				$files         = $_FILES["upfile"];
@@ -2677,77 +2687,83 @@ function checkout_service() {
 	$zoho_data          = array();
 	$description        = get_the_title( $id );
 	if ( $id && get_post( $id ) && $user_id ) {
-		if ( $regions && $products ) {
-			$titles = array();
-			foreach ( $products as $product ) {
-				$titles[] = get_the_title( $product );
-			}
-			$description .= ' для ' . implode( ', ', $titles );
-			$post_data   = array(
-				'post_type'   => 'purchased',
-				'post_title'  => 'Замовлення послуги ' . get_the_title( $id ),
-				'post_status' => 'publish',
-				'post_author' => $user_id,
-			);
-			$_id         = wp_insert_post( $post_data );
-			if ( $post = get_post( $_id ) ) {
-				$time           = time();
-				$id             = (int) $id;
-				$term           = carbon_get_post_meta( $id, 'service_term' ) ?: 1;
-				$is_urgently    = carbon_get_post_meta( $id, 'service_urgently' );
-				$service_date   = carbon_get_post_meta( $id, 'service_date' );
-				$count_up       = carbon_get_post_meta( $id, 'service_up' ) ?: 0;
-				$count_products = count( $products );
-				$count_regions  = count( $regions );
-				$service_price  = get_service_price( $id, $regions );
-				if ( $start_date ) {
-					$start_date = strtotime( "$start_date 00:00" );
-					$start_date = $start_date <= $time ? $time : $start_date;
-				} else {
-					$start_date = time();
+		$is_top           = carbon_get_post_meta( $id, 'service_is_top' );
+		$service_up       = carbon_get_post_meta( $id, 'service_up' );
+		$service_urgently = carbon_get_post_meta( $id, 'service_urgently' );
+		if ( $is_top || $service_up || $service_urgently ) {
+			if ( $regions && $products ) {
+				$titles = array();
+				foreach ( $products as $product ) {
+					$titles[] = get_the_title( $product );
 				}
-
-
-				$sum                   = $service_price * $count_products;
-				$res['service_price']  = $service_price;
-				$res['count_products'] = $count_products;
-				$res['sum']            = $sum;
-				carbon_set_post_meta( $_id, 'purchased_sum', $sum );
-				carbon_set_post_meta( $_id, 'purchased_status', 'not_pay' );
-				carbon_set_post_meta( $_id, 'purchased_name', get_the_title( $id ) );
-				carbon_set_post_meta( $_id, 'purchased_date', $start_date );
-				carbon_set_post_meta( $_id, 'purchased_service_id', $id );
-				carbon_set_post_meta( $_id, 'purchased_product_ids', implode( ',', $products ) );
-				carbon_set_post_meta( $_id, 'purchased_regions', implode( ',', $regions ) );
-				$res['type'] = 'success';
-				if ( $portmone_url ) {
-					$success_url = $url;
-					$failure_url = $url;
-					$success_url = $success_url . '?hash_service=' . base64_encode( $_id ) . '&user=' . $user_id;
-					$failure_url = $failure_url . '?hash_service=' . base64_encode( $_id ) . '&user=' . $user_id . '&type=error';
-					$form_html   = '<form action="https://www.portmone.com.ua/gateway/" method="post">';
-					$form_html   .= '<input type="hidden" name="payee_id" value="' . $payee_id . '" />';
-					$form_html   .= '<input type="hidden" name="shop_order_number" value="' . $_id . '" />';
-					$form_html   .= '<input type="hidden" name="bill_amount" value="' . $sum . '" />';
-					$form_html   .= '<input type="hidden" name="description" value="' . $description . '" />';
-					$form_html   .= '<input type="hidden" name="success_url" value="' . $success_url . '" />';
-					$form_html   .= '<input type="hidden" name="failure_url" value="' . $failure_url . '" />';
-					$form_html   .= '<input type="hidden" name="encoding"  value= "UTF-8" /><input type="hidden" name="exp_time"  value= "400" />';
-					$form_html   .= '</form>';
-					$res['form'] = $form_html;
-				} else {
-					if ( $personal_area_page ) {
-						$personal_area_page = $personal_area_page[0]['id'];
-						$res['url']         = get_the_permalink( $personal_area_page ) . '?route=advertisement';
+				$description .= ' для ' . implode( ', ', $titles );
+				$post_data   = array(
+					'post_type'   => 'purchased',
+					'post_title'  => 'Замовлення послуги ' . get_the_title( $id ),
+					'post_status' => 'publish',
+					'post_author' => $user_id,
+				);
+				$_id         = wp_insert_post( $post_data );
+				if ( $post = get_post( $_id ) ) {
+					$time           = time();
+					$id             = (int) $id;
+					$term           = carbon_get_post_meta( $id, 'service_term' ) ?: 1;
+					$is_urgently    = carbon_get_post_meta( $id, 'service_urgently' );
+					$service_date   = carbon_get_post_meta( $id, 'service_date' );
+					$count_up       = carbon_get_post_meta( $id, 'service_up' ) ?: 0;
+					$count_products = count( $products );
+					$count_regions  = count( $regions );
+					$service_price  = get_service_price( $id, $regions );
+					if ( $start_date ) {
+						$start_date = strtotime( "$start_date 00:00" );
+						$start_date = $start_date <= $time ? $time : $start_date;
+					} else {
+						$start_date = time();
 					}
+					$sum                   = $service_price * $count_products;
+					$res['service_price']  = $service_price;
+					$res['count_products'] = $count_products;
+					$res['sum']            = $sum;
+					carbon_set_post_meta( $_id, 'purchased_sum', $sum );
+					carbon_set_post_meta( $_id, 'purchased_status', 'not_pay' );
+					carbon_set_post_meta( $_id, 'purchased_name', get_the_title( $id ) );
+					carbon_set_post_meta( $_id, 'purchased_date', $start_date );
+					carbon_set_post_meta( $_id, 'purchased_service_id', $id );
+					carbon_set_post_meta( $_id, 'purchased_product_ids', implode( ',', $products ) );
+					carbon_set_post_meta( $_id, 'purchased_regions', implode( ',', $regions ) );
+					$res['type'] = 'success';
+					if ( $portmone_url ) {
+						$success_url = $url;
+						$failure_url = $url;
+						$success_url = $success_url . '?hash_service=' . base64_encode( $_id ) . '&user=' . $user_id;
+						$failure_url = $failure_url . '?hash_service=' . base64_encode( $_id ) . '&user=' . $user_id . '&type=error';
+						$form_html   = '<form action="https://www.portmone.com.ua/gateway/" method="post">';
+						$form_html   .= '<input type="hidden" name="payee_id" value="' . $payee_id . '" />';
+						$form_html   .= '<input type="hidden" name="shop_order_number" value="' . $_id . '" />';
+						$form_html   .= '<input type="hidden" name="bill_amount" value="' . $sum . '" />';
+						$form_html   .= '<input type="hidden" name="description" value="' . $description . '" />';
+						$form_html   .= '<input type="hidden" name="success_url" value="' . $success_url . '" />';
+						$form_html   .= '<input type="hidden" name="failure_url" value="' . $failure_url . '" />';
+						$form_html   .= '<input type="hidden" name="encoding"  value= "UTF-8" /><input type="hidden" name="exp_time"  value= "400" />';
+						$form_html   .= '</form>';
+						$res['form'] = $form_html;
+					} else {
+						if ( $personal_area_page ) {
+							$personal_area_page = $personal_area_page[0]['id'];
+							$res['url']         = get_the_permalink( $personal_area_page ) . '?route=advertisement';
+						}
+					}
+				} else {
+					$res['msg']  = 'Помилка, спробуйте ще раз! ';
+					$res['type'] = 'error';
 				}
 			} else {
-				$res['msg']  = 'Помилка, спробуйте ще раз! ';
 				$res['type'] = 'error';
+				$res['msg']  = 'Виберіть регіон і/або оголошення';
 			}
 		} else {
 			$res['type'] = 'error';
-			$res['msg']  = 'Виберіть регіон і/або оголошення';
+			$res['msg']  = 'Помилка';
 		}
 	} else {
 		$res['type'] = 'error';

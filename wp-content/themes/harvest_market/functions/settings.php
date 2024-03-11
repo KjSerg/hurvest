@@ -45,6 +45,8 @@ function post_unpublished( $new_status, $old_status, $post ) {
 	if ( $post_type == 'applications' && $old_status != 'publish' && $new_status == 'publish' ) {
 		$user_seller = carbon_get_user_meta( $author_id, 'user_seller' );
 		if ( ! $user_seller ) {
+			$work_time                        = carbon_get_post_meta( $id, 'application_work_time_organization' ) ?: '';
+			$work_time_delivery               = carbon_get_post_meta( $id, 'application_work_time_delivery_organization' ) ?: '';
 			$application_company_postcode     = carbon_get_post_meta( $id, 'application_company_postcode' ) ?: '';
 			$application_company_country      = carbon_get_post_meta( $id, 'application_company_country' ) ?: '';
 			$application_company_country_code = carbon_get_post_meta( $id, 'application_company_country_code' ) ?: '';
@@ -57,6 +59,8 @@ function post_unpublished( $new_status, $old_status, $post ) {
 			$company_name                     = get_the_title( $id ) ?: '';
 			$company_name                     = str_replace( '[edit]', '', $company_name );
 			$text                             = get_content_by_id( $id ) ?: '';
+			carbon_set_user_meta( $author_id, 'user_work_time_organization', $work_time );
+			carbon_set_user_meta( $author_id, 'user_work_time_delivery_organization', $work_time_delivery );
 			carbon_set_user_meta( $author_id, 'user_seller', true );
 			carbon_set_user_meta( $author_id, 'user_company_phone', $application_phone );
 			carbon_set_user_meta( $author_id, 'user_company_city', $application_city );

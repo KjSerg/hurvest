@@ -199,22 +199,7 @@ $user_id              = $current_author_id;
                                         <div class="product-card__list-main"> <?php echo $max_value . ' ' . $unit; ?></div>
                                     </div>
 								<?php endif; ?>
-                                <div class="product-card__list-item">
-                                    <div class="product-card__list-title">Рейтинг:</div>
-                                    <div class="product-card__list-main">
-                                        <ul class="product-item__reviews">
-                                            <li><?php echo $seller_count_review ?: 0; ?> відгуків</li>
-                                            <li>
-                                                <strong><?php echo (float) ( $seller_rating ?: 5 ); ?> </strong>
-                                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                                     style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                        <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                              style="fill:#ffc327"/>
-                                                    </svg>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
+
                             </div>
                             <div class="product-card__count">
                                 <div class="product-item__price">
@@ -267,7 +252,7 @@ $user_id              = $current_author_id;
 							<?php echo carbon_get_post_meta( $id, 'product_company_name' ) ?: $user_company_name; ?>
                         </a>
 						<?php if ( $verification ): ?>
-                            <div class="product-verified">
+                            <div class="product-verified product-card__list-item">
                                 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                      style="enable-background:new 0 0 15 15" viewBox="0 0 15 15">
                                     <path d="M8.2.3C8 .1 7.8 0 7.5 0c-.3 0-.5.1-.7.3l-.9.9h-.2L4.5.9c-.2-.1-.5 0-.7.1-.3.1-.5.4-.5.6l-.4 1.3V3h-.1l-1.2.3c-.2 0-.5.2-.6.4-.1.3-.2.6-.1.8l.3 1.2v.2l-.9.9c-.2.2-.3.4-.3.7 0 .3.1.5.3.7l.9.9v.2l-.3 1.2c-.1.3 0 .5.1.8.1.2.4.4.6.5l1.2.3h.1v.1l.3 1.2c.1.3.2.5.5.6.2.1.5.2.8.1l1.2-.3h.2l.9.9c.2.2.4.3.7.3.3 0 .5-.1.7-.3l.9-.9h.2l1.2.3c.3.1.5 0 .8-.1.2-.1.4-.4.5-.6l.3-1.2v-.1h.1l1.2-.3c.3-.1.5-.2.6-.5.1-.2.2-.5.1-.8l-.3-1.2v-.2l.9-.9c.2-.2.3-.4.3-.7 0-.3-.1-.5-.3-.7l-.9-.9v-.2l.3-1.2c.1-.3 0-.5-.1-.8-.1-.2-.4-.4-.6-.5l-1.2-.3h-.1v-.1l-.3-1.2c-.1-.3-.2-.5-.5-.6-.2-.1-.5-.2-.8-.1l-1.3.3H9L8.2.3zm-1.8 10c.1 0 .2 0 .3-.1L10.9 6c.2-.2.2-.6 0-.8l-.3-.3c-.2-.2-.6-.2-.8 0L6.4 8.4 5.1 7.1c-.2-.2-.6-.2-.8 0l-.2.2c-.2.2-.2.6 0 .8l2 2.1c.1 0 .2.1.3.1z"
@@ -283,6 +268,22 @@ $user_id              = $current_author_id;
                                 <span class="info-attention__content"> Надав усі документи та підтвердив свою діяльність </span></span>
                             </div>
 						<?php endif; ?>
+                        <div class="product-card__list-item">
+                            <div class="product-card__list-title">Рейтинг:</div>
+                            <div class="product-card__list-main">
+                                <ul class="product-item__reviews">
+                                    <li><?php echo $seller_count_review ?: 0; ?> відгуків</li>
+                                    <li>
+                                        <strong><?php echo (float) ( $seller_rating ?: 5 ); ?> </strong>
+                                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                             style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
+                                                        <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
+                                                              style="fill:#ffc327"/>
+                                                    </svg>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
 						<?php if ( $company_description ): ?>
                             <div class="text-group description_fermer">
 								<?php _t( $company_description ); ?>
@@ -323,7 +324,6 @@ $user_id              = $current_author_id;
                                  data-lat="<?php echo $product_latitude; ?>"
                                  data-long="<?php echo $product_longitude; ?>"
                                  data-pin="<?php echo $assets; ?>img/pin.webp"></div>
-<!--                            <script src="--><?php //echo $map_api_url; ?><!--" defer></script>-->
 						<?php endif; ?>
                     </div>
                 </div>

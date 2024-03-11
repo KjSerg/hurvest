@@ -794,6 +794,10 @@ function crb_attach_in_applications() {
 		         Field::make( "text", "application_address", "Місцезнаходження" ),
 		         Field::make( "text", "application_city", "Місто" ),
 		         Field::make( "text", "application_phone", "Телефон" ),
+
+		         Field::make( "text", "application_work_time_organization", "Години роботи" ),
+		         Field::make( "text", "application_work_time_delivery_organization", "Години роботи доставки" ),
+
 	         ) );
 	Container::make( 'post_meta', 'Документи' )
 	         ->show_on_post_type( 'applications' )
@@ -820,14 +824,15 @@ function crb_attach_in_services() {
 		         Field::make( "text", "service_price", "Ціна одиниці пакета для області на 1 день" )
 		              ->set_required( true )
 		              ->set_attribute( 'type', 'number' ),
-		         Field::make( "text", "service_term", "Термін роботи ТОП-пакета, днів" )
-		              ->set_attribute( 'type', 'number' )->set_required( true )
+		         Field::make( "text", "service_term", "Термін роботи пакета, днів" )
+		              ->set_attribute( 'type', 'number' )->set_required(true)
 		              ->set_attribute( 'step', '1' )
 		              ->set_attribute( 'min', '1' ),
 		         Field::make( "text", "service_up", "Підняття в гору, кількість" )
 		              ->set_attribute( 'type', 'number' )
 		              ->set_attribute( 'step', '1' )
 		              ->set_attribute( 'min', '0' ),
+		         Field::make( "checkbox", "service_is_top", "ТОП-список" ),
 		         Field::make( "checkbox", "service_urgently", "Позначка Терміново" ),
 		         Field::make( "checkbox", "service_date", "Дата запуску реклами" ),
 
@@ -988,6 +993,8 @@ function crb_attach_in_users() {
 			         Field::make( 'text', 'user_company_region', 'Регіон' ),
 			         Field::make( 'text', 'user_company_city', 'Місто' ),
 			         Field::make( 'text', 'user_company_address', 'Адрес' ),
+			         Field::make( 'text', 'user_work_time_organization', 'Години роботи' ),
+			         Field::make( 'text', 'user_work_time_delivery_organization', 'Години роботи доставки' ),
 			         Field::make( 'text', 'user_company_name', 'Назва компанії або господарства' ),
 			         Field::make( 'textarea', 'user_company_description', 'Опис компанії або господарства' ),
 			         Field::make( 'media_gallery', 'user_company_gallery', 'Фото' ),
