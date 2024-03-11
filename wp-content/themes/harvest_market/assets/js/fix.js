@@ -1715,12 +1715,24 @@ $doc.ready(function () {
             $result.removeClass('hidden');
         }
     });
+    $doc.on('focus', '.autocomplete__search-input', function () {
+        var $result = $doc.find('.autocomplete__result');
+        if ($result.find('li').length > 0) {
+            $result.removeClass('hidden');
+        }
+    });
     $doc.mouseup(function (e) {
         var $result = $doc.find('.np-autocomplete__result');
         var div = $(".np-autocomplete__container");
+        var $autocompleteContainer = $(".autocomplete__container");
+        var $autocompleteResult = $autocompleteContainer.find('.autocomplete__result');
         if (!div.is(e.target)
             && div.has(e.target).length === 0) {
             $result.addClass('hidden');
+        }
+        if (!$autocompleteContainer.is(e.target)
+            && $autocompleteContainer.has(e.target).length === 0) {
+            $autocompleteResult.addClass('hidden');
         }
     });
     $doc.on('click', '.np-autocomplete__result li', function (e) {
@@ -1733,13 +1745,45 @@ $doc.ready(function () {
         ref = $t.attr('data-ref') || '';
         $result.addClass('hidden');
         setPostOffices();
-    })
+    });
+    $doc.on('click', '.autocomplete__result li', function (e) {
+        e.preventDefault();
+        var $t = $(this);
+        var $container = $t.closest('.autocomplete__container');
+        var $result = $container.find('.autocomplete__result');
+        var $input = $container.find('.autocomplete__search-input');
+        var value = $t.attr('data-value');
+        $input.val(value);
+        $result.addClass('hidden');
+        $t.addClass('active');
+    });
+    $doc.on('input', '.autocomplete__search-input', function () {
+        var $t = $(this);
+        var $container = $t.closest('.autocomplete__container');
+        var $result = $container.find('.autocomplete__result');
+        var $items = $result.find('li');
+        var val = $t.val() || '';
+        val = val.trim().toUpperCase();
+        if (val === '') {
+            $items.show();
+            return;
+        }
+        $items.each(function () {
+            var $li = $(this);
+            var text = $li.text().trim().toUpperCase();
+            if (text.includes(val)) {
+                $li.show();
+            } else {
+                $li.hide();
+            }
+        });
+    });
 });
 
 function setPostOffices() {
     showPreloader();
-    var $result = $doc.find('.np-autocomplete__result');
-    var $select = $doc.find('.nova-post-office');
+    var $result = $doc.find('.np-offices');
+    var $input = $doc.find('.nova-post-office');
     $.ajax({
         type: 'POST',
         url: admin_ajax,
@@ -1749,10 +1793,10 @@ function setPostOffices() {
         }
     }).done(function (r) {
         if (r) {
-            $select.selectric('destroy')
-            $select.html(r);
-            $select.selectric('init');
+            $result.html(r);
+
         }
+        $input.val('');
         hidePreloader();
     });
 }
@@ -1789,7 +1833,7 @@ function getNovaPostCities(val) {
         hidePreloader();
         if ($result.find('li').length > 0) {
             $result.removeClass('hidden');
-            if ($result.find('li').length === 1) {
+            if ($result.find('li').length === 1 && ref === '') {
                 $result.find('li').eq(0).trigger('click');
             }
         } else {

@@ -110,7 +110,7 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
                                                required="required"/>
                                     </div>
                                     <div class="form-group half np-autocomplete__container">
-                                        <input class="input_st np-autocomplete__search-input" type="text"
+                                        <input class="input_st np-autocomplete__search-input np-cities" type="text"
                                                value="<?php echo $user_city; ?>" autocomplete="off"
                                                name="city" placeholder="Місто*"
                                                required="required"/>
@@ -157,11 +157,13 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
                                             <input class="input_st" type="text" name="post_office"
                                                    placeholder="Відділення*"/>
                                         </div>
-                                        <div class="form-group half trigger-element hidden delivery-method-delivery_service-np">
-                                            <select name="nova_post_office" class="nova-post-office">
-                                                <option value="" selected disabled>Відділення*</option>
-                                            </select>
+                                        <div class="form-group half autocomplete__container trigger-element hidden delivery-method-delivery_service-np">
+                                            <input class="input_st autocomplete__search-input nova-post-office" type="text"
+                                                   value="<?php echo $user_city; ?>" autocomplete="off"
+                                                   name="nova_post_office" placeholder="Відділення*"/>
+                                            <ul class="hidden autocomplete__result np-offices"></ul>
                                         </div>
+
                                     </div>
 									<?php foreach ( $_delivery_methods as $delivery_method ):
 										$_delivery_method = get_delivery_method_by_value( $delivery_method, $types );

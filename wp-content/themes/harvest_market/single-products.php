@@ -323,7 +323,7 @@ $user_id              = $current_author_id;
                                  data-lat="<?php echo $product_latitude; ?>"
                                  data-long="<?php echo $product_longitude; ?>"
                                  data-pin="<?php echo $assets; ?>img/pin.webp"></div>
-                            <script src="<?php echo $map_api_url; ?>" defer></script>
+<!--                            <script src="--><?php //echo $map_api_url; ?><!--" defer></script>-->
 						<?php endif; ?>
                     </div>
                 </div>

@@ -564,11 +564,11 @@ main.content.showing {
     align-items: start;
 }
 
-.np-autocomplete__container {
+.np-autocomplete__container, .autocomplete__container {
     position: relative;
 }
 
-.np-autocomplete__result {
+.np-autocomplete__result, .autocomplete__result {
     position: absolute;
     max-height: 200px;
     z-index: 1;
@@ -585,8 +585,12 @@ main.content.showing {
     -webkit-box-shadow: 0 4px 15px 0 rgba(152, 115, 72, .15);
 }
 
+.autocomplete__result li.active {
+    color: #4D76FF;
+    background-color: rgba(0, 0, 0, 0.1);
+}
 
-.np-autocomplete__result li {
+.np-autocomplete__result li, .autocomplete__result li {
     display: block;
     font-size: 1.4rem;
     padding: 1rem 2rem;
@@ -597,7 +601,8 @@ main.content.showing {
     -webkit-border-radius: 1.5rem;
     border-radius: 1.5rem;
 }
-.np-autocomplete__result li:hover {
+
+.np-autocomplete__result li:hover, .autocomplete__result li:hover {
     color: #4D76FF;
 }
 

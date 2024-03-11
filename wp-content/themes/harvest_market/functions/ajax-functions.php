@@ -2782,7 +2782,7 @@ function get_np_offices() {
 	$offices = get_nova_post_offices( $ref );
 	if ( $offices ) {
 		$offices = $offices['data'];
-		echo '<option value="" disabled>Відділення*</option>';
+		echo '<li class="not-active">Відділення*</li>';
 		foreach ( $offices as $office ) {
 			$Description           = $office['Description'];
 			$DescriptionRu         = $office['DescriptionRu'];
@@ -2791,10 +2791,10 @@ function get_np_offices() {
 			if ( $TotalMaxWeightAllowed && $TotalMaxWeightAllowed > 0 ) {
 				$string .= " [Вага: $TotalMaxWeightAllowed кг]";
 			}
-			echo "<option value='$Description'>$string</option>";
+			echo "<li  data-value='$Description'>$string</li>";
 		}
 	} else {
-		echo '<option value="" selected disabled>Відділення відсутні</option>';
+		echo '<li  class="not-active">Відділення відсутні</li>';
 	}
 	die();
 }
