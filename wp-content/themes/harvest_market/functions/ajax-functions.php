@@ -1431,23 +1431,38 @@ function change_user_data() {
 add_action( 'wp_ajax_nopriv_add_enterprise', 'add_enterprise' );
 add_action( 'wp_ajax_add_enterprise', 'add_enterprise' );
 function add_enterprise() {
-	$res                             = array();
-	$user_id                         = get_current_user_id();
-	$postcode                        = $_POST['postcode'] ?? '';
-	$type                            = $_POST['type'] ?? '';
-	$country                         = $_POST['country'] ?? '';
-	$country_code                    = $_POST['country_code'] ?? '';
-	$city                            = $_POST['city'] ?? '';
-	$region                          = $_POST['region'] ?? '';
-	$lat                             = $_POST['lat'] ?? '';
-	$lng                             = $_POST['lng'] ?? '';
-	$address                         = $_POST['address'] ?? '';
-	$name                            = $_POST['name'] ?? '';
-	$phone                           = $_POST['phone'] ?? '';
-	$text                            = $_POST['text'] ?? '';
-	$work_time_organization          = $_POST['work_time_organization'] ?? '';
-	$work_time_delivery_organization = $_POST['work_time_delivery_organization'] ?? '';
-	$application                     = get_application( $user_id );
+	$res                    = array();
+	$user_id                = get_current_user_id();
+	$postcode               = $_POST['postcode'] ?? '';
+	$type                   = $_POST['type'] ?? '';
+	$country                = $_POST['country'] ?? '';
+	$country_code           = $_POST['country_code'] ?? '';
+	$city                   = $_POST['city'] ?? '';
+	$region                 = $_POST['region'] ?? '';
+	$lat                    = $_POST['lat'] ?? '';
+	$lng                    = $_POST['lng'] ?? '';
+	$address                = $_POST['address'] ?? '';
+	$name                   = $_POST['name'] ?? '';
+	$phone                  = $_POST['phone'] ?? '';
+	$text                   = $_POST['text'] ?? '';
+	$days_prefix            = $_POST['days_prefix'] ?? '';
+	$delivery_types         = $_POST['delivery_types'] ?? '';
+	$application            = get_application( $user_id );
+	$work_time_organization = get_work_time_json_string( $days_prefix );
+	if ( $user_id ) {
+		if ( $delivery_types ) {
+			$__arr = array();
+			if ( is_array( $delivery_types ) ) {
+				foreach ( $delivery_types as $item ) {
+					$__arr[] = $item;
+				}
+			} else {
+				$__arr[] = $delivery_types;
+			}
+			carbon_set_user_meta( $user_id, 'user_delivery_methods', $__arr );
+		}
+
+	}
 	if ( $application == 0 ) {
 		if ( $user_id && $city && $phone && $name ) {
 			$post_data = array(
@@ -1466,12 +1481,10 @@ function add_enterprise() {
 				carbon_set_post_meta( $_id, 'application_company_latitude', $lat );
 				carbon_set_post_meta( $_id, 'application_company_longitude', $lng );
 				carbon_set_post_meta( $_id, 'application_company_region', $region );
-
 				carbon_set_post_meta( $_id, 'application_address', $address );
 				carbon_set_post_meta( $_id, 'application_city', $city );
 				carbon_set_post_meta( $_id, 'application_phone', $phone );
-				carbon_set_post_meta( $_id, 'application_work_time_organization', $work_time_organization );
-				carbon_set_post_meta( $_id, 'application_work_time_delivery_organization', $work_time_delivery_organization );
+				carbon_set_post_meta( $_id, 'application_work_time_organization', $work_time_organization ?: '' );
 				$files         = $_FILES["upfile"];
 				$arr           = array();
 				$res['$files'] = $files;
@@ -1533,8 +1546,7 @@ function add_enterprise() {
 				carbon_set_post_meta( $_id, 'application_city', $city );
 				carbon_set_post_meta( $_id, 'application_phone', $phone );
 
-				carbon_set_post_meta( $_id, 'application_work_time_organization', $work_time_organization );
-				carbon_set_post_meta( $_id, 'application_work_time_delivery_organization', $work_time_delivery_organization );
+				carbon_set_post_meta( $_id, 'application_work_time_organization', $work_time_organization ?: '' );
 
 				carbon_set_user_meta( $user_id, 'user_company_address', $address );
 				carbon_set_user_meta( $user_id, 'user_company_city', $city );
@@ -1549,8 +1561,7 @@ function add_enterprise() {
 				carbon_set_user_meta( $user_id, 'user_company_longitude', $lng );
 				carbon_set_user_meta( $user_id, 'user_company_region', $region );
 
-				carbon_set_user_meta( $user_id, 'user_work_time_organization', $work_time_organization );
-				carbon_set_user_meta( $user_id, 'user_work_time_delivery_organization', $work_time_delivery_organization );
+				carbon_set_user_meta( $user_id, 'user_work_time_organization', $work_time_organization ?: '' );
 
 				$res['msg']    = 'Інформацію змінено';
 				$files         = $_FILES["upfile"];
@@ -1572,15 +1583,16 @@ function add_enterprise() {
 					}
 				}
 				carbon_set_user_meta( $user_id, 'user_company_gallery', $arr );
-				$res['$arr'] = $arr;
-				$r           = edit_zoho_account( array(
+				$res['$arr']                   = $arr;
+				$r                             = edit_zoho_account( array(
 					'name'        => $name,
 					'description' => $text,
 					'region'      => $region,
 					'phone'       => $phone,
 					'user_id'     => $user_id,
 				) );
-				$res['$r']   = $r;
+				$res['$r']                     = $r;
+				$res['work_time_organization'] = $work_time_organization;
 			} else {
 				$res['type'] = 'error';
 				$res['msg']  = 'Помилка';
@@ -2812,6 +2824,16 @@ function get_np_offices() {
 	} else {
 		echo '<li  class="not-active">Відділення відсутні</li>';
 	}
+	die();
+}
+
+add_action( 'wp_ajax_nopriv_get_work_time_row_html', 'get_work_time_row_html' );
+add_action( 'wp_ajax_get_work_time_row_html', 'get_work_time_row_html' );
+function get_work_time_row_html() {
+	$index = $_POST['index'] ?? 1;
+	the_work_time_row( array(
+		'days_index' => $index
+	) );
 	die();
 }
 

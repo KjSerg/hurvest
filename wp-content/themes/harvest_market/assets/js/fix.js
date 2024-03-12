@@ -1778,6 +1778,46 @@ $doc.ready(function () {
             }
         });
     });
+    $doc.on('click', '.work-time-row-button', function (e) {
+        e.preventDefault();
+        var $t = $(this);
+        var value = $t.attr('data-days-prefix');
+        var index = $t.attr('data-index') || 0;
+        index = Number(index);
+        var removeStr = $t.attr('data-remove') || '';
+        var addStr = $t.attr('data-add') || '';
+        var $result = $doc.find('.form-hours__list');
+        if ($t.hasClass('remove-button')) {
+            $t.closest('.form-hours__item').remove();
+            $result.find('.form-hours__item').each(function (index) {
+                var $item = $(this);
+                var prefix = $item.attr('data-days-prefix') || '';
+                var $select = $item.find('.work-time-days-select');
+                $select.attr('name', prefix + '_' + index);
+            });
+        } else {
+            showPreloader();
+            $.ajax({
+                type: 'POST',
+                url: admin_ajax,
+                data: {
+                    action: 'get_work_time_row_html',
+                    index: (index + 1),
+                }
+            }).done(function (r) {
+                if (r) {
+                    $result.append(r);
+                }
+                $t.addClass('remove-button');
+                $t.find('span').text(removeStr);
+                $('.form-hours-input > .select_st, .form-hours-select__item > .select_st').selectric({
+                    disableOnMobile: false,
+                    nativeOnMobile: false
+                });
+                hidePreloader();
+            });
+        }
+    });
 });
 
 function setPostOffices() {
@@ -1841,7 +1881,6 @@ function getNovaPostCities(val) {
         }
     });
 }
-
 
 function showDialogModal() {
     if ($doc.find('#dialog-after-pay').length === 0) return;

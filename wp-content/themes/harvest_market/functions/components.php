@@ -731,7 +731,7 @@ function the_user_testimonials( $author_id ) {
                             <div class="rating">
 								<?php for ( $a = 1; $a <= 10; $a ++ ): ?>
                                     <label class="rating-item">
-                                        <input type="radio" name="rating"  value="<?php echo $a ?>"/>
+                                        <input type="radio" name="rating" value="<?php echo $a ?>"/>
                                         <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                              style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
                                                     <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
@@ -763,6 +763,172 @@ function the_user_testimonials( $author_id ) {
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+	<?php
+}
+
+function the_organization_work_time() {
+	$hours            = 24;
+	$minutes          = 59;
+	$user_id          = get_current_user_id();
+	$work_time_string = carbon_get_user_meta( $user_id, 'user_work_time_organization' ) ?: '';
+	$work_time_arr    = $work_time_string ? json_decode( $work_time_string, true ) : array();
+	?>
+
+    <div class="form-hours">
+        <input type="hidden" name="days_prefix" value="days">
+        <div class="faq-item__title">Години роботи</div>
+        <div class="form-hours__list">
+			<?php
+			if ( $work_time_arr ) {
+				foreach ( $work_time_arr as $k => $item ) {
+					$start_time       = $item[1] ?? array();
+					$finish_time      = $item[2] ?? array();
+					$is_remove_button = $k != ( count( $work_time_arr ) - 1 );
+					the_work_time_row(
+						array(
+							'is_remove_button' => $is_remove_button,
+							'days_index'       => $k,
+							'days'             => $item[0],
+							'start_hour'       => $start_time[0] ?? '09',
+							'start_minutes'    => $start_time[1] ?? '00',
+							'finish_hour'      => $finish_time[0] ?? '18',
+							'finish_minutes'   => $finish_time[1] ?? '00',
+						)
+					);
+				}
+			} else {
+				the_work_time_row();
+			}
+			?>
+        </div>
+    </div>
+	<?php
+}
+
+function the_work_time_row( $args = array() ) {
+	$hours            = 24;
+	$minutes          = 59;
+	$days_prefix      = $args['days_prefix'] ?? 'days';
+	$days_index       = $args['days_index'] ?? 0;
+	$days             = $args['days'] ?? array( '1' );
+	$start_hour       = $args['start_hour'] ?? '09';
+	$start_minutes    = $args['start_minutes'] ?? '00';
+	$finish_hour      = $args['finish_hour'] ?? '18';
+	$finish_minutes   = $args['finish_minutes'] ?? '00';
+	$is_remove_button = $args['is_remove_button'] ?? false;
+
+	?>
+    <div class="form-hours__item"
+         data-days-prefix="<?php echo $days_prefix; ?>">
+        <div class="form-horizontal">
+            <div class="form-group quarter">
+                <div class="form-hours-input">
+                    <div class="form-hours-input__title">Виберіть дні</div>
+                    <select class="select_st work-time-days-select" required
+                            name="<?php echo $days_prefix; ?>_<?php echo $days_index; ?>[]"
+                            multiple>
+                        <option
+							<?php echo in_array( '1', $days ) ? 'selected' : ''; ?>
+                                value="1">
+                            Понеділок
+                        </option>
+                        <option <?php echo in_array( '2', $days ) ? 'selected' : ''; ?> value="2">Вівторок</option>
+                        <option <?php echo in_array( '3', $days ) ? 'selected' : ''; ?> value="3">Середа</option>
+                        <option <?php echo in_array( '4', $days ) ? 'selected' : ''; ?> value="4">Четвер</option>
+                        <option <?php echo in_array( '5', $days ) ? 'selected' : ''; ?> value="5">П'ятниця</option>
+                        <option <?php echo in_array( '6', $days ) ? 'selected' : ''; ?> value="6">Субота</option>
+                        <option <?php echo in_array( '7', $days ) ? 'selected' : ''; ?> value="7">Неділя</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group quarter">
+                <div class="form-hours-input">
+                    <div class="form-hours-input__title">З котрої години ви працюєте</div>
+                    <div class="form-hours-select">
+                        <div class="form-hours-select__item">
+                            <select class="select_st" required name="start_hours[]">
+								<?php for ( $h = 0; $h < $hours; $h ++ ):
+									$v = $h < 10 ? '0' . $h : $h;
+									$attr = $v == $start_hour ? 'selected' : '';
+									?>
+                                    <option <?php echo $attr; ?>>
+										<?php echo $v ?>
+                                    </option>
+								<?php endfor; ?>
+                            </select>
+                        </div>
+                        <div class="form-hours-select__item">
+                            <select class="select_st" required name="start_minutes[]">
+								<?php for ( $m = 0; $m <= $minutes; $m ++ ):
+									if ( $m % 10 == 0 ) :
+										$v = $m < 10 ? '0' . $m : $m;
+										$attr = $v == $start_minutes ? 'selected' : '';
+										?>
+                                        <option <?php echo $attr; ?>>
+											<?php echo $v; ?>
+                                        </option>
+									<?php endif; endfor; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group quarter">
+                <div class="form-hours-input">
+                    <div class="form-hours-input__title">До котрої години працюєте</div>
+                    <div class="form-hours-select">
+                        <div class="form-hours-select__item">
+                            <select class="select_st" required name="finish_hours[]">
+								<?php for ( $h = 0; $h <= $hours; $h ++ ):
+									$v = $h < 10 ? '0' . $h : $h;
+									$attr = $v == $finish_hour ? 'selected' : '';
+									?>
+                                    <option <?php echo $attr; ?>>
+										<?php echo $v; ?>
+                                    </option>
+								<?php endfor; ?>
+                            </select>
+                        </div>
+                        <div class="form-hours-select__item">
+                            <select class="select_st" required name="finish_minutes[]">
+								<?php for ( $m = 0; $m < $minutes; $m ++ ):
+									if ( $m % 10 == 0 ) :
+										$v = $m < 10 ? '0' . $m : $m;
+										$attr = $v == $finish_minutes ? 'selected' : '';
+										?>
+                                        <option <?php echo $attr; ?>>
+											<?php echo $v; ?>
+                                        </option>
+									<?php endif; endfor; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group quarter">
+				<?php if ( $is_remove_button ): ?>
+                    <a class="btn_st btn_yellow w100 work-time-row-button remove-button"
+                       data-days-prefix="<?php echo $days_prefix; ?>"
+                       data-remove="Видалити"
+                       data-add="Додати робочі дні"
+                       data-index="<?php echo $days_index; ?>"
+                       href="#">
+                        <span>Видалити</span>
+                    </a>
+				<?php else: ?>
+                    <a class="btn_st btn_yellow w100 work-time-row-button"
+                       data-days-prefix="<?php echo $days_prefix; ?>"
+                       data-remove="Видалити"
+                       data-add="Додати робочі дні"
+                       data-index="<?php echo $days_index; ?>"
+                       href="#">
+                        <span>Додати робочі дні </span>
+                    </a>
+				<?php endif; ?>
+
+            </div>
         </div>
     </div>
 	<?php

@@ -31,6 +31,13 @@ function harvest_scripts() {
 
 add_action( 'wp_enqueue_scripts', 'harvest_scripts' );
 
+function enqueue_admin_scripts() {
+	wp_enqueue_style('custom-admin-css', get_template_directory_uri() . '/assets/css/admin.css', array(), '1.0');
+	wp_enqueue_script('custom-admin-scripts', get_template_directory_uri(). '/assets/js/admin.js', array('jquery'), '1.0', true);
+}
+
+add_action('admin_enqueue_scripts', 'enqueue_admin_scripts');
+
 get_template_part( 'functions/helpers' );
 get_template_part( 'functions/settings' );
 get_template_part( 'functions/carbon-settings' );

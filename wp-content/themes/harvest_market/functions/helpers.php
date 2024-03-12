@@ -2569,3 +2569,25 @@ function get_user_categories( $user_id, $post_status ) {
 
 	return $categories;
 }
+
+function get_work_time_json_string($days_prefix = 'days'){
+	$work_time_organization = array();
+	$start_hours            = $_POST['start_hours'] ?? array();
+	$start_minutes          = $_POST['start_minutes'] ?? array();
+	$finish_hours           = $_POST['finish_hours'] ?? array();
+	$finish_minutes         = $_POST['finish_minutes'] ?? array();
+	foreach ( $_POST as $key => $value ) {
+		$pos = strpos( $key, $days_prefix );
+		if ( $pos !== false && $key !== 'days_prefix' ) {
+			$_index = explode( '_', $key )[1];
+			$_index                   = (int) $_index;
+			$temp                     = array(
+				$value,
+				array( $start_hours[ $_index ] ?? '09', $start_minutes[ $_index ] ?? '00' ),
+				array( $finish_hours[ $_index ] ?? '18', $finish_minutes[ $_index ] ?? '00' ),
+			);
+			$work_time_organization[] = $temp;
+		}
+	}
+    return json_encode($work_time_organization);
+}

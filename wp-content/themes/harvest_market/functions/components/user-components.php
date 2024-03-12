@@ -31,6 +31,8 @@ function the_user_data_editing() {
 	$map_api_url         = carbon_get_theme_option( 'autocomplete_api_url' );
 	$image_count         = carbon_get_theme_option( 'image_count' ) ?: 1;
 	$user_post           = carbon_get_user_meta( $user_id, 'user_post' );
+	$delivery_types      = carbon_get_theme_option( 'delivery_types' );
+	$_delivery_methods   = carbon_get_user_meta( $user_id, 'user_delivery_methods' );
 	$author_link         = false;
 	if ( $user_post && get_post( $user_post ) ) {
 		$author_link = get_the_permalink( $user_post );
@@ -202,7 +204,7 @@ function the_user_data_editing() {
                                            title="Обовʼязкове поле"
                                            placeholder="Номер телефону*"/>
                                 </div>
-                                <div class="form-group half">
+                                <div class="form-group quarter">
                                     <input class="input_st address-js" type="text"
                                            name="address"
                                            id="address-google"
@@ -210,6 +212,23 @@ function the_user_data_editing() {
                                            placeholder="Місцезнаходження (Місто, індекс)*"
                                            required="required"/>
                                 </div>
+	                            <?php if ( $delivery_types ): ?>
+                                    <div class="form-group quarter">
+                                        <select multiple class="select_st" required name="delivery_types[]">
+                                            <option disabled="disabled" value="">
+                                                Умови доставки (виберіть один або декілька)
+                                            </option>
+				                            <?php foreach ( $delivery_types as $item ):
+					                            $_type_item = $item['_type'];
+					                            $_title_item = $item['title'];
+					                            ?>
+                                                <option value="<?php echo $_title_item . "[$_type_item]"; ?>">
+						                            <?php echo $_title_item; ?>
+                                                </option>
+				                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+	                            <?php endif; ?>
                                 <div class="form-group">
                             <textarea class="input_st content-field" name="text"
                                       placeholder="Опис фермерського господарства*"
@@ -218,22 +237,8 @@ function the_user_data_editing() {
                                       required="required"></textarea>
                                     <div class="form-group__info content-count-js">0/500</div>
                                 </div>
-                                <div class="form-group half">
-                                    <input class="input_st"
-                                           type="text"
-                                           name="work_time_organization"
-                                           required="required"
-                                           title="Обовʼязкове поле"
-                                           placeholder="Дні і години роботи підприємства*"/>
-                                </div>
-                                <div class="form-group half">
-                                    <input class="input_st"
-                                           type="text"
-                                           name="work_time_delivery_organization"
-                                           required="required"
-                                           title="Обовʼязкове поле"
-                                           placeholder="Дні і години роботи доставки підприємства*"/>
-                                </div>
+								<?php the_organization_work_time(); ?>
+
                                 <div class="cabinet-item" title="Загрузіть що найменше 1 фото">
                                     <div class="cabinet-item__title">Фото*</div>
                                     <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
@@ -310,7 +315,7 @@ function the_user_data_editing() {
                                            title="Обовʼязкове поле"
                                            placeholder="Номер телефону*"/>
                                 </div>
-                                <div class="form-group half">
+                                <div class="form-group quarter">
                                     <input class="input_st address-js" type="text"
                                            name="address"
                                            value="<?php echo $company_address; ?>"
@@ -319,6 +324,24 @@ function the_user_data_editing() {
                                            title="Обовʼязкове поле"
                                            placeholder="Місцезнаходження (Місто, індекс)*" required="required"/>
                                 </div>
+	                            <?php if ( $delivery_types ): ?>
+                                    <div class="form-group quarter">
+                                        <select multiple class="select_st" required name="delivery_types[]">
+                                            <option disabled="disabled" >
+                                                Умови доставки (виберіть один або декілька)
+                                            </option>
+				                            <?php foreach ( $delivery_types as $item ):
+					                            $_type_item = $item['_type'];
+					                            $_title_item = $item['title'];
+					                            $attr = in_array( $_title_item . "[$_type_item]", $_delivery_methods ) ? 'selected' : '';
+					                            ?>
+                                                <option value="<?php echo $_title_item . "[$_type_item]"; ?>" <?php echo $attr; ?>>
+						                            <?php echo $_title_item; ?>
+                                                </option>
+				                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+	                            <?php endif; ?>
                                 <div class="form-group">
                             <textarea class="input_st content-field" name="text"
                                       placeholder="Опис фермерського господарства*"
@@ -327,23 +350,8 @@ function the_user_data_editing() {
                                       required="required"><?php echo trim( strip_tags( $company_description ) ); ?></textarea>
                                     <div class="form-group__info content-count-js">0/500</div>
                                 </div>
-                                <div class="form-group half">
-                                    <input class="input_st"
-                                           type="text"
-                                           name="work_time_organization"
-                                           required="required" value="<?php echo carbon_get_user_meta($user_id, 'user_work_time_organization') ?>"
-                                           title="Обовʼязкове поле"
-                                           placeholder="Дні і години роботи підприємства*"/>
-                                </div>
-                                <div class="form-group half">
-                                    <input class="input_st"
-                                           type="text"
-                                           name="work_time_delivery_organization"
-                                           value="<?php echo carbon_get_user_meta($user_id, 'user_work_time_delivery_organization') ?>"
-                                           required="required"
-                                           title="Обовʼязкове поле"
-                                           placeholder="Дні і години роботи доставки підприємства*"/>
-                                </div>
+
+								<?php the_organization_work_time(); ?>
                                 <div class="cabinet-item">
                                     <div class="cabinet-item__title">Фото*</div>
                                     <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>

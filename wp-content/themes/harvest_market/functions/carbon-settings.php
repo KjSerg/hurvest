@@ -796,7 +796,6 @@ function crb_attach_in_applications() {
 		         Field::make( "text", "application_phone", "Телефон" ),
 
 		         Field::make( "text", "application_work_time_organization", "Години роботи" ),
-		         Field::make( "text", "application_work_time_delivery_organization", "Години роботи доставки" ),
 
 	         ) );
 	Container::make( 'post_meta', 'Документи' )
@@ -994,7 +993,6 @@ function crb_attach_in_users() {
 			         Field::make( 'text', 'user_company_city', 'Місто' ),
 			         Field::make( 'text', 'user_company_address', 'Адрес' ),
 			         Field::make( 'text', 'user_work_time_organization', 'Години роботи' ),
-			         Field::make( 'text', 'user_work_time_delivery_organization', 'Години роботи доставки' ),
 			         Field::make( 'text', 'user_company_name', 'Назва компанії або господарства' ),
 			         Field::make( 'textarea', 'user_company_description', 'Опис компанії або господарства' ),
 			         Field::make( 'media_gallery', 'user_company_gallery', 'Фото' ),
@@ -1022,6 +1020,8 @@ function crb_attach_in_users() {
 	         ->add_fields(
 		         array(
 			         Field::make( 'text', 'delivery_count', 'Кількість успішних доставок' ),
+			         Field::make( 'multiselect', 'user_delivery_methods', 'Можливі методи доставки' )
+			              ->add_options( 'get_delivery_methods' ),
 		         )
 	         );
 	Container::make( 'user_meta', 'Довірені користувачі' )

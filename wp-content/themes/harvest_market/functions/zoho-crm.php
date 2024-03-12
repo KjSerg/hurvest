@@ -209,7 +209,7 @@ function edit_zoho_account( $args = array() ) {
 							'Email'         => $args['email'],
 							'Tag'           => array(
 								array(
-									'id'         => 'Seller',
+									'name'         => 'Seller',
 									'color_code' => '#fc3636'
 								)
 							),
