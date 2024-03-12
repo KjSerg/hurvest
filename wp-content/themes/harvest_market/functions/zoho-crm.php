@@ -40,7 +40,7 @@ function create_zoho_user( $user_data = array() ) {
 				$contact_data['Mailing_City'] = $user_data['city'];
 			}
 			if ( isset( $user_data['description'] ) ) {
-				$contact_data['Description'] = $user_data['description'];
+				$contact_data['Description'] = strip_tags( trim( $user_data['description'] ) );
 			}
 			$tag                 = $user_data['tag'] ?? 'Buyer';
 			$contact_data['Tag'] = array(
@@ -105,7 +105,7 @@ function edit_zoho_user( $user_data = array() ) {
 					$contact_data['Telegram'] = $user_data['telegram'];
 				}
 				if ( isset( $user_data['description'] ) ) {
-					$contact_data['Description'] = $user_data['description'];
+					$contact_data['Description'] = strip_tags( trim( $user_data['description'] ) );
 				}
 				if ( isset( $user_data['Account_Name'] ) ) {
 					$contact_data['Account_Name'] = $user_data['Account_Name'];
@@ -146,7 +146,7 @@ function create_zoho_account( $args = array() ) {
 					'data' => array(
 						array(
 							'Account_Name'  => $args['name'] ?? '',
-							'Description'   => trim($args['description'] ?? ''),
+							'Description'   => strip_tags( trim( $args['description'] ?? '' ) ),
 							'Mailing_State' => $args['region'] ?? '',
 							'Phone'         => $args['phone'] ?? '',
 							'Email'         => $args['email'] ?? get_user_by( 'ID', $user_id )->user_email,
@@ -203,13 +203,13 @@ function edit_zoho_account( $args = array() ) {
 					'data' => array(
 						array(
 							'Account_Name'  => $args['name'] ?? '',
-							'Description'   => trim($args['description'] ?? ''),
+							'Description'   => strip_tags( trim( $args['description'] ?? '' ) ),
 							'Mailing_State' => $args['region'] ?? '',
 							'Phone'         => $args['phone'] ?? '',
 							'Email'         => $args['email'],
 							'Tag'           => array(
 								array(
-									'id'       => 'Seller',
+									'id'         => 'Seller',
 									'color_code' => '#fc3636'
 								)
 							),
@@ -299,7 +299,7 @@ function link_zoho_account() {
 				$company_phone = carbon_get_user_meta( $user_id, 'user_company_phone' ) ?: '';
 				$r             = create_zoho_account( array(
 					'name'        => $company_name,
-					'description' => $text,
+					'description' => strip_tags( trim( $text ) ),
 					'region'      => $region,
 					'phone'       => $company_phone,
 					'user_id'     => $user_id,
