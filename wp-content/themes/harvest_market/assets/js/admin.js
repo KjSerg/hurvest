@@ -14,10 +14,8 @@ jQuery(document).ready(function ($) {
 
 
 function checkRequiredFields() {
-
     setRequiredFields();
     var missingFields = [];
-
     requiredFields.forEach(function (fieldName) {
         var $field = jQuery('#' + fieldName);
         var fieldValue = $field.val();
