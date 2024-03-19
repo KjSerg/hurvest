@@ -443,6 +443,19 @@ function get_delivery_methods() {
 	return $res;
 }
 
+function get_payment_methods() {
+	$res = array();
+	if ( $types = carbon_get_theme_option( 'payment_methods' ) ) {
+		foreach ( $types as $type_index => $type ) {
+			$_type_item                            = $type['_type'];
+			$_title_item                           = $type['title'];
+			$res[ $_title_item . "[$_type_item]" ] = $_title_item;
+		}
+	}
+
+	return $res;
+}
+
 function get_delivery_methods_types() {
 	$res = array();
 	if ( $types = carbon_get_theme_option( 'delivery_types' ) ) {
@@ -455,7 +468,7 @@ function get_delivery_methods_types() {
 	return $res;
 }
 
-function get_delivery_method_by_value( $value, $types ) {
+function get_method_by_value( $value, $types ) {
 	$res = array();
 	if ( $types ) {
 		foreach ( $types as $type_index => $type ) {
@@ -2097,6 +2110,7 @@ function transliterate( $textcyr = null, $textlat = null ) {
 }
 
 function get_closest( $productID ) {
+	$time             = time();
 	$res              = array();
 	$user_location    = get_user_location();
 	$user_coordinates = get_user_location_coordinates();
@@ -2115,18 +2129,38 @@ function get_closest( $productID ) {
 			$categories_ids[] = $category->term_id;
 		}
 	}
-	$args  = array(
+	$args = array(
 		'post_type'      => 'products',
 		'post_status'    => 'publish',
 		'posts_per_page' => 20,
-		'meta_key'       => '_product_city',
-		'meta_value'     => $city,
 		'post__not_in'   => array( $productID ),
 		'tax_query'      => array(
 			array(
 				'taxonomy' => 'categories',
 				'field'    => 'id',
 				'terms'    => $categories_ids
+			)
+		),
+		'meta_query'     => array(
+			array(
+				'key'   => '_product_city',
+				'value' => $city
+			),
+			array(
+				'key'   => '_product_is_top',
+				'value' => 'top'
+			),
+			array(
+				'key'     => '_product_end_top',
+				'value'   => $time,
+				'type'    => 'numeric',
+				'compare' => '>'
+			),
+			array(
+				'key'     => '_product_start_top',
+				'value'   => $time,
+				'type'    => 'numeric',
+				'compare' => '<'
 			)
 		)
 	);
@@ -2363,7 +2397,7 @@ function execute_package( $id, $sum = 0 ) {
 		$service_date = carbon_get_post_meta( $purchased_service_id, 'service_date' );
 		$count_up     = carbon_get_post_meta( $purchased_service_id, 'service_up' ) ?: 0;
 		$is_top       = carbon_get_post_meta( $purchased_service_id, 'service_is_top' );
-		if (  $start_date ) {
+		if ( $start_date ) {
 			$term_number = $term * 86400;
 			$term_end    = $start_date + $term_number;
 			if ( $products ) {
@@ -2570,7 +2604,7 @@ function get_user_categories( $user_id, $post_status ) {
 	return $categories;
 }
 
-function get_work_time_json_string($days_prefix = 'days'){
+function get_work_time_json_string( $days_prefix = 'days' ) {
 	$work_time_organization = array();
 	$start_hours            = $_POST['start_hours'] ?? array();
 	$start_minutes          = $_POST['start_minutes'] ?? array();
@@ -2579,7 +2613,7 @@ function get_work_time_json_string($days_prefix = 'days'){
 	foreach ( $_POST as $key => $value ) {
 		$pos = strpos( $key, $days_prefix );
 		if ( $pos !== false && $key !== 'days_prefix' ) {
-			$_index = explode( '_', $key )[1];
+			$_index                   = explode( '_', $key )[1];
 			$_index                   = (int) $_index;
 			$temp                     = array(
 				$value,
@@ -2589,5 +2623,6 @@ function get_work_time_json_string($days_prefix = 'days'){
 			$work_time_organization[] = $temp;
 		}
 	}
-    return json_encode($work_time_organization);
+
+	return json_encode( $work_time_organization );
 }

@@ -89,7 +89,9 @@ echo '</pre>';
 			the_notifications_page();
 		} elseif ( $route == 'packages' ) {
 			the_promo_page();
-		}
+		} elseif ( $route == 'organization' ) {
+			the_organization_data_editing();
+        }
 		?>
     </div>
 </section>

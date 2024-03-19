@@ -1,17 +1,29 @@
 <?php
-$var                = variables();
-$set                = $var['setting_home'];
-$assets             = $var['assets'];
-$url                = $var['url'];
-$id                 = get_the_ID();
-$user_id            = get_current_user_id();
-$logo               = carbon_get_theme_option( 'logo' );
-$header_tel         = carbon_get_theme_option( 'header_tel' );
-$get_route          = $_GET['route'] ?? '';
-$body_class         = $_COOKIE['body_class'] ?? '';
+$var = variables();
+$set = $var['setting_home'];
+$assets = $var['assets'];
+$url = $var['url'];
+$id = get_the_ID();
+$user_id = get_current_user_id();
+$logo = carbon_get_theme_option( 'logo' );
+$header_tel = carbon_get_theme_option( 'header_tel' );
+$get_route = $_GET['route'] ?? '';
+$body_class = $_COOKIE['body_class'] ?? '';
 $personal_area_page = carbon_get_theme_option( 'personal_area_page' );
-$login_page         = carbon_get_theme_option( 'login_page' );
-$is_personal_area   = $personal_area_page && ( (int) $personal_area_page[0]['id'] == $id );
+$login_page = carbon_get_theme_option( 'login_page' );
+$is_personal_area = $personal_area_page && ( (int) $personal_area_page[0]['id'] == $id );
+$enter_link_text = 'Мій профіль';
+if ( $user_id ) {
+	$current_user    = get_user_by( 'ID', $user_id );
+	$email           = $current_user->user_email ?: '';
+	$display_name    = $current_user->display_name ?: '';
+	$first_name      = $current_user->first_name ?: '';
+	$last_name       = $current_user->last_name ?: '';
+	$name            = $first_name ?: $display_name;
+	$name            = explode( '@', $name )[0];
+	$string_length   = string_length( $name );
+	$enter_link_text = $string_length > 20 ? mb_strimwidth( $name, 0, 15, "..." ) : $name;
+}
 get_portmone_post_data();
 onTelegramAuth();
 ?><!DOCTYPE html>
@@ -56,20 +68,20 @@ onTelegramAuth();
 					<?php endif; ?>
                     <nav class="navigation">
                         <ul>
-	                        <?php
-	                        $menu = wp_nav_menu(
-		                        array(
-			                        'theme_location' => 'header_menu',
-			                        'menu'           => 'Меню в шапці',
-			                        'items_wrap'     => '%3$s',
-			                        'container'      => '',
-			                        'link_before'    => '',
-			                        'link_after'     => '',
-			                        'echo'           => 0
-		                        )
-	                        );
-	                        echo $menu;
-	                        ?>
+							<?php
+							$menu = wp_nav_menu(
+								array(
+									'theme_location' => 'header_menu',
+									'menu'           => 'Меню в шапці',
+									'items_wrap'     => '%3$s',
+									'container'      => '',
+									'link_before'    => '',
+									'link_after'     => '',
+									'echo'           => 0
+								)
+							);
+							echo $menu;
+							?>
                         </ul>
                     </nav>
                 </div>
@@ -91,7 +103,7 @@ onTelegramAuth();
 					<?php if ( $login_page ): ?>
                         <a class="enter-link"
                            href="<?php echo get_the_permalink( $login_page[0]['id'] ); ?>">
-                            <span>Мій профіль</span>
+                            <span><?php echo $enter_link_text; ?></span>
                             <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                  style="enable-background:new 0 0 13 15"
                                  viewBox="0 0 13 15">
@@ -110,10 +122,14 @@ onTelegramAuth();
                         <span class="favorites-count"><?php echo count( $favorites ); ?></span>
                     </a>
                     <form action="<?php echo $url ?>" class="header-search-form" method="get">
-                        <input type="hidden" name="post_type" value="<?php echo $_GET['post_type']??'products'; ?>">
-                        <input type="text" required class="header-search-input" name="s" value="<?php echo $_GET['s']??''; ?>">
-                        <a  class="user-link header-search-button">
-                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 13 13" viewBox="0 0 13 13"><path d="M12.9 12.1 9.7 9c.8-.9 1.3-2.2 1.3-3.5C11 2.5 8.5 0 5.5 0S0 2.5 0 5.5 2.5 11 5.5 11C6.8 11 8 10.5 9 9.7l3.2 3.2c.1.1.2.1.4.1.1 0 .3 0 .4-.1 0-.2 0-.6-.1-.8zM1 5.5C1 3 3 1 5.5 1S10 3 10 5.5 8 10 5.5 10C3 9.9 1 7.9 1 5.5z" style="fill:#fff"/></svg>
+                        <input type="hidden" name="post_type" value="<?php echo $_GET['post_type'] ?? 'products'; ?>">
+                        <input type="text" required class="header-search-input" name="s"
+                               value="<?php echo $_GET['s'] ?? ''; ?>">
+                        <a class="user-link header-search-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                 style="enable-background:new 0 0 13 13" viewBox="0 0 13 13"><path
+                                        d="M12.9 12.1 9.7 9c.8-.9 1.3-2.2 1.3-3.5C11 2.5 8.5 0 5.5 0S0 2.5 0 5.5 2.5 11 5.5 11C6.8 11 8 10.5 9 9.7l3.2 3.2c.1.1.2.1.4.1.1 0 .3 0 .4-.1 0-.2 0-.6-.1-.8zM1 5.5C1 3 3 1 5.5 1S10 3 10 5.5 8 10 5.5 10C3 9.9 1 7.9 1 5.5z"
+                                        style="fill:#fff"/></svg>
                         </a>
                     </form>
                     <div class="tog-nav"><span> </span></div>

@@ -94,6 +94,7 @@ $user_location = get_user_location();
             <div class="filter-top__title">Фільтри</div>
             <div class="filter-close"></div>
         </div>
+        <div class="active-filter__list"></div>
         <div class="filter-list-wrap">
             <form class="filter-form" method="post" action="<?php echo $filter_form_url; ?>">
                 <div class="filter-form-box" style="display:none;"></div>
@@ -106,10 +107,12 @@ $user_location = get_user_location();
 				}
 				?>
                 <div class="filter-list js-collapse">
-                    <div class="filter-list__item js-collapse-item">
+                    <div class="filter-list__item js-collapse-item" style="display: none">
                         <div class="filter-list__item-title js-collapse-title"> Населений пункт</div>
                         <div class="filter-list__item-content js-collapse-content position-relative">
-                            <input class="input_st filter-place-input" type="text" name="place"
+                            <input class="input_st filter-place-input"
+                                   type="text"
+                                   name="place"
                                    value="<?php echo $get_place; ?>"
                                    placeholder="Назва населеного пункту"/>
                             <div class="products-places-list"></div>
@@ -233,8 +236,8 @@ $user_location = get_user_location();
                         </div>
 
                         <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item js-collapse-item">
-                            <div class="filter-list__item-title js-collapse-title"> Підкатегорія типу або виду
-                                продукту
+                            <div class="filter-list__item-title js-collapse-title">
+                                Підкатегорія типу або виду продукту
                             </div>
                             <div class="filter-list__item-content js-collapse-content">
                                 <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
@@ -316,7 +319,7 @@ $user_location = get_user_location();
                             </div>
                         </div>
 					<?php endif; ?>
-                    <div class="form-wrap-hidden <?php echo isset( $_GET['min-price'] ) ? '' : 'hidden'; ?>">
+                    <div class=" ">
                         <div class="filter-list__item js-collapse-item">
                             <div class="filter-list__item-title js-collapse-title">Ціна</div>
                             <div class="filter-list__item-content js-collapse-content">
@@ -360,7 +363,7 @@ $user_location = get_user_location();
                             </div>
 						<?php endif; ?>
 						<?php if ( $certificates ): ?>
-                            <div class="filter-list__item js-collapse-item">
+                            <div class="filter-list__item js-collapse-item" style="display:none;">
                                 <div class="filter-list__item-title js-collapse-title"> Сертифікати</div>
                                 <div class="filter-list__item-content js-collapse-content">
                                     <div class="filter-check">
@@ -573,7 +576,7 @@ $user_location = get_user_location();
                     <div class="modal-title__main">Або вкажіть свою локацію</div>
                 </div>
                 <form class="google-places-form" method="get" action="<?php echo $url; ?>">
-                    <input type="hidden"  name="type" value="local_ads">
+                    <input type="hidden" name="type" value="local_ads">
                     <input type="hidden" id="lat" name="lat">
                     <input type="hidden" id="lng" name="lng">
                     <input type="hidden" id="confirm-user-city" name="confirm_user_city">

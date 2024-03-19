@@ -75,64 +75,10 @@ function the_promo_package( $args = array() ) {
 						<?php echo get_the_title( $id ); ?><span></span>
                     </div>
                     <div class="advertise-item__price-main">
-						<?php echo $formatted_price; ?> <span>/ область</span>
+						<?php echo $formatted_price; ?> <span> за одне оголошення по одній області</span>
                     </div>
-                    <div class="advertise-item__select form-group">
-                        <div class="advertise-item__select-item">
-                            <div class="advertise-item__select-text">Оберіть область</div>
-                            <select class="select_st select-region" name="regions[]" required multiple="multiple">
-                                <option disabled value="">
-                                    Зробіть вибір областей
-                                </option>
-                                <option data-all="data-all" value="country">Вся Україна</option>
-								<?php if ( $regions ): foreach ( $regions as $region ): ?>
-                                    <option value="<?php echo $region->term_id; ?>">
-										<?php echo $region->name; ?>
-                                    </option>
-								<?php endforeach; endif; ?>
-                            </select>
-                        </div>
-                        <div class="advertise-item__select-item form-group">
-                            <div class="advertise-item__select-text">Оберіть оголошення для реклами</div>
-                            <select class="select_st select-product" name="products[]" required multiple="multiple">
-                                <option disabled value="">
-                                    Зробіть вибір оголошень
-                                </option>
-								<?php if ( $product_ID ): ?>
-                                    <option selected value="<?php echo $product_ID ?>">
-										<?php echo get_the_title( $product_ID ); ?>
-                                    </option>
-								<?php endif; ?>
-								<?php if ( $user_products_ids ): foreach ( $user_products_ids as $product_id ): if ( get_post( $product_id ) && $product_id != $product_ID ): ?>
-                                    <option value="<?php echo $product_id ?>">
-										<?php echo get_the_title( $product_id ); ?>
-                                    </option>
-								<?php endif; endforeach; endif; ?>
-                            </select>
-                        </div>
-                    </div>
-					<?php if ( $is_date ): ?>
-                        <div class="package-service__cart-item-calendar form-group">
-                            <div class="package-service__cart-item-calendar-title"> Дата старту реклами</div>
-                            <div class="package-service__cart-item-calendar-main">
-                                <input class="input_st js-range-period"
-                                       required
-                                       name="start_date"
-                                       readonly
-                                       type="text"
-                                       value=""/>
-                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                     style="enable-background:new 0 0 15 15" viewBox="0 0 15 15">
-                                            <path d="M4.1.7c0-.4-.3-.7-.7-.7s-.8.3-.8.7v.7c0 .4.3.7.8.7s.8-.3.8-.7V.7zM12.4.7c0-.4-.4-.7-.8-.7s-.8.3-.8.7v.7c0 .4.3.7.8.7s.8-.3.8-.7V.7zM0 5.4v8.2c0 .8.7 1.4 1.5 1.4h12c.8 0 1.5-.6 1.5-1.4V5.4H0zm4.5 7.1c0 .4-.3.7-.8.7H3c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7zm0-3.9c0 .4-.3.7-.8.7H3c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7zm4.1 3.9c0 .4-.3.7-.8.7h-.7c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7zm0-3.9c0 .4-.3.7-.8.7h-.7c-.4 0-.7-.3-.7-.7v-.7c0-.4.3-.7.8-.7H8c.4 0 .8.3.8.7v.7zm4.2 3.9c0 .4-.3.7-.8.7h-.8c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7zm0-3.9c0 .4-.3.7-.8.7h-.8c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7z"
-                                                  style="fill:#014433"/>
-                                    <path d="M15 4.6V2.5c0-.8-.7-1.4-1.5-1.4h-.4v.4c0 .8-.7 1.4-1.5 1.4s-1.5-.6-1.5-1.4v-.4H4.9v.4c0 .8-.7 1.4-1.5 1.4s-1.5-.7-1.5-1.5v-.3h-.4C.7 1.1 0 1.7 0 2.5v2.1h15z"
-                                          style="fill:#014433"/>
-                                        </svg>
-                            </div>
-                        </div>
-					<?php endif; ?>
-                    <div class="advertise-item__listtitle">Що включено:</div>
-                    <ul>
+                    <div class="advertise-item__listtitle"></div>
+                    <ul class="">
 						<?php if ( $is_top ): ?>
                             <li>ТОП-оголошення на <?php echo $service_term; ?> дні <?php if ( $service_hint1 ): ?><span
                                         class="info-attention"><svg
@@ -176,23 +122,86 @@ function the_promo_package( $args = array() ) {
 						<?php endif; ?>
 
                     </ul>
-					<?php if ( $service_text ): ?>
-                        <div class="all-list">
-							<?php echo $service_text; ?>
+                    <div class="advertise-item__select form-group">
+                        <div class="advertise-item__select-item">
+                            <div class="advertise-item__select-text"></div>
+                            <select class="select_st select-region" name="regions[]" required multiple="multiple">
+                                <option disabled value="">
+                                    Оберіть область
+                                </option>
+                                <option data-all="data-all" value="country">Вся Україна</option>
+								<?php if ( $regions ): foreach ( $regions as $region ): ?>
+                                    <option value="<?php echo $region->term_id; ?>">
+										<?php echo $region->name; ?>
+                                    </option>
+								<?php endforeach; endif; ?>
+                            </select>
+                        </div>
+                        <div class="advertise-item__select-item form-group">
+                            <div class="advertise-item__select-text"></div>
+                            <select class="select_st select-product" name="products[]" required multiple="multiple">
+                                <option disabled value="">
+                                    Оберіть оголошення
+                                </option>
+								<?php if ( $product_ID ): ?>
+                                    <option selected value="<?php echo $product_ID ?>">
+										<?php echo get_the_title( $product_ID ); ?>
+                                    </option>
+								<?php endif; ?>
+								<?php if ( $user_products_ids ): foreach ( $user_products_ids as $product_id ): if ( get_post( $product_id ) && $product_id != $product_ID ): ?>
+                                    <option value="<?php echo $product_id ?>">
+										<?php echo get_the_title( $product_id ); ?>
+                                    </option>
+								<?php endif; endforeach; endif; ?>
+                            </select>
+                        </div>
+                    </div>
+					<?php if ( $is_date ): ?>
+                        <div class="package-service__cart-item-calendar form-group">
+                            <div class="package-service__cart-item-calendar-title"> Дата старту реклами</div>
+                            <div class="package-service__cart-item-calendar-main">
+                                <input class="input_st js-range-period"
+                                       required
+                                       name="start_date"
+                                       readonly
+                                       type="text"
+                                       value=""/>
+                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                     style="enable-background:new 0 0 15 15" viewBox="0 0 15 15">
+                                            <path d="M4.1.7c0-.4-.3-.7-.7-.7s-.8.3-.8.7v.7c0 .4.3.7.8.7s.8-.3.8-.7V.7zM12.4.7c0-.4-.4-.7-.8-.7s-.8.3-.8.7v.7c0 .4.3.7.8.7s.8-.3.8-.7V.7zM0 5.4v8.2c0 .8.7 1.4 1.5 1.4h12c.8 0 1.5-.6 1.5-1.4V5.4H0zm4.5 7.1c0 .4-.3.7-.8.7H3c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7zm0-3.9c0 .4-.3.7-.8.7H3c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7zm4.1 3.9c0 .4-.3.7-.8.7h-.7c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7zm0-3.9c0 .4-.3.7-.8.7h-.7c-.4 0-.7-.3-.7-.7v-.7c0-.4.3-.7.8-.7H8c.4 0 .8.3.8.7v.7zm4.2 3.9c0 .4-.3.7-.8.7h-.8c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7zm0-3.9c0 .4-.3.7-.8.7h-.8c-.4 0-.8-.3-.8-.7v-.7c0-.4.3-.7.8-.7h.8c.4 0 .8.3.8.7v.7z"
+                                                  style="fill:#014433"/>
+                                    <path d="M15 4.6V2.5c0-.8-.7-1.4-1.5-1.4h-.4v.4c0 .8-.7 1.4-1.5 1.4s-1.5-.6-1.5-1.4v-.4H4.9v.4c0 .8-.7 1.4-1.5 1.4s-1.5-.7-1.5-1.5v-.3h-.4C.7 1.1 0 1.7 0 2.5v2.1h15z"
+                                          style="fill:#014433"/>
+                                        </svg>
+                            </div>
                         </div>
 					<?php endif; ?>
+
+
                 </div>
                 <div class="advertise-item__bot">
                     <div class="advertise-item__bot-price">
                         <div class="advertise-item__bot-price-title"> Загалом:</div>
                         <div class="advertise-item__price">
-                            <span class="advertise-new-price"><?php echo $formatted_price; ?></span>
+                            <span class="hidden-promo-price hidden advertise-new-price">
+								<?php echo $formatted_price; ?>
+                            </span>
+                            <span class="zero-promo-price advertise-new-price">
+								<?php echo 0 . ' ' . $currency; ?>
+                            </span>
                             <span class="advertise-old-price"></span>
                         </div>
                     </div>
-                    <button type="submit" class="btn_st checkout-service-js " data-id="<?php echo $id; ?>">
-                        <span> Сплатити </span>
-                    </button>
+                    <div class="flex-space-between">
+                        <button type="submit" class="btn_st checkout-service-js " data-id="<?php echo $id; ?>">
+                            <span> Сплатити </span>
+                        </button>
+						<?php if ( $service_text ): ?>
+                            <div class="all-list">
+								<?php echo $service_text; ?>
+                            </div>
+						<?php endif; ?>
+                    </div>
                 </div>
             </form>
 		<?php

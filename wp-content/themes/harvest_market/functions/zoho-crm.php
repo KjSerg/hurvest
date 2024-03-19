@@ -141,6 +141,8 @@ function create_zoho_account( $args = array() ) {
 		$url     .= 'Accounts';
 		$user_id = $args['user_id'] ?? '';
 		if ( $user_id ) {
+			$phone = $args['phone'] ?? '';
+			$phone = explode( ',', $phone )[0] ?? '';
 			if ( $contact_id = carbon_get_user_meta( $user_id, 'zoho_id' ) ) {
 				$data      = array(
 					'data' => array(
@@ -148,7 +150,7 @@ function create_zoho_account( $args = array() ) {
 							'Account_Name'  => $args['name'] ?? '',
 							'Description'   => strip_tags( trim( $args['description'] ?? '' ) ),
 							'Mailing_State' => $args['region'] ?? '',
-							'Phone'         => $args['phone'] ?? '',
+							'Phone'         => $phone,
 							'Email'         => $args['email'] ?? get_user_by( 'ID', $user_id )->user_email,
 							'Tag'           => array(
 								array(
@@ -196,6 +198,8 @@ function edit_zoho_account( $args = array() ) {
 		$url     .= 'Accounts';
 		$user_id = $args['user_id'] ?? '';
 		if ( $user_id ) {
+			$phone = $args['phone'] ?? '';
+			$phone = explode( ',', $phone )[0] ?? '';
 			if ( $contact_id = carbon_get_user_meta( $user_id, 'zoho_id' ) ) {
 				$zoho_account_id = carbon_get_user_meta( $user_id, 'zoho_account_id' );
 				$url             .= '/' . $zoho_account_id;
@@ -205,11 +209,11 @@ function edit_zoho_account( $args = array() ) {
 							'Account_Name'  => $args['name'] ?? '',
 							'Description'   => strip_tags( trim( $args['description'] ?? '' ) ),
 							'Mailing_State' => $args['region'] ?? '',
-							'Phone'         => $args['phone'] ?? '',
+							'Phone'         => $phone,
 							'Email'         => $args['email'],
 							'Tag'           => array(
 								array(
-									'name'         => 'Seller',
+									'name'       => 'Seller',
 									'color_code' => '#fc3636'
 								)
 							),

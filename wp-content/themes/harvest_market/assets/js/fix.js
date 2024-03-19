@@ -30,6 +30,7 @@ $doc.ready(function () {
     initCorrespondenceReload();
     checkingNotificationsSchedules();
     checkingStorage();
+    setFilterCurrentList($doc.find('.filter-form'));
     $('input[type=tel]').mask("+99(999) 999-99-99");
     $doc.on('submit', '.google-places-form', function (e) {
         e.preventDefault();
@@ -234,6 +235,7 @@ $doc.ready(function () {
         var $t = $(this);
         setFilterSerialize($t);
         var serialize = $t.serialize();
+        setFilterCurrentList($t);
         var action = $t.attr('action');
         var method = $t.attr('method');
         renderCatalog({
@@ -1818,7 +1820,104 @@ $doc.ready(function () {
             });
         }
     });
+    $doc.on('click', '.social-network-row-button', function (e) {
+        e.preventDefault();
+        var $t = $(this);
+        var removeStr = $t.attr('data-remove') || '';
+        var addStr = $t.attr('data-add') || '';
+        var $result = $doc.find('.user-social-networks');
+
+        if ($t.hasClass('remove-button')) {
+            $t.closest('.user-social-network').remove();
+            var $rows = $doc.find('.user-social-network');
+            if ($rows.length <= 10) {
+                $doc.find('.social-network-row-button').removeClass('not-active');
+            }
+        } else {
+            showPreloader();
+            $.ajax({
+                type: 'POST',
+                url: admin_ajax,
+                data: {
+                    action: 'get_social_networks_row_html',
+                }
+            }).done(function (r) {
+                if (r) {
+                    $result.append(r);
+                }
+                $t.addClass('remove-button');
+                $t.find('span').text(removeStr);
+                $('.select_st').selectric({
+                    disableOnMobile: false,
+                    nativeOnMobile: false
+                });
+                hidePreloader();
+                var $rows = $doc.find('.user-social-network');
+                if ($rows.length > 10) {
+                    $doc.find('.social-network-row-button').not('.remove-button').addClass('not-active');
+                }
+            });
+        }
+    });
+    $doc.on('click', '.active-filter', function (e) {
+        e.preventDefault();
+        var $t = $(this);
+        var id = $t.attr('data-id');
+        var $form = $doc.find('.filter-form');
+        if (id === undefined) return;
+        var $el = $doc.find('[data-id="' + id + '"]');
+        if (id === 'price-items') {
+            var $minPrice = $form.find('.js-input-from[name="min-price"]');
+            var $maxPrice = $form.find('.js-input-to[name="max-price"]');
+            var $range = $minPrice.closest('.filter-range').find('.js-range');
+            if ($minPrice.length > 0 && $maxPrice.length > 0 && $range.length > 0) {
+                $minPrice.val($range.attr('data-min')).trigger('keyup').trigger('change');
+                $maxPrice.val($range.attr('data-max')).trigger('keyup').trigger('change');
+                $t.remove();
+                $form.trigger('submit');
+            }
+        }
+        if ($el.length > 0) {
+            if ($el.hasClass('filter-check-input')) {
+                $el.prop('checked', false);
+                $el.trigger('change');
+                $form.trigger('submit');
+                return;
+            }
+            if ($el.hasClass('select_st')) {
+                $el.selectric('destroy');
+                $el.val('');
+                $el.selectric('init');
+                $el.trigger('change');
+                $form.trigger('submit');
+                return;
+            }
+
+            if ($el.hasClass('filter-place-input')) {
+                $el.val('');
+                $el.trigger('change');
+                $form.trigger('submit');
+                return;
+            }
+        }
+    });
+
 });
+
+$w.on('load resize', changePromoHeight);
+
+function changePromoHeight() {
+    var height = 0;
+    $doc.find('.advertise-item__content ul').css('height', 'auto');
+    $doc.find('.advertise-item__content ul').each(function () {
+        var $item = $(this);
+        var outerHeight = $item.outerHeight();
+        if (outerHeight > height) height = outerHeight;
+    });
+    if ($w.width() > 860) {
+        $doc.find('.advertise-item__content ul').css('height', height + 'px');
+    }
+}
 
 function setPostOffices() {
     showPreloader();
@@ -1901,6 +2000,7 @@ function initPromoPackages() {
         var products = $products.val();
         $regions.on('change', function () {
             var $select = $(this);
+
             if ($select.val().includes('country')) {
                 $select.prop('selectedIndex', $select.find('option[data-all="data-all"]').index()).selectric('refresh').selectric('open');
                 $select.closest('.selectric-wrapper').addClass('selected-country');
@@ -1910,6 +2010,15 @@ function initPromoPackages() {
             regions = $select.val();
             calculate(id, regions, products);
             activatedButton(id, regions, products);
+            if (regions.length === 0) {
+                $item.find('.hidden-promo-price').addClass('hidden');
+                $item.find('.zero-promo-price').removeClass('hidden');
+            } else {
+
+                $item.find('.hidden-promo-price').removeClass('hidden');
+                $item.find('.zero-promo-price').addClass('hidden');
+            }
+
         });
         $products.on('change', function () {
             var $select = $(this);
@@ -1950,7 +2059,7 @@ function activatedButton(id, regions, products) {
 
 function calculate(id, regions, products) {
     var $item = $doc.find('.advertise-item[data-id="' + id + '"]');
-    var $price = $item.find('.advertise-new-price');
+    var $price = $item.find('.advertise-new-price').not('.zero-promo-price');
     var $oldPrice = $item.find('.advertise-old-price');
     var $title = $item.find('.advertise-item__title');
     $title.removeClass('has-discount');
@@ -2322,7 +2431,7 @@ function setSubCategories($select) {
             $next.trigger('change');
             if (isFilterForm) {
                 $next.closest('.filter-list__item').removeClass('hidden');
-                $next.closest('.filter-list__item').find('.js-collapse-title').trigger('click');
+                // $next.closest('.filter-list__item').find('.js-collapse-title').trigger('click');
             }
         } else {
             $next.removeAttr('required');
@@ -2440,6 +2549,67 @@ w.addEventListener("popstate", function (event) {
     });
 });
 
+function setFilterCurrentList($form) {
+    var $items = $form.find('.filter-check-input, select, .filter-place-input');
+    var $minPrice = $form.find('.js-input-from[name="min-price"]');
+    var $maxPrice = $form.find('.js-input-to[name="max-price"]');
+    var $box = $form.closest('.filter').find('.active-filter__list');
+    var obj = {};
+    var html = '';
+    $items.each(function (index) {
+        var $t = $(this);
+        var ID = $t.attr('data-id');
+        if (ID === undefined) {
+            ID = 'filter-item-' + index;
+            $t.attr('data-id', ID);
+        }
+        var name = $t.attr('data-name');
+        var val = $t.val() || false;
+        if ($t.hasClass('filter-place-input') || name === undefined) {
+            name = $t.attr('name');
+        }
+        if ($t.hasClass('filter-check-input')) {
+            if ($t.prop('checked') === true) {
+                val = $t.closest('.check-item').text().trim();
+            } else {
+                val = false;
+            }
+        }
+        if ($t.hasClass('select_st') && val) {
+            val = $t.find('option:selected').text().trim();
+        }
+        var title = $t.closest('.filter-list__item').find('.filter-list__item-title').text().trim();
+
+        if (name !== undefined && val) {
+            var string = val;
+            if ($t.hasClass('js-input-radius')) {
+                string = title + ': ' + val;
+            }
+            html += '<div data-id="' + ID + '" class="active-filter"><span></span>' + string + '</div>';
+        }
+    });
+
+    if ($minPrice.length > 0 && $maxPrice.length > 0) {
+        var minVal = $minPrice.val();
+        var maxVal = $maxPrice.val();
+        var title = $minPrice.closest('.filter-list__item').find('.filter-list__item-title').text().trim();
+        var $range = $minPrice.closest('.filter-range').find('.js-range');
+        var min = $range.attr('data-min');
+        var max = $range.attr('data-max');
+        minVal = Number(minVal);
+        maxVal = Number(maxVal);
+        min = Number(min);
+        max = Number(max);
+        if (max !== maxVal || min !== minVal) {
+            var string = title + ': ' + minVal + '-' + maxVal;
+            html += '<div data-id="price-items" class="active-filter"><span></span>' + string + '</div>';
+        }
+    }
+
+
+    $box.html(html);
+}
+
 function setFilterSerialize($form) {
     var $items = $form.find('.filter-check-input:checked, select');
     var $box = $form.find('.filter-form-box');
@@ -2454,9 +2624,7 @@ function setFilterSerialize($form) {
                 if (obj[name] === undefined) obj[name] = [];
                 obj[name].push(val);
             }
-
         }
-
     });
     for (var key in obj) {
         var items = obj[key];

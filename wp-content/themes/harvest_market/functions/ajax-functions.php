@@ -1447,8 +1447,13 @@ function add_enterprise() {
 	$text                   = $_POST['text'] ?? '';
 	$days_prefix            = $_POST['days_prefix'] ?? '';
 	$delivery_types         = $_POST['delivery_types'] ?? '';
+	$payment_methods        = $_POST['payment_methods'] ?? '';
+	$office_type            = $_POST['office_type'] ?? '';
+	$social_network         = $_POST['social_network'] ?? '';
+	$social_network_urls    = $_POST['social_network_url'] ?? '';
 	$application            = get_application( $user_id );
 	$work_time_organization = get_work_time_json_string( $days_prefix );
+	$phone                  = implode( ',', $phone );
 	if ( $user_id ) {
 		if ( $delivery_types ) {
 			$__arr = array();
@@ -1461,7 +1466,29 @@ function add_enterprise() {
 			}
 			carbon_set_user_meta( $user_id, 'user_delivery_methods', $__arr );
 		}
-
+		if ( $payment_methods ) {
+			$__arr = array();
+			if ( is_array( $payment_methods ) ) {
+				foreach ( $payment_methods as $item ) {
+					$__arr[] = $item;
+				}
+			} else {
+				$__arr[] = $payment_methods;
+			}
+			carbon_set_user_meta( $user_id, 'user_payment_methods', $__arr );
+		}
+		if ( $social_network && $social_network_urls ) {
+			foreach ( $social_network as $social_network_index => $network_name ) {
+				$social_network_url = $social_network_urls[ $social_network_index ] ?? '';
+				if ( filter_var( $social_network_url, FILTER_VALIDATE_URL ) === false ) {
+					$social_network_url = false;
+				}
+				if ( $network_name && $social_network_url ) {
+					$network_name = strtolower( $network_name );
+					update_user_meta( $user_id, $network_name, $social_network_url );
+				}
+			}
+		}
 	}
 	if ( $application == 0 ) {
 		if ( $user_id && $city && $phone && $name ) {
@@ -1485,6 +1512,7 @@ function add_enterprise() {
 				carbon_set_post_meta( $_id, 'application_city', $city );
 				carbon_set_post_meta( $_id, 'application_phone', $phone );
 				carbon_set_post_meta( $_id, 'application_work_time_organization', $work_time_organization ?: '' );
+				carbon_set_user_meta( $user_id, 'user_company_office_type', $office_type ?: '' );
 				$files         = $_FILES["upfile"];
 				$arr           = array();
 				$res['$files'] = $files;
@@ -1562,6 +1590,7 @@ function add_enterprise() {
 				carbon_set_user_meta( $user_id, 'user_company_region', $region );
 
 				carbon_set_user_meta( $user_id, 'user_work_time_organization', $work_time_organization ?: '' );
+				carbon_set_user_meta( $user_id, 'user_company_office_type', $office_type ?: '' );
 
 				$res['msg']    = 'Інформацію змінено';
 				$files         = $_FILES["upfile"];
@@ -1707,38 +1736,44 @@ function new_seller_review() {
 	$text      = $_POST['text'] ?? '';
 	$seller_id = $_POST['seller_id'] ?? '';
 	$rating    = $_POST['rating'] ?? '';
-	if ( $name && $text && $email && $seller_id ) {
-		$review_test = get_result_test_review( $email, $text );
-		if ( $review_test ) {
-			$post_data = array(
-				'post_type'    => 'reviews',
-				'post_title'   => $name,
-				'post_status'  => 'pending',
-				'post_author'  => (int) $user_id,
-				'post_content' => $text,
-			);
-			$_id       = wp_insert_post( $post_data );
-			$post      = get_post( $_id );
-			if ( $post ) {
-				carbon_set_post_meta( $_id, 'review_seller_id', $seller_id );
-				carbon_set_post_meta( $_id, 'review_author_email', $email );
-				carbon_set_post_meta( $_id, 'review_rating', $rating );
-				carbon_set_post_meta( $_id, 'review_user_id', $user_id );
-				$res['type'] = 'success';
-				$res['msg']  = 'Дякуємо за відгук! Він зʼявиться після модерації';
+	if ( $user_id ) {
+		if ( $name && $text && $email && $seller_id ) {
+			$review_test = get_result_test_review( $email, $text );
+			if ( $review_test ) {
+				$post_data = array(
+					'post_type'    => 'reviews',
+					'post_title'   => $name,
+					'post_status'  => 'pending',
+					'post_author'  => (int) $user_id,
+					'post_content' => $text,
+				);
+				$_id       = wp_insert_post( $post_data );
+				$post      = get_post( $_id );
+				if ( $post ) {
+					carbon_set_post_meta( $_id, 'review_seller_id', $seller_id );
+					carbon_set_post_meta( $_id, 'review_author_email', $email );
+					carbon_set_post_meta( $_id, 'review_rating', $rating );
+					carbon_set_post_meta( $_id, 'review_user_id', $user_id );
+					$res['type'] = 'success';
+					$res['msg']  = 'Дякуємо за відгук! Він зʼявиться після модерації';
+				} else {
+					$res['type'] = 'error';
+					$res['msg']  = 'Помилка';
+				}
 			} else {
 				$res['type'] = 'error';
-				$res['msg']  = 'Помилка';
+				$res['msg']  = 'Ви вже це казали';
 			}
+
 		} else {
 			$res['type'] = 'error';
-			$res['msg']  = 'Ви вже це казали';
+			$res['msg']  = 'Сталась помилка спробуйте пізніше';
 		}
-
 	} else {
 		$res['type'] = 'error';
-		$res['msg']  = 'Сталась помилка спробуйте пізніше';
+		$res['msg']  = 'Щоб залишити коментар потрібно авторизуватись!';
 	}
+
 	echo json_encode( $res );
 	die();
 }
@@ -2834,6 +2869,13 @@ function get_work_time_row_html() {
 	the_work_time_row( array(
 		'days_index' => $index
 	) );
+	die();
+}
+
+add_action( 'wp_ajax_nopriv_get_social_networks_row_html', 'get_social_networks_row_html' );
+add_action( 'wp_ajax_get_social_networks_row_html', 'get_social_networks_row_html' );
+function get_social_networks_row_html() {
+	the_social_network_row();
 	die();
 }
 

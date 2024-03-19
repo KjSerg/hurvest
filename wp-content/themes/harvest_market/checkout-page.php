@@ -42,25 +42,28 @@ if ( $coupon ) {
 		$coupon_discount = carbon_get_post_meta( $coupon_id, 'coupon_discount' );
 	}
 }
-$_id               = $product;
-$_img              = get_the_post_thumbnail_url( $_id ) ?: $assets . 'img/product1.webp';
-$_permalink        = get_the_permalink( $_id );
-$_price            = carbon_get_post_meta( $_id, 'product_price' );
-$_delivery_methods = carbon_get_post_meta( $_id, 'product_delivery_methods' );
-$author_id         = get_post_field( 'post_author', $_id );
-$user_company_name = carbon_get_user_meta( $author_id, 'user_company_name' ) ?: '';
-$sub_sum           = $_price * $qnt;
+$_id                  = $product;
+$author_id            = get_post_field( 'post_author', $_id );
+$_img                 = get_the_post_thumbnail_url( $_id ) ?: $assets . 'img/product1.webp';
+$_permalink           = get_the_permalink( $_id );
+$_price               = carbon_get_post_meta( $_id, 'product_price' );
+$_delivery_methods    = carbon_get_post_meta( $_id, 'product_delivery_methods' );
+$user_payment_methods = carbon_get_user_meta( $author_id, 'user_payment_methods' );
+$user_company_name    = carbon_get_user_meta( $author_id, 'user_company_name' ) ?: '';
+$sub_sum              = $_price * $qnt;
 if ( $coupon_discount ) {
 	$discount     = ( $coupon_discount * $sub_sum ) / 100;
 	$discount_sum = $discount_sum + $discount;
 }
-$types      = carbon_get_theme_option( 'delivery_types' );
-$user       = get_user_by( 'ID', $user_id );
-$first_name = $user_id ? $user->first_name : '';
-$last_name  = $user_id ? $user->last_name : '';
-$user_email = $user_id ? $user->user_email : '';
-$phone      = $user_id ? carbon_get_user_meta( $user_id, 'user_phone' ) : '';
-$user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
+$types           = carbon_get_theme_option( 'delivery_types' );
+$payment_methods = carbon_get_theme_option( 'payment_methods' );
+$user            = get_user_by( 'ID', $user_id );
+$first_name      = $user_id ? $user->first_name : '';
+$last_name       = $user_id ? $user->last_name : '';
+$user_email      = $user_id ? $user->user_email : '';
+$user_surname    = $user_id ? carbon_get_user_meta( $user_id, 'user_surname' ) : '';
+$phone           = $user_id ? carbon_get_user_meta( $user_id, 'user_phone' ) : '';
+$user_city       = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
 ?>
 
     <section class="section-order pad_section_sm_top pad_section_bot">
@@ -106,7 +109,9 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
                                                required="required"/>
                                     </div>
                                     <div class="form-group half">
-                                        <input class="input_st" type="text" name="surname" placeholder="По батькові*"
+                                        <input class="input_st" type="text" name="surname"
+                                               value="<?php echo $user_surname ?>"
+                                               placeholder="По батькові*"
                                                required="required"/>
                                     </div>
                                     <div class="form-group half np-autocomplete__container">
@@ -136,7 +141,7 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
                                         <div class="form-group half">
                                             <select name="delivery_method" class="select_st trigger-on-select">
 												<?php foreach ( $_delivery_methods as $delivery_method ):
-													$_delivery_method = get_delivery_method_by_value( $delivery_method, $types );
+													$_delivery_method = get_method_by_value( $delivery_method, $types );
 													$_type_item = $_delivery_method['_type'];
 													$_title_item = $_delivery_method['title'];
 													$_is_nova_post = $_delivery_method['is_nova_post'];
@@ -158,7 +163,8 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
                                                    placeholder="Відділення*"/>
                                         </div>
                                         <div class="form-group half autocomplete__container trigger-element hidden delivery-method-delivery_service-np">
-                                            <input class="input_st autocomplete__search-input nova-post-office" type="text"
+                                            <input class="input_st autocomplete__search-input nova-post-office"
+                                                   type="text"
                                                    value="<?php echo $user_city; ?>" autocomplete="off"
                                                    name="nova_post_office" placeholder="Відділення*"/>
                                             <ul class="hidden autocomplete__result np-offices"></ul>
@@ -166,7 +172,7 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
 
                                     </div>
 									<?php foreach ( $_delivery_methods as $delivery_method ):
-										$_delivery_method = get_delivery_method_by_value( $delivery_method, $types );
+										$_delivery_method = get_method_by_value( $delivery_method, $types );
 										$_type_item = $_delivery_method['_type'];
 										$_cls = $_delivery_method['is_error'] ? 'error' : '';
 										if ( $_delivery_method['text'] ):
@@ -184,17 +190,22 @@ $user_city  = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : '';
 										<?php endif; endforeach; ?>
                                 </div>
 							<?php endif; ?>
-                            <div class="order-form__item">
-                                <div class="order-form__item-title"> Оплата</div>
-                                <div class="form-horizontal">
-                                    <div class="form-group">
-                                        <select name="payment_method" class="select_st">
-                                            <option value="При отриманні товари">При отриманні товари</option>
-                                            <option value="online">Онлайн оплата</option>
-                                        </select>
+							<?php if ( $user_payment_methods ): ; ?>
+                                <div class="order-form__item">
+                                    <div class="order-form__item-title"> Оплата</div>
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <select name="payment_method" class="select_st">
+												<?php foreach ( $user_payment_methods as $method ):
+													$_payment_method = get_method_by_value( $method, $payment_methods );
+													?>
+                                                    <option value="<?php echo $method; ?>"><?php echo $_payment_method['title']; ?></option>
+												<?php endforeach; ?>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+							<?php endif; ?>
                         </div>
                         <div class="order-form__bot">
                             <a class="btn_st b_yelloow" href="<?php echo get_the_permalink( $_id ); ?>">

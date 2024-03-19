@@ -173,6 +173,18 @@ function crb_attach_theme_options() {
 		         Field::make( "text", "novaposhta_api_key", "API-ключ Нової пошти" ),
 		         Field::make( "text", "novaposhta_api_end_point", "Шлюз запитів" )->set_required( true )->set_attribute( 'type', 'url' ),
 	         ) );
+	Container::make( 'theme_options', "Методи оплати" )
+	         ->set_page_parent( 'edit.php?post_type=products' )
+	         ->add_fields( array(
+		         Field::make( 'complex', 'payment_methods', 'Методи оплати' )
+		              ->setup_labels( $labels )
+		              ->add_fields( 'simple', 'Оплата', array(
+			              Field::make( "text", "title", "Назва методу оплати" )->set_required( true ),
+		              ) )
+		              ->add_fields( 'online', 'Online', array(
+			              Field::make( "text", "title", "Назва методу оплати" )->set_required( true ),
+		              ) )
+	         ) );
 }
 
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_front_page' );
@@ -584,8 +596,6 @@ function crb_attach_in_products() {
 	         ) )
 	         ->add_tab( 'Додаткові налаштування', array(
 		         Field::make( 'checkbox', 'product_auto_continue', 'Автопродовження' ),
-
-
 		         Field::make( 'select', 'product_is_top', 'TOP-оголошення активне' )
 		              ->set_width( 50 )
 		              ->add_options( array(
@@ -598,7 +608,6 @@ function crb_attach_in_products() {
 		         Field::make( 'date_time', 'product_end_top', 'Закінчення TOP-оголошення' )
 		              ->set_storage_format( 'U' )
 		              ->set_width( 25 ),
-
 		         Field::make( 'select', 'product_is_urgently', 'Термінове оголошення активне' )
 		              ->set_width( 50 )
 		              ->add_options( array(
@@ -824,7 +833,7 @@ function crb_attach_in_services() {
 		              ->set_required( true )
 		              ->set_attribute( 'type', 'number' ),
 		         Field::make( "text", "service_term", "Термін роботи пакета, днів" )
-		              ->set_attribute( 'type', 'number' )->set_required(true)
+		              ->set_attribute( 'type', 'number' )->set_required( true )
 		              ->set_attribute( 'step', '1' )
 		              ->set_attribute( 'min', '1' ),
 		         Field::make( "text", "service_up", "Підняття в гору, кількість" )
@@ -993,11 +1002,28 @@ function crb_attach_in_users() {
 			         Field::make( 'text', 'user_company_city', 'Місто' ),
 			         Field::make( 'text', 'user_company_address', 'Адрес' ),
 			         Field::make( 'text', 'user_work_time_organization', 'Години роботи' ),
+			         Field::make( 'text', 'user_company_office_type', 'Тип приміщення' ),
 			         Field::make( 'text', 'user_company_name', 'Назва компанії або господарства' ),
 			         Field::make( 'textarea', 'user_company_description', 'Опис компанії або господарства' ),
 			         Field::make( 'media_gallery', 'user_company_gallery', 'Фото' ),
 			         Field::make( 'color', 'user_company_color', 'Колір сторінки продавця' ),
 			         Field::make( 'hidden', 'user_post', ' ' ),
+		         )
+	         );
+
+	Container::make( 'user_meta', 'Доставки' )
+	         ->add_fields(
+		         array(
+			         Field::make( 'text', 'delivery_count', 'Кількість успішних доставок' ),
+			         Field::make( 'multiselect', 'user_delivery_methods', 'Можливі методи доставки' )
+			              ->add_options( 'get_delivery_methods' ),
+		         )
+	         );
+	Container::make( 'user_meta', 'Методи оплати' )
+	         ->add_fields(
+		         array(
+			         Field::make( 'multiselect', 'user_payment_methods', 'Методи оплати' )
+			              ->add_options( 'get_payment_methods' ),
 		         )
 	         );
 	Container::make( 'user_meta', 'Telegram' )
@@ -1014,14 +1040,6 @@ function crb_attach_in_users() {
 		         array(
 			         Field::make( 'text', 'zoho_id' ),
 			         Field::make( 'text', 'zoho_account_id' ),
-		         )
-	         );
-	Container::make( 'user_meta', 'Доставки' )
-	         ->add_fields(
-		         array(
-			         Field::make( 'text', 'delivery_count', 'Кількість успішних доставок' ),
-			         Field::make( 'multiselect', 'user_delivery_methods', 'Можливі методи доставки' )
-			              ->add_options( 'get_delivery_methods' ),
 		         )
 	         );
 	Container::make( 'user_meta', 'Довірені користувачі' )

@@ -182,7 +182,8 @@ function create_advertisements() {
 					<?php if ( $delivery_types ): ?>
                         <div class="form-group quarter">
                             <select multiple class="select_st" required name="delivery_types[]">
-                                <option disabled="disabled" value="">Умови доставки (виберіть один або декілька)
+                                <option disabled="disabled" value="">
+                                    Умови доставки (виберіть один або декілька)
                                 </option>
 								<?php foreach ( $delivery_types as $item ):
 									$_type_item = $item['_type'];
@@ -228,6 +229,35 @@ function create_advertisements() {
                     <div class="cabinet-item">
                         <div class="cabinet-item__title"></div>
                         <div class="form-description">
+	                        <?php if ( $management_users ): ?>
+                                <div class="form-group">
+                                    <div class="form-description__item-title">
+                                        Для якого господарства створюється оголошення
+                                    </div>
+                                    <select class="select_st" name="author_id">
+				                        <?php if ( $user_seller ): ?>
+                                            <option value="<?php echo $user_id; ?>">
+						                        <?php echo $user_company_name; ?>
+                                            </option>
+				                        <?php endif; ?>
+				                        <?php foreach ( $management_users as $l => $user ):
+					                        $ID = $user->ID;
+					                        $is_active_manager = is_active_manager( $user_id, $ID );
+					                        if ( $user->allcaps['edit_posts'] && $is_active_manager ):
+						                        $attr = $l == 0 ? 'selected' : '';
+						                        $attr = $management_user == $ID ? 'selected' : '';
+
+						                        ?>
+                                                <option value="<?php echo $ID; ?>"
+							                        <?php echo $attr; ?>
+                                                        data-is_active="<?php echo $is_active_manager; ?>"
+                                                        data-val="<?php echo $user->allcaps['edit_posts']; ?>">
+							                        <?php echo carbon_get_user_meta( $ID, 'user_company_name' ); ?>
+                                                </option>
+					                        <?php endif; endforeach; ?>
+                                    </select>
+                                </div>
+	                        <?php endif; ?>
                             <div class="form-description__item">
                                 <div class="form-group">
                                     <input class="input_st content-field" type="text"
@@ -324,35 +354,7 @@ function create_advertisements() {
                                     </label>
                                 </div>
                             </div>
-							<?php if ( $management_users ): ?>
-                                <div class="form-group">
-                                    <div class="form-description__item-title">
-                                        Для якого господарства створюється оголошення
-                                    </div>
-                                    <select class="select_st" name="author_id">
-										<?php if ( $user_seller ): ?>
-                                            <option value="<?php echo $user_id; ?>">
-												<?php echo $user_company_name; ?>
-                                            </option>
-										<?php endif; ?>
-										<?php foreach ( $management_users as $l => $user ):
-											$ID = $user->ID;
-											$is_active_manager = is_active_manager( $user_id, $ID );
-											if ( $user->allcaps['edit_posts'] && $is_active_manager ):
-												$attr = $l == 0 ? 'selected' : '';
-												$attr = $management_user == $ID ? 'selected' : '';
 
-												?>
-                                                <option value="<?php echo $ID; ?>"
-													<?php echo $attr; ?>
-                                                        data-is_active="<?php echo $is_active_manager; ?>"
-                                                        data-val="<?php echo $user->allcaps['edit_posts']; ?>">
-													<?php echo carbon_get_user_meta( $ID, 'user_company_name' ); ?>
-                                                </option>
-											<?php endif; endforeach; ?>
-                                    </select>
-                                </div>
-							<?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -728,8 +730,8 @@ function edit_advertisement() {
 					<?php if ( $delivery_types ): ?>
                         <div class="form-group quarter">
                             <select multiple class="select_st" required name="delivery_types[]">
-                                <option disabled="disabled" selected="selected">Умови доставки (виберіть один або
-                                    декілька)
+                                <option disabled="disabled" >
+                                    Умови доставки (виберіть один або декілька)
                                 </option>
 								<?php foreach ( $delivery_types as $item ):
 									$_type_item = $item['_type'];

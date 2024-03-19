@@ -1,44 +1,44 @@
 <?php
 get_header();
-$var               = variables();
-$set               = $var['setting_home'];
-$assets            = $var['assets'];
-$url               = $var['url'];
-$url_home          = $var['url_home'];
-$admin_ajax        = $var['admin_ajax'];
-$current_user_id   = get_current_user_id();
-$id                = get_the_ID();
-$author_id         = get_post_field( 'post_author', $id );
+$var                 = variables();
+$set                 = $var['setting_home'];
+$assets              = $var['assets'];
+$url                 = $var['url'];
+$url_home            = $var['url_home'];
+$admin_ajax          = $var['admin_ajax'];
+$current_user_id     = get_current_user_id();
+$id                  = get_the_ID();
+$author_id           = get_post_field( 'post_author', $id );
 $seller_rating       = get_seller_rating( $author_id );
 $seller_count_review = get_seller_count_review( $author_id );
-$isLighthouse      = isLighthouse();
-$product_latitude  = carbon_get_post_meta( $id, 'product_latitude' );
-$product_longitude = carbon_get_post_meta( $id, 'product_longitude' );
-$size              = $isLighthouse ? 'thumbnail' : 'full';
-$gallery           = carbon_get_post_meta( $id, 'product_gallery' );
-$img               = get_the_post_thumbnail_url( $id );
-$title             = get_the_title();
-$content           = get_content_by_id( $id );
-$reviews_count     = review_count( $id );
-$rating            = carbon_get_post_meta( $id, 'product_rating' );
-$is_favorite       = is_in_favorite( $id );
-$is_bought         = is_bought( $id );
-$cls               = $is_favorite ? 'active' : '';
-$min_order         = carbon_get_post_meta( $id, 'product_min_order' );
-$max_value         = carbon_get_post_meta( $id, 'product_max_value' );
-$currency          = carbon_get_theme_option( 'currency' );
-$delivery_methods  = carbon_get_post_meta( $id, 'product_delivery_methods' );
-$unit              = carbon_get_post_meta( $id, 'product_unit' );
-$address           = carbon_get_post_meta( $id, 'product_address' );
-$city              = carbon_get_post_meta( $id, 'product_city' );
-$price             = carbon_get_post_meta( $id, 'product_price' );
-$products          = carbon_get_post_meta( $id, 'product_products' );
-$product_views     = carbon_get_post_meta( $id, 'product_views' ) ?: 0;
-$user_location     = get_user_location();
-$user_coordinates  = get_user_location_coordinates();
-$user_lat          = $user_coordinates['lat'] ?? ( $user_location['lat'] ?? '' );
-$user_lon          = $user_coordinates['lon'] ?? ( $user_location['lon'] ?? '' );
-$distance          = 0;
+$isLighthouse        = isLighthouse();
+$product_latitude    = carbon_get_post_meta( $id, 'product_latitude' );
+$product_longitude   = carbon_get_post_meta( $id, 'product_longitude' );
+$size                = $isLighthouse ? 'thumbnail' : 'full';
+$gallery             = carbon_get_post_meta( $id, 'product_gallery' );
+$img                 = get_the_post_thumbnail_url( $id );
+$title               = get_the_title();
+$content             = get_content_by_id( $id );
+$reviews_count       = review_count( $id );
+$rating              = carbon_get_post_meta( $id, 'product_rating' );
+$is_favorite         = is_in_favorite( $id );
+$is_bought           = is_bought( $id );
+$cls                 = $is_favorite ? 'active' : '';
+$min_order           = carbon_get_post_meta( $id, 'product_min_order' );
+$max_value           = carbon_get_post_meta( $id, 'product_max_value' );
+$currency            = carbon_get_theme_option( 'currency' );
+$delivery_methods    = carbon_get_post_meta( $id, 'product_delivery_methods' );
+$unit                = carbon_get_post_meta( $id, 'product_unit' );
+$address             = carbon_get_post_meta( $id, 'product_address' );
+$city                = carbon_get_post_meta( $id, 'product_city' );
+$price               = carbon_get_post_meta( $id, 'product_price' );
+$products            = carbon_get_post_meta( $id, 'product_products' );
+$product_views       = carbon_get_post_meta( $id, 'product_views' ) ?: 0;
+$user_location       = get_user_location();
+$user_coordinates    = get_user_location_coordinates();
+$user_lat            = $user_coordinates['lat'] ?? ( $user_location['lat'] ?? '' );
+$user_lon            = $user_coordinates['lon'] ?? ( $user_location['lon'] ?? '' );
+$distance            = 0;
 if ( $product_latitude && $product_longitude && $user_lat && $user_lon ) {
 	$distance = getDistanceByCoordinates( array(
 		'location_from' => array(
@@ -72,12 +72,12 @@ $user_post   = carbon_get_user_meta( $author_id, 'user_post' );
 if ( $user_post && get_post( $user_post ) ) {
 	$author_link = get_the_permalink( $user_post );
 }
-$_order               = $_GET['order'] ?? '';
-$_orderby             = $_GET['orderby'] ?? '';
-$pagenum              = $_GET['pagenum'] ?? 1;
-$is_logged            = is_user_logged_in();
-$current_author_id    = $author_id ?: $wp_query->get_queried_object()->ID;
-$user_id              = $current_author_id;
+$_order            = $_GET['order'] ?? '';
+$_orderby          = $_GET['orderby'] ?? '';
+$pagenum           = $_GET['pagenum'] ?? 1;
+$is_logged         = is_user_logged_in();
+$current_author_id = $author_id ?: $wp_query->get_queried_object()->ID;
+$user_id           = $current_author_id;
 ?>
     <section class="section-product pad_section_bot">
         <div class="container">
@@ -157,7 +157,7 @@ $user_id              = $current_author_id;
 						<?php endif; ?>
 					<?php endif; ?>
 
-                    <?php the_user_testimonials($author_id); ?>
+					<?php the_user_testimonials( $author_id ); ?>
 
                 </div>
                 <div class="product-group__right">
@@ -166,6 +166,9 @@ $user_id              = $current_author_id;
                             <div class="product-card__top">
                                 <div class="product-card__title">
 									<?php echo $title; ?>
+                                </div>
+                                <div class="product-card__list-main">
+                                    ID: <?php echo $id; ?>
                                 </div>
                             </div>
                             <div class="product-card__list">
@@ -331,8 +334,6 @@ $user_id              = $current_author_id;
         </div>
     </section>
 
-
-
 <?php
 $args  = array(
 	'post_type'      => 'products',
@@ -374,7 +375,7 @@ if ( $query->have_posts() ) :
 wp_reset_postdata();
 wp_reset_query(); ?>
 
-<?php $closest   = get_closest( $id );
+<?php $closest = get_closest( $id );
 if ( $closest ) :
 	?>
     <section class="section-slider line_top pad_section">
@@ -389,7 +390,7 @@ if ( $closest ) :
                 </div>
             </div>
             <div class="similar-slider">
-				<?php foreach ( $closest as $distance => $items ) : foreach ($items as $item): ?>
+				<?php foreach ( $closest as $distance => $items ) : foreach ( $items as $item ): ?>
                     <div>
 						<?php the_product( $item ); ?>
                     </div>
@@ -407,7 +408,7 @@ if ( $products ):
 		'posts_per_page' => 5,
 		'post__in'       => explode( ',', $products )
 	);
-	$query = new WP_Query( $args );
+	$query     = new WP_Query( $args );
 	if ( $query->have_posts() ) :
 		?>
         <section class="section-slider line_top pad_section">

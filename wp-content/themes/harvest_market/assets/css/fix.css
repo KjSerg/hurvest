@@ -615,15 +615,99 @@ main.content.showing {
 }
 
 .advertise-old-price {
-    -webkit-text-decoration-line:  line-through;
+    -webkit-text-decoration-line: line-through;
     text-decoration-line: line-through;
 }
 
-.create-item-main .sort-wrap > *:not(:last-child){
+.create-item-main .sort-wrap > *:not(:last-child) {
     margin-right: 2rem;
 }
-.create-item-main .sort-wrap{
+
+.create-item-main .sort-wrap {
     justify-content: flex-start;
+}
+
+.product-card__list-main:nth-child(2) {
+    margin-left: 1rem;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.advertise-item__content ul {
+    margin-bottom: 2rem;
+}
+
+.flex-space-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.flex-space-between > *:not(:last-child){
+    margin-right: 2rem;
+}
+
+.form-group.quarter.flex-align-items-center > a {
+    height: 4rem;
+}
+
+.advertise-item.advertise-buy {
+    padding-bottom: 18rem
+}
+
+.user-social-networks-wrapper {
+    margin-bottom: 1rem;
+}
+
+.user-social-networks-wrapper .faq-item__title {
+    margin-bottom: 1.5rem;
+}
+
+.user-social-networks > * {
+    width: 100%;
+}
+.user-social-networks {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    -webkit-box-direction: normal;
+    display: flex;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    -webkit-box-orient: horizontal;
+    -webkit-flex-flow: row wrap;
+    -ms-flex-flow: row wrap;
+    flex-flow: row wrap;
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -ms-flex-align: end;
+    align-items: flex-end;
+}
+
+@media (max-width: 1600px) {
+    .advertise-item {
+        width: -webkit-calc(33.333% - 2rem);
+        width: calc(33.333% - 2rem);
+
+    }
+}
+
+@media (max-width: 1100px) {
+    .advertise-item {
+        width: -webkit-calc(50% - 2rem);
+        width: calc(50% - 2rem);
+    }
+}
+
+@media (max-width: 860px) {
+    .advertise-item {
+        width: -webkit-calc(100% - 2rem);
+        width: calc(100% - 2rem);
+    }
+    .advertise-item.advertise-buy {
+        padding-bottom: 2rem;
+    }
 }
 
 @media (max-width: 460px) {
@@ -640,6 +724,13 @@ main.content.showing {
         margin-right: 1rem;
         width: 1.8rem;
         height: 1.8rem;
+    }
+
+    .product-card__top {
+        display: flex;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
     }
 }
 

@@ -174,227 +174,6 @@ function the_user_data_editing() {
                 </div>
             </div>
 		<?php endif; ?>
-		<?php if ( ! $user_seller ): ?>
-            <div class="cabinet-item js-collapse">
-                <div class="faq-item js-collapse-item">
-                    <div class="faq-item__title ">
-                        Створити фермерське господарство
-                    </div>
-                    <div class="faq-item__content js-collapse-content" style="display: block">
-                        <form class="form-js add-enterprise-form" id="add-enterprise-form" novalidate method="post">
-                            <input type="hidden" name="action" value="add_enterprise">
-                            <input type="hidden" id="user_post_code" name="postcode" value="">
-                            <input type="hidden" id="user_country" name="country">
-                            <input type="hidden" id="user_country_code" name="country_code">
-                            <input type="hidden" id="user_city" name="city">
-                            <input type="hidden" id="user_region" name="region">
-                            <input type="hidden" id="lat" name="lat">
-                            <input type="hidden" id="lng" name="lng">
-                            <div class="form-horizontal">
-                                <div class="form-group quarter">
-                                    <input class="input_st" type="text"
-                                           name="name" required="required"
-                                           placeholder="Назва господарства*"/>
-                                </div>
-                                <div class="form-group quarter">
-                                    <input class="input_st"
-                                           type="tel"
-                                           name="phone"
-                                           required="required"
-                                           title="Обовʼязкове поле"
-                                           placeholder="Номер телефону*"/>
-                                </div>
-                                <div class="form-group quarter">
-                                    <input class="input_st address-js" type="text"
-                                           name="address"
-                                           id="address-google"
-                                           title="Обовʼязкове поле"
-                                           placeholder="Місцезнаходження (Місто, індекс)*"
-                                           required="required"/>
-                                </div>
-	                            <?php if ( $delivery_types ): ?>
-                                    <div class="form-group quarter">
-                                        <select multiple class="select_st" required name="delivery_types[]">
-                                            <option disabled="disabled" value="">
-                                                Умови доставки (виберіть один або декілька)
-                                            </option>
-				                            <?php foreach ( $delivery_types as $item ):
-					                            $_type_item = $item['_type'];
-					                            $_title_item = $item['title'];
-					                            ?>
-                                                <option value="<?php echo $_title_item . "[$_type_item]"; ?>">
-						                            <?php echo $_title_item; ?>
-                                                </option>
-				                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-	                            <?php endif; ?>
-                                <div class="form-group">
-                            <textarea class="input_st content-field" name="text"
-                                      placeholder="Опис фермерського господарства*"
-                                      data-number="500"
-                                      title="Обовʼязкове поле"
-                                      required="required"></textarea>
-                                    <div class="form-group__info content-count-js">0/500</div>
-                                </div>
-								<?php the_organization_work_time(); ?>
-
-                                <div class="cabinet-item" title="Загрузіть що найменше 1 фото">
-                                    <div class="cabinet-item__title">Фото*</div>
-                                    <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
-                                    <div class="cabinet-item__photo">
-                                        <div class="cabinet-item__photo-item cover-photo">
-                                            <label>
-                                                <input required
-                                                       multiple
-                                                       id="photos"
-                                                       data-max="<?php echo $image_count; ?>"
-                                                       class="upfile_product" type="file" name="upfile[]"
-                                                       accept="image/heic, image/png, image/jpeg, image/webp"/>
-                                            </label>
-                                            <img src="" alt=""/>
-                                            <span class="remove-file"></span>
-                                        </div>
-										<?php if ( $image_count > 1 ): for ( $a = 1; $a < $image_count; $a ++ ): ?>
-                                            <div class="cabinet-item__photo-item">
-                                                <label for="photos"></label>
-                                                <img src="" alt=""/>
-                                                <span class="remove-file"></span>
-                                            </div>
-										<?php endfor; endif; ?>
-                                    </div>
-                                </div>
-                                <div class="personal-form-btn">
-                                    <button class="btn_st" type="submit">
-                                        <span>Додати господарство </span>
-                                    </button>
-                                </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-		<?php else:
-			$gallery = carbon_get_user_meta( $user_id, 'user_company_gallery' );
-			?>
-            <div class="cabinet-item js-collapse">
-                <div class="faq-item js-collapse-item">
-                    <div class="faq-item__title ">
-                        Редагувати фермерське господарство
-                    </div>
-                    <div class="faq-item__content js-collapse-content" style="display:block;">
-                        <form class="form-js add-enterprise-form" id="add-enterprise-form" novalidate method="post">
-                            <input type="hidden" name="action" value="add_enterprise">
-                            <input type="hidden" name="type" value="edit">
-                            <input type="hidden" id="user_post_code" name="postcode"
-                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_postcode' ) ?>">
-                            <input type="hidden" id="user_country" name="country"
-                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country' ) ?>">
-                            <input type="hidden" id="user_country_code" name="country_code"
-                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country_code' ) ?>">
-                            <input type="hidden" id="user_city" name="city" value="<?php echo $company_city; ?>">
-                            <input type="hidden" id="user_region" name="region"
-                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_region' ) ?>">
-                            <input type="hidden" id="lat" name="lat"
-                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_latitude' ) ?>">
-                            <input type="hidden" id="lng" name="lng"
-                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_longitude' ) ?>">
-                            <div class="form-horizontal">
-                                <div class="form-group quarter">
-                                    <input class="input_st" type="text"
-                                           name="name" required="required"
-                                           title="Обовʼязкове поле"
-                                           value="<?php echo $company_name; ?>"
-                                           placeholder="Назва господарства*"/>
-                                </div>
-                                <div class="form-group quarter">
-                                    <input class="input_st"
-                                           type="tel"
-                                           name="phone"
-                                           value="<?php echo carbon_get_user_meta( $user_id, 'user_company_phone' ); ?>"
-                                           required="required"
-                                           title="Обовʼязкове поле"
-                                           placeholder="Номер телефону*"/>
-                                </div>
-                                <div class="form-group quarter">
-                                    <input class="input_st address-js" type="text"
-                                           name="address"
-                                           value="<?php echo $company_address; ?>"
-                                           data-selected="<?php echo $company_address; ?>"
-                                           id="address-google"
-                                           title="Обовʼязкове поле"
-                                           placeholder="Місцезнаходження (Місто, індекс)*" required="required"/>
-                                </div>
-	                            <?php if ( $delivery_types ): ?>
-                                    <div class="form-group quarter">
-                                        <select multiple class="select_st" required name="delivery_types[]">
-                                            <option disabled="disabled" >
-                                                Умови доставки (виберіть один або декілька)
-                                            </option>
-				                            <?php foreach ( $delivery_types as $item ):
-					                            $_type_item = $item['_type'];
-					                            $_title_item = $item['title'];
-					                            $attr = in_array( $_title_item . "[$_type_item]", $_delivery_methods ) ? 'selected' : '';
-					                            ?>
-                                                <option value="<?php echo $_title_item . "[$_type_item]"; ?>" <?php echo $attr; ?>>
-						                            <?php echo $_title_item; ?>
-                                                </option>
-				                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-	                            <?php endif; ?>
-                                <div class="form-group">
-                            <textarea class="input_st content-field" name="text"
-                                      placeholder="Опис фермерського господарства*"
-                                      data-number="500"
-                                      title="Обовʼязкове поле"
-                                      required="required"><?php echo trim( strip_tags( $company_description ) ); ?></textarea>
-                                    <div class="form-group__info content-count-js">0/500</div>
-                                </div>
-
-								<?php the_organization_work_time(); ?>
-                                <div class="cabinet-item">
-                                    <div class="cabinet-item__title">Фото*</div>
-                                    <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
-                                    <div class="cabinet-item__photo">
-                                        <div class="cabinet-item__photo-item cover-photo">
-                                            <label>
-                                                <input required
-                                                       multiple
-                                                       id="photos"
-                                                       data-max="<?php echo $image_count; ?>"
-                                                       class="upfile_product" type="file" name="upfile[]"
-                                                       accept="iimage/heic, image/png, image/jpeg, image/webp"/>
-                                            </label>
-                                            <img src="<?php _u( $gallery[0] ); ?>" alt=""
-                                                 class="<?php echo $gallery[0] && _u( $gallery[0], 1 ) ? 'visible add-to-buffer' : ''; ?>"/>
-                                            <span class="remove-file"></span>
-                                        </div>
-										<?php if ( $image_count > 1 ): for ( $a = 1; $a < $image_count; $a ++ ): ?>
-                                            <div class="cabinet-item__photo-item">
-                                                <label for="photos"></label>
-                                                <img src="<?php echo $gallery[ $a ] ? _u( $gallery[ $a ], 1 ) : ''; ?>"
-                                                     class="<?php echo $gallery[ $a ] && _u( $gallery[ $a ], 1 ) ? 'visible add-to-buffer' : ''; ?>"
-                                                     alt=""/>
-                                                <span class="remove-file"></span>
-                                            </div>
-										<?php endfor; endif; ?>
-                                    </div>
-                                </div>
-                                <div class="personal-form-btn">
-                                    <button class="btn_st" type="submit">
-                                        <span>Редагувати господарство </span>
-                                    </button>
-									<?php if ( $author_link ): ?>
-                                        <a href="<?php echo $author_link; ?>" class="btn_st">
-                                            <span>Сторінка господарства</span>
-                                        </a>
-									<?php endif; ?>
-                                </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-		<?php endif; ?>
     </div>
 	<?php if ( $map_api_url ): ?>
         <script src="<?php echo $map_api_url; ?>" id="google-map-api" defer></script>
@@ -1757,5 +1536,366 @@ function the_payment_history_item( $id = false ) {
             </strong>
         </div>
     </div>
+	<?php
+}
+
+function the_organization_data_editing() {
+	$var                  = variables();
+	$set                  = $var['setting_home'];
+	$assets               = $var['assets'];
+	$url                  = $var['url'];
+	$url_home             = $var['url_home'];
+	$admin_ajax           = $var['admin_ajax'];
+	$user_id              = get_current_user_id();
+	$current_user         = get_user_by( 'ID', $user_id );
+	$email                = $current_user->user_email ?: '';
+	$display_name         = $current_user->display_name ?: '';
+	$first_name           = $current_user->first_name ?: '';
+	$last_name            = $current_user->last_name ?: '';
+	$name                 = $first_name ?: $display_name;
+	$user_surname         = carbon_get_user_meta( $user_id, 'user_surname' ) ?: '';
+	$user_city            = carbon_get_user_meta( $user_id, 'user_city' ) ?: '';
+	$user_phone           = carbon_get_user_meta( $user_id, 'user_phone' ) ?: '';
+	$user_avatar          = carbon_get_user_meta( $user_id, 'user_avatar' );
+	$user_seller          = carbon_get_user_meta( $user_id, 'user_seller' );
+	$telegram_id          = carbon_get_user_meta( $user_id, 'telegram_id' );
+	$company_address      = carbon_get_user_meta( $user_id, 'user_company_address' );
+	$company_name         = carbon_get_user_meta( $user_id, 'user_company_name' );
+	$company_description  = carbon_get_user_meta( $user_id, 'user_company_description' );
+	$company_city         = carbon_get_user_meta( $user_id, 'user_company_city' );
+	$avatar_url           = $user_avatar ? _u( $user_avatar, 1 ) : get_avatar_url( $email ?: $user_id );
+	$BOT_USERNAME         = carbon_get_theme_option( 'telegram_bot_name' );
+	$BOT_TOKEN            = carbon_get_theme_option( 'telegram_token' );
+	$REDIRECT_URI         = get_the_permalink() ?: $url;
+	$map_api_url          = carbon_get_theme_option( 'autocomplete_api_url' );
+	$image_count          = carbon_get_theme_option( 'image_count' ) ?: 1;
+	$user_post            = carbon_get_user_meta( $user_id, 'user_post' );
+	$delivery_types       = carbon_get_theme_option( 'delivery_types' );
+	$_delivery_methods    = carbon_get_user_meta( $user_id, 'user_delivery_methods' );
+	$user_company_phones  = carbon_get_user_meta( $user_id, 'user_company_phone' );
+	$office_type          = carbon_get_user_meta( $user_id, 'user_company_office_type' ) ?: '';
+	$user_payment_methods = carbon_get_user_meta( $user_id, 'user_payment_methods' ) ?: '';
+	$user_company_phones  = explode( ',', $user_company_phones );
+	$author_link          = false;
+	if ( $user_post && get_post( $user_post ) ) {
+		$author_link = get_the_permalink( $user_post );
+	}
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/media.php';
+	the_header_cabinet();
+	?>
+    <div class="create-item-main">
+		<?php if ( ! $user_seller ): ?>
+            <div class="cabinet-item js-collapse">
+                <div class="faq-item js-collapse-item">
+                    <div class="faq-item__title ">
+                        Створити фермерське господарство
+                    </div>
+                    <div class="faq-item__content js-collapse-content" style="display: block">
+                        <form class="form-js add-enterprise-form" id="add-enterprise-form" novalidate method="post">
+                            <input type="hidden" name="action" value="add_enterprise">
+                            <input type="hidden" id="user_post_code" name="postcode" value="">
+                            <input type="hidden" id="user_country" name="country">
+                            <input type="hidden" id="user_country_code" name="country_code">
+                            <input type="hidden" id="user_city" name="city">
+                            <input type="hidden" id="user_region" name="region">
+                            <input type="hidden" id="lat" name="lat">
+                            <input type="hidden" id="lng" name="lng">
+                            <div class="form-horizontal">
+                                <div class="form-group third">
+                                    <input class="input_st" type="text"
+                                           name="name" required="required"
+                                           placeholder="Назва господарства*"/>
+                                </div>
+
+                                <div class="form-group third">
+                                    <input class="input_st address-js" type="text"
+                                           name="address"
+                                           id="address-google"
+                                           title="Обовʼязкове поле"
+                                           placeholder="Місцезнаходження (Місто, індекс)*"
+                                           required="required"/>
+                                </div>
+                                <div class="form-group third">
+                                    <select class="select_st" required name="office_type">
+                                        <option disabled="disabled" selected value="">
+                                            Тип приміщення
+                                        </option>
+                                        <option>Офіс</option>
+                                        <option>Приміщення</option>
+                                        <option>Квартира</option>
+                                    </select>
+                                </div>
+                                <div class="form-group half">
+                                    <input class="input_st"
+                                           type="tel"
+                                           name="phone[]"
+                                           required="required"
+                                           title="Обовʼязкове поле"
+                                           placeholder="Номер телефону*"/>
+                                </div>
+                                <div class="form-group half">
+                                    <input class="input_st"
+                                           type="tel"
+                                           name="phone[]"
+                                           title=""
+                                           placeholder="Додатковий номер телефону"/>
+                                </div>
+								<?php if ( $delivery_types ): ?>
+                                    <div class="form-group half">
+                                        <select multiple class="select_st" required name="delivery_types[]">
+                                            <option disabled="disabled" value="">
+                                                Умови доставки (виберіть один або декілька)
+                                            </option>
+											<?php foreach ( $delivery_types as $item ):
+												$_type_item = $item['_type'];
+												$_title_item = $item['title'];
+												?>
+                                                <option value="<?php echo $_title_item . "[$_type_item]"; ?>">
+													<?php echo $_title_item; ?>
+                                                </option>
+											<?php endforeach; ?>
+                                        </select>
+                                    </div>
+								<?php endif; ?>
+								<?php if ( $types = carbon_get_theme_option( 'payment_methods' ) ): ?>
+                                    <div class="form-group half">
+                                        <select multiple class="select_st" required name="payment_methods[]">
+                                            <option disabled="disabled" value="">
+                                                Умови оплати (виберіть один або декілька)
+                                            </option>
+											<?php foreach ( $types as $item ):
+												$_type_item = $item['_type'];
+												$_title_item = $item['title'];
+												?>
+                                                <option value="<?php echo $_title_item . "[$_type_item]"; ?>">
+													<?php echo $_title_item; ?>
+                                                </option>
+											<?php endforeach; ?>
+                                        </select>
+                                    </div>
+								<?php endif; ?>
+                                <div class="form-group">
+                            <textarea class="input_st content-field" name="text"
+                                      placeholder="Опис фермерського господарства*"
+                                      data-number="500"
+                                      title="Обовʼязкове поле"
+                                      required="required"></textarea>
+                                    <div class="form-group__info content-count-js">0/500</div>
+                                </div>
+								<?php the_organization_work_time(); ?>
+	                            <?php the_user_social_networks(); ?>
+                                <div class="cabinet-item" title="Загрузіть що найменше 1 фото">
+                                    <div class="cabinet-item__title">Фото*</div>
+                                    <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
+                                    <div class="cabinet-item__photo">
+                                        <div class="cabinet-item__photo-item cover-photo">
+                                            <label>
+                                                <input required
+                                                       multiple
+                                                       id="photos"
+                                                       data-max="<?php echo $image_count; ?>"
+                                                       class="upfile_product" type="file" name="upfile[]"
+                                                       accept="image/heic, image/png, image/jpeg, image/webp"/>
+                                            </label>
+                                            <img src="" alt=""/>
+                                            <span class="remove-file"></span>
+                                        </div>
+										<?php if ( $image_count > 1 ): for ( $a = 1; $a < $image_count; $a ++ ): ?>
+                                            <div class="cabinet-item__photo-item">
+                                                <label for="photos"></label>
+                                                <img src="" alt=""/>
+                                                <span class="remove-file"></span>
+                                            </div>
+										<?php endfor; endif; ?>
+                                    </div>
+                                </div>
+                                <div class="personal-form-btn">
+                                    <button class="btn_st" type="submit">
+                                        <span>Додати господарство </span>
+                                    </button>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+		<?php else:
+			$gallery = carbon_get_user_meta( $user_id, 'user_company_gallery' );
+			?>
+            <div class="cabinet-item js-collapse">
+                <div class="faq-item js-collapse-item">
+                    <div class="faq-item__title ">
+                        Редагувати фермерське господарство
+                    </div>
+                    <div class="faq-item__content js-collapse-content" style="display:block;">
+                        <form class="form-js add-enterprise-form" id="add-enterprise-form" novalidate method="post">
+                            <input type="hidden" name="action" value="add_enterprise">
+                            <input type="hidden" name="type" value="edit">
+                            <input type="hidden" id="user_post_code" name="postcode"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_postcode' ) ?>">
+                            <input type="hidden" id="user_country" name="country"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country' ) ?>">
+                            <input type="hidden" id="user_country_code" name="country_code"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_country_code' ) ?>">
+                            <input type="hidden" id="user_city" name="city" value="<?php echo $company_city; ?>">
+                            <input type="hidden" id="user_region" name="region"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_region' ) ?>">
+                            <input type="hidden" id="lat" name="lat"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_latitude' ) ?>">
+                            <input type="hidden" id="lng" name="lng"
+                                   value="<?php echo carbon_get_user_meta( $user_id, 'user_company_longitude' ) ?>">
+                            <div class="form-horizontal">
+                                <div class="form-group third">
+                                    <input class="input_st" type="text"
+                                           name="name" required="required"
+                                           title="Обовʼязкове поле"
+                                           value="<?php echo $company_name; ?>"
+                                           placeholder="Назва господарства*"/>
+                                </div>
+
+                                <div class="form-group third">
+                                    <input class="input_st address-js" type="text"
+                                           name="address"
+                                           value="<?php echo $company_address; ?>"
+                                           data-selected="<?php echo $company_address; ?>"
+                                           id="address-google"
+                                           title="Обовʼязкове поле"
+                                           placeholder="Місцезнаходження (Місто, індекс)*" required="required"/>
+                                </div>
+                                <div class="form-group third">
+                                    <select class="select_st" required name="office_type">
+                                        <option disabled="disabled" <?php echo $office_type == '' ? 'selected' : ''; ?>
+                                                value="">
+                                            Тип приміщення
+                                        </option>
+                                        <option <?php echo $office_type == 'Офіс' ? 'selected' : ''; ?> >
+                                            Офіс
+                                        </option>
+                                        <option <?php echo $office_type == 'Приміщення' ? 'selected' : ''; ?> >
+                                            Приміщення
+                                        </option>
+                                        <option <?php echo $office_type == 'Квартира' ? 'selected' : ''; ?> >
+                                            Квартира
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group half">
+                                    <input class="input_st"
+                                           type="tel"
+                                           name="phone[]"
+                                           value="<?php echo $user_company_phones[0] ?? ''; ?>"
+                                           required="required"
+                                           title="Обовʼязкове поле"
+                                           placeholder="Номер телефону*"/>
+                                </div>
+                                <div class="form-group half">
+                                    <input class="input_st"
+                                           type="tel"
+                                           name="phone[]"
+                                           value="<?php echo $user_company_phones[1] ?? ''; ?>"
+                                           title=""
+                                           placeholder="Додатковий номер телефону"/>
+                                </div>
+								<?php if ( $delivery_types ): ?>
+                                    <div class="form-group half">
+                                        <select multiple class="select_st" required name="delivery_types[]">
+                                            <option disabled="disabled">
+                                                Умови доставки (виберіть один або декілька)
+                                            </option>
+											<?php foreach ( $delivery_types as $item ):
+												$_type_item = $item['_type'];
+												$_title_item = $item['title'];
+												$attr = in_array( $_title_item . "[$_type_item]", $_delivery_methods ) ? 'selected' : '';
+												?>
+                                                <option value="<?php echo $_title_item . "[$_type_item]"; ?>" <?php echo $attr; ?>>
+													<?php echo $_title_item; ?>
+                                                </option>
+											<?php endforeach; ?>
+                                        </select>
+                                    </div>
+								<?php endif; ?>
+								<?php if ( $types = carbon_get_theme_option( 'payment_methods' ) ):
+
+									?>
+                                    <div class="form-group half">
+                                        <select multiple class="select_st" required name="payment_methods[]">
+                                            <option disabled="disabled" value="">
+                                                Умови оплати (виберіть один або декілька)
+                                            </option>
+											<?php foreach ( $types as $item ):
+												$_type_item = $item['_type'];
+												$_title_item = $item['title'];
+												$attr = '';
+												if ( in_array( $_title_item . "[$_type_item]", $user_payment_methods ) ) {
+													$attr = 'selected';
+												}
+												?>
+                                                <option <?php echo $attr; ?>
+                                                        value="<?php echo $_title_item . "[$_type_item]"; ?>">
+													<?php echo $_title_item; ?>
+                                                </option>
+											<?php endforeach; ?>
+                                        </select>
+                                    </div>
+								<?php endif; ?>
+                                <div class="form-group">
+                            <textarea class="input_st content-field" name="text"
+                                      placeholder="Опис фермерського господарства*"
+                                      data-number="500"
+                                      title="Обовʼязкове поле"
+                                      required="required"><?php echo trim( strip_tags( $company_description ) ); ?></textarea>
+                                    <div class="form-group__info content-count-js">0/500</div>
+                                </div>
+
+								<?php the_organization_work_time(); ?>
+								<?php the_user_social_networks(); ?>
+                                <div class="cabinet-item">
+                                    <div class="cabinet-item__title">Фото*</div>
+                                    <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
+                                    <div class="cabinet-item__photo">
+                                        <div class="cabinet-item__photo-item cover-photo">
+                                            <label>
+                                                <input required
+                                                       multiple
+                                                       id="photos"
+                                                       data-max="<?php echo $image_count; ?>"
+                                                       class="upfile_product" type="file" name="upfile[]"
+                                                       accept="iimage/heic, image/png, image/jpeg, image/webp"/>
+                                            </label>
+                                            <img src="<?php _u( $gallery[0] ); ?>" alt=""
+                                                 class="<?php echo $gallery[0] && _u( $gallery[0], 1 ) ? 'visible add-to-buffer' : ''; ?>"/>
+                                            <span class="remove-file"></span>
+                                        </div>
+										<?php if ( $image_count > 1 ): for ( $a = 1; $a < $image_count; $a ++ ): ?>
+                                            <div class="cabinet-item__photo-item">
+                                                <label for="photos"></label>
+                                                <img src="<?php echo $gallery[ $a ] ? _u( $gallery[ $a ], 1 ) : ''; ?>"
+                                                     class="<?php echo $gallery[ $a ] && _u( $gallery[ $a ], 1 ) ? 'visible add-to-buffer' : ''; ?>"
+                                                     alt=""/>
+                                                <span class="remove-file"></span>
+                                            </div>
+										<?php endfor; endif; ?>
+                                    </div>
+                                </div>
+                                <div class="personal-form-btn">
+                                    <button class="btn_st" type="submit">
+                                        <span>Редагувати господарство </span>
+                                    </button>
+									<?php if ( $author_link ): ?>
+                                        <a href="<?php echo $author_link; ?>" class="btn_st">
+                                            <span>Сторінка господарства</span>
+                                        </a>
+									<?php endif; ?>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+		<?php endif; ?>
+    </div>
+	<?php if ( $map_api_url ): ?>
+        <script src="<?php echo $map_api_url; ?>" id="google-map-api" defer></script>
+	<?php endif; ?>
 	<?php
 }

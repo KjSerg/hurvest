@@ -707,62 +707,66 @@ function the_user_testimonials( $author_id ) {
 			<?php echo _get_more_reviews_link( $query->max_num_pages, $author_id ); ?>
         </div>
         <div class="cabinet-item">
-            <div class="cabinet-item__title">Залишити відгук</div>
-            <form class="form-js seller-comment-form" id="seller-comment-form" method="post" novalidate>
-                <input type="hidden" name="action" value="new_seller_review">
-                <input type="hidden" name="seller_id" value="<?php echo $current_author_id; ?>">
-                <div class="form-horizontal">
-                    <div class="form-group half">
-                        <input class="input_st"
-                               type="text"
-                               name="name"
-                               placeholder="Ім'я" required="required"/>
-                    </div>
-                    <div class="form-group half">
-                        <input class="input_st"
-                               type="email"
-                               name="email"
-                               data-reg="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])"
-                               placeholder="E-mail" required="required"/>
-                    </div>
-                    <div class="form-group">
-                        <div class="feedback-rating">
-                            <div class="feedback-rating__text"> Оцініть товар:</div>
-                            <div class="rating">
-								<?php for ( $a = 1; $a <= 10; $a ++ ): ?>
-                                    <label class="rating-item">
-                                        <input type="radio" name="rating" value="<?php echo $a ?>"/>
-                                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                             style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
+			<?php if ( $current_user_id ): ?>
+                <div class="cabinet-item__title">Залишити відгук</div>
+                <form class="form-js seller-comment-form" id="seller-comment-form" method="post" novalidate>
+                    <input type="hidden" name="action" value="new_seller_review">
+                    <input type="hidden" name="seller_id" value="<?php echo $current_author_id; ?>">
+                    <div class="form-horizontal">
+                        <div class="form-group half">
+                            <input class="input_st"
+                                   type="text"
+                                   name="name"
+                                   placeholder="Ім'я" required="required"/>
+                        </div>
+                        <div class="form-group half">
+                            <input class="input_st"
+                                   type="email"
+                                   name="email"
+                                   data-reg="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])"
+                                   placeholder="E-mail" required="required"/>
+                        </div>
+                        <div class="form-group">
+                            <div class="feedback-rating">
+                                <div class="feedback-rating__text"> Оцініть товар:</div>
+                                <div class="rating">
+									<?php for ( $a = 1; $a <= 10; $a ++ ): ?>
+                                        <label class="rating-item">
+                                            <input type="radio" name="rating" value="<?php echo $a ?>"/>
+                                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                                 style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
                                                     <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
                                                           style="fill:#ffc327"/>
                                                 </svg>
-                                    </label>
-								<?php endfor; ?>
+                                        </label>
+									<?php endfor; ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group">
+                        <div class="form-group">
                                 <textarea class="input_st" name="text"
                                           placeholder="Ваш коментар"
                                           required="required"></textarea>
-                    </div>
-                </div>
-                <div class="form-bot">
-                    <div class="form-consent">
-                        <label>
-                            <input class="check_st" name="consent" type="checkbox"/><span></span>
-                        </label>
-                        <div class="form-consent__text">
-                            Даю згоду на обробку персональних даних та погоджуюся з <a href="#">політикою
-                                конфіденційності </a>
                         </div>
                     </div>
-                    <button class="btn_st" type="submit">
-                        <span> Відправити відгук </span>
-                    </button>
-                </div>
-            </form>
+                    <div class="form-bot">
+                        <div class="form-consent">
+                            <label>
+                                <input class="check_st" name="consent" type="checkbox"/><span></span>
+                            </label>
+                            <div class="form-consent__text">
+                                Даю згоду на обробку персональних даних та погоджуюся з <a href="#">політикою
+                                    конфіденційності </a>
+                            </div>
+                        </div>
+                        <button class="btn_st" type="submit">
+                            <span> Відправити відгук </span>
+                        </button>
+                    </div>
+                </form>
+			<?php else: ?>
+                <div class="cabinet-item__title">Залишити відгук можуть тільки авторизовані користувачі</div>
+			<?php endif; ?>
         </div>
     </div>
 	<?php
@@ -932,4 +936,115 @@ function the_work_time_row( $args = array() ) {
         </div>
     </div>
 	<?php
+}
+
+
+function the_user_social_networks() {
+	$names   = get_social_networks_name();
+	$user_id = get_current_user_id();
+	$items   = array();
+	if ( $names ) {
+		foreach ( $names as $str ) {
+			$value         = get_user_meta( $user_id, strtolower( $str ), true );
+			$items[ $str ] = $value;
+		}
+	}
+	?>
+    <div class="user-social-networks-wrapper">
+        <div class="faq-item__title">Соціальні мережі</div>
+        <div class="user-social-networks">
+			<?php
+			if ( $items ) {
+				$k = 0;
+				foreach ( $items as $name => $item ) {
+					$is_remove_button = $k != ( count( $items ) );
+					$k ++;
+					the_social_network_row( array(
+						'names'            => $names,
+						'name'             => $name,
+						'value'            => $item,
+						'is_remove_button' => $is_remove_button,
+					) );
+				}
+			} else {
+				the_social_network_row( array(
+					'names' => $names
+				) );
+			}
+			?>
+			<?php the_social_network_row(); ?>
+        </div>
+    </div>
+	<?php
+}
+
+function get_social_networks_name() {
+	return array(
+		'Facebook',
+		'Instagram',
+		'LinkedIn',
+		'MySpace',
+		'Pinterest',
+		'SoundCloud',
+		'Tumblr',
+		'Twitter',
+		'YouTube',
+		'Wikipedia',
+	);
+}
+
+function the_social_network_row( $array = array() ) {
+	$names            = $array['names'] ?? get_social_networks_name();
+	$name             = $array['name'] ?? '';
+	$value            = $array['value'] ?? '';
+	$is_remove_button = $array['is_remove_button'] ?? false;
+	if ( $names ):
+		?>
+        <div class="user-social-network">
+            <div class="form-horizontal">
+                <div class="form-group third">
+                    <div class="form-hours-input">
+                        <div class="form-hours-input__title">Виберіть соціальну мережу</div>
+                        <select class="select_st" required
+                                name="social_network[]"
+                        >
+							<?php foreach ( $names as $_name ): ?>
+                                <option
+									<?php echo $name == $_name ? 'selected' : ''; ?>
+                                        value="<?php echo $_name; ?>">
+									<?php echo $_name; ?>
+                                </option>
+							<?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group third">
+                    <div class="form-hours-input">
+                        <div class="form-hours-input__title">Заповніть посилання</div>
+                        <input class="input_st" placeholder="Посилання профілю" value="<?php echo $value; ?>"
+                               type="url" name="social_network_url[]">
+                    </div>
+                </div>
+                <div class="form-group third">
+					<?php if ( $is_remove_button ): ?>
+                        <a class="btn_st btn_yellow w100 social-network-row-button remove-button"
+                           data-remove="Видалити"
+                           data-add="Додати соціальну мережу"
+                           href="#">
+                            <span>Видалити</span>
+                        </a>
+					<?php else: ?>
+                        <a class="btn_st btn_yellow w100 social-network-row-button"
+                           data-remove="Видалити"
+                           data-add="Додати соціальну мережу"
+                           href="#">
+                            <span>Додати соціальну мережу</span>
+                        </a>
+					<?php endif; ?>
+
+                </div>
+            </div>
+        </div>
+	<?php
+	endif;
 }
