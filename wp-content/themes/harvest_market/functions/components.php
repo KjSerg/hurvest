@@ -75,13 +75,8 @@ function the_product( $id = false ) {
                         class="reviews-count"><?php echo $seller_count_review ?: 0; ?> відгуків</span>
             </a>
             <a class="product-item__title product-item__organization" href="<?php echo $author_link; ?>">
-				<?php echo $user_company_name; ?> <span
-                        class="reviews-rating">  <strong><?php echo $seller_rating ?: 5; ?> <span class="icon-rating"><svg
-                                    xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                    style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
-                                                <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
-                                                      style="fill:#ffc327"/>
-                                            </svg></span></span></strong>
+				<?php echo $user_company_name; ?>
+                <span class="reviews-rating">  <strong><?php echo $seller_rating; ?> </span></strong>
 
             </a>
             <ul class="product-item__place">
@@ -673,7 +668,7 @@ function the_user_testimonials( $author_id ) {
     <div class="user-testimonials">
         <div class="product-testimonials__top">
             <div class="product-testimonials__top-item">
-                <img src="<?php echo $assets; ?>img/star-gold.svg" alt=""/><?php echo $seller_rating ?>
+                <div class="reviews-rating"> <?php echo $seller_rating ?></div>
             </div>
             <div class="product-testimonials__top-item">
 				<?php echo $seller_count_review; ?> відгуків

@@ -1517,10 +1517,10 @@ function get_seller_rating( $user_id ) {
 	}
 	if ( $res > 0 ) {
 		$res = $res / $num;
-		$res = round( $res, 2 );
+		$res = round( $res, 1 );
 	}
 
-	return $res;
+	return number_format( ($res ?: 5 ), 1 );
 }
 
 function v( $var ) {
