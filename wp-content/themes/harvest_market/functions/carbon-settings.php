@@ -776,7 +776,7 @@ function crb_attach_in_reviews() {
 			         Field::make( "text", "review_rating", "Оцінка" )
 			              ->set_attribute( 'type', 'number' )
 			              ->set_attribute( 'min', '1' )
-			              ->set_attribute( 'max', '10' )
+			              ->set_attribute( 'max', '5' )
 			              ->set_attribute( 'step', '1' ),
 			         Field::make( "text", "review_author_email", "Email" ),
 		         )
@@ -962,7 +962,7 @@ function crb_attach_in_comments() {
 			         Field::make( 'text', 'comment_rating', 'Оцінка' )
 			              ->set_attribute( 'type', 'number' )
 			              ->set_attribute( 'min', '0' )
-			              ->set_attribute( 'max', '10' )
+			              ->set_attribute( 'max', '5' )
 			              ->set_attribute( 'step', '1' )
 		         )
 	         );

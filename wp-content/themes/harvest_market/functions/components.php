@@ -359,7 +359,7 @@ function the_filter_categories( $categories ) {
 
 function the_seller_review( $id = false ) {
 	$id            = $id ?: get_the_ID();
-	$review_rating = carbon_get_post_meta( $id, 'review_rating' ) ?: 10;
+	$review_rating = carbon_get_post_meta( $id, 'review_rating' ) ?: 5;
 	$_email        = carbon_get_post_meta( $id, 'review_author_email' );
 	$_user_id      = carbon_get_post_meta( $id, 'review_user_id' );
 	$author_id     = get_post_field( 'post_author', $id );
@@ -386,7 +386,7 @@ function the_seller_review( $id = false ) {
 						<?php echo $title ?: ( $first_name . ' ' . $last_name ); ?>
                     </div>
                     <ul class="rating">
-						<?php for ( $a = 1; $a <= 10; $a ++ ): ?>
+						<?php for ( $a = 1; $a <= 5; $a ++ ): ?>
                             <li class="<?php echo $a <= $review_rating ? 'active' : ''; ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                      style="enable-background:new 0 0 12 11.2"
@@ -730,7 +730,7 @@ function the_user_testimonials( $author_id ) {
                             <div class="feedback-rating">
                                 <div class="feedback-rating__text"> Оцініть товар:</div>
                                 <div class="rating">
-									<?php for ( $a = 1; $a <= 10; $a ++ ): ?>
+									<?php for ( $a = 1; $a <= 5; $a ++ ): ?>
                                         <label class="rating-item">
                                             <input type="radio" name="rating" value="<?php echo $a ?>"/>
                                             <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
@@ -937,7 +937,6 @@ function the_work_time_row( $args = array() ) {
     </div>
 	<?php
 }
-
 
 function the_user_social_networks() {
 	$names   = get_social_networks_name();
