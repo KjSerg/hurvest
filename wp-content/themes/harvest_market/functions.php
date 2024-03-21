@@ -6,11 +6,17 @@
  */
 
 function harvest_scripts() {
+
+    $correct_path = '';
+    if(is_singular('post') || is_author()){
+	    $correct_path = '/seller';
+    }
+
 	wp_enqueue_style( 'harvest-style', get_stylesheet_uri() );
 
 	wp_enqueue_style( 'harvest-fancybox', 'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css', array(), '1.0' );
 
-	wp_enqueue_style( 'harvest-main', get_template_directory_uri() . '/assets/css/main.css', array(), '1.0' );
+	wp_enqueue_style( 'harvest-main', get_template_directory_uri() . "/assets$correct_path/css/main.css", array(), '1.0' );
 
 	wp_enqueue_style( 'harvest-fix', get_template_directory_uri() . '/assets/css/fix.css', array(), '1.0' );
 
@@ -20,9 +26,9 @@ function harvest_scripts() {
 
 	wp_enqueue_script( 'harvest-fancybox', 'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', array(), '1.0', true );
 
-	wp_enqueue_script( 'harvest-libs', get_template_directory_uri() . '/assets/js/libs.min.js', array(), '1.0', true );
+	wp_enqueue_script( 'harvest-libs', get_template_directory_uri() . "/assets$correct_path/js/libs.min.js", array(), '1.0', true );
 
-	wp_enqueue_script( 'harvest-scripts', get_template_directory_uri() . '/assets/js/main.js', array(), '1.0', true );
+	wp_enqueue_script( 'harvest-scripts', get_template_directory_uri() . "/assets$correct_path/js/main.js", array(), '1.0', true );
 
 	wp_enqueue_script( 'harvest-fix-scripts', get_template_directory_uri() . '/assets/js/fix.js', array(), '1.0', true );
 

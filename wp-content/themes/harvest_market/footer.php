@@ -628,8 +628,7 @@ $user_location = get_user_location();
     </div>
 <?php endif; ?>
 <div class="scroll_top">
-    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 8 15"
-         viewBox="0 0 8 15">
+    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 8 15" viewBox="0 0 8 15">
             <path d="M4.7 14.3v-12l2.2 2.2c.6.6 1.6-.3.9-1L4.5.2c-.3-.3-.7-.3-.9 0L.2 3.6c-.1.1-.2.3-.2.5 0 .6.7.9 1.1.5l2.2-2.2v12c.1.9 1.4.8 1.4-.1z"
                   style="fill:#262c40"/>
         </svg>

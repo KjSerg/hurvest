@@ -620,11 +620,11 @@ function crb_attach_in_products() {
 		         Field::make( 'date_time', 'product_end_urgently', 'Закінчення термінового оголошення' )
 		              ->set_storage_format( 'U' )
 		              ->set_width( 25 ),
-		         Field::make( 'text', 'product_boost_time' ),
 	         ) )
 	         ->add_tab( 'Здійсненні покупки', array(
 		         Field::make( 'text', 'product_views', 'Переглянуто' )->set_attribute( 'type', 'number' ),
 		         Field::make( 'text', 'product_purchased', 'Куплено' )->set_attribute( 'type', 'number' ),
+		         Field::make( 'hidden', 'product_time', '' ),
 		         Field::make( 'complex', 'product_purchases', 'Покупки' )
 		              ->setup_labels( $labels )
 		              ->add_fields( array(
@@ -974,6 +974,11 @@ function crb_attach_in_users() {
 		'plural_name'   => 'элементы',
 		'singular_name' => 'элемент',
 	);
+	Container::make( 'user_meta', 'Мережі' )
+	         ->add_fields(
+		         array(
+			         Field::make( 'text', 'tiktok' ),
+		         ) );
 	Container::make( 'user_meta', 'Інформація' )
 	         ->add_fields(
 		         array(
@@ -1005,6 +1010,7 @@ function crb_attach_in_users() {
 			         Field::make( 'text', 'user_company_office_type', 'Тип приміщення' ),
 			         Field::make( 'text', 'user_company_name', 'Назва компанії або господарства' ),
 			         Field::make( 'textarea', 'user_company_description', 'Опис компанії або господарства' ),
+			         Field::make( 'image', 'user_company_logo', 'Логотип компанії' ),
 			         Field::make( 'media_gallery', 'user_company_gallery', 'Фото' ),
 			         Field::make( 'color', 'user_company_color', 'Колір сторінки продавця' ),
 			         Field::make( 'hidden', 'user_post', ' ' ),

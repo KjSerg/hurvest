@@ -683,6 +683,10 @@ main.content.showing {
     align-items: flex-end;
 }
 
+.upfile_logo {
+    display: none;
+}
+
 @media (max-width: 1600px) {
     .advertise-item {
         width: -webkit-calc(33.333% - 2rem);

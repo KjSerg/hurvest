@@ -1,7 +1,7 @@
 <?php
 $id        = get_the_ID();
 $author_id = get_post_field( 'post_author', $id );
-get_header();
+get_header( 'seller' );
 global $wp_query;
 $is_logged            = is_user_logged_in();
 $var                  = variables();
@@ -13,7 +13,7 @@ $id                   = get_the_ID();
 $isLighthouse         = isLighthouse();
 $size                 = isLighthouse() ? 'thumbnail' : 'full';
 $current_author_id    = $author_id ?: $wp_query->get_queried_object()->ID;
-$user_id              = $current_author_id;
+$user_id              = (int) $current_author_id;
 $current_user_id      = get_current_user_id();
 $current_user         = get_user_by( 'ID', $user_id );
 $email                = $current_user->user_email ?: '';
@@ -42,195 +42,584 @@ $user_company_gallery = carbon_get_user_meta( $user_id, 'user_company_gallery' )
 $user_phone           = carbon_get_user_meta( $user_id, 'user_phone' );
 $user_company_address = carbon_get_user_meta( $user_id, 'user_company_address' );
 $user_company_color   = carbon_get_user_meta( $user_id, 'user_company_color' );
+$user_company_logo    = carbon_get_user_meta( $user_id, 'user_company_logo' );
 $seller_rating        = get_seller_rating( $user_id );
 $seller_count_review  = get_seller_count_review( $user_id );
+$user_link            = get_seller_page_link( $author_id );
 $head_banner          = $user_company_gallery ? _u( $user_company_gallery[0], 1 ) : $assets . 'img/user_head.webp';
 $attr                 = $user_company_color ? "style='background-color:$user_company_color'" : '';
 
+$products_data      = get_products_data();
+$get_route          = $_GET['route'] ?? '';
+$get_place          = $_GET['place'] ?? '';
+$_user_city         = $_COOKIE['user_city'] ?? '';
+$_user_confirm_city = $_COOKIE['user_confirm_city'] ?? '';
+$_radius            = $_GET['radius'] ?? '10';
+$_min_price         = $_GET['min-price'] ?? ( $products_data['min_price'] ?: '1' );
+$_max_price         = $_GET['max-price'] ?? ( $products_data['max_price'] ?: '10000000' );
+$product_types      = get_terms( array(
+	'taxonomy'   => 'product_type',
+	'hide_empty' => false
+) );
+$processing_types   = get_terms( array(
+	'taxonomy'   => 'processing_type',
+	'hide_empty' => false
+) );
+$package            = get_terms( array(
+	'taxonomy'   => 'package',
+	'hide_empty' => false
+) );
+$categories         = get_terms( array(
+	'taxonomy'   => 'categories',
+	'hide_empty' => false,
+	'parent'     => 0,
+) );
+$certificates       = get_terms( array(
+	'taxonomy'   => 'certificates',
+	'hide_empty' => false,
+) );
+$units_measurement  = carbon_get_theme_option( 'units_measurement' );
+$delivery_types     = get_delivery_methods();
+$current_year       = date( "Y" );
+$_type              = $_GET['type'] ?? '';
+$_certificates      = $_GET['certificate'] ?? '';
+$_processing_types  = $_GET['processing_types'] ?? '';
+$_units_measurement = $_GET['units_measurement'] ?? '';
+$_packages          = $_GET['packages'] ?? '';
+$_delivery_methods  = $_GET['delivery_methods'] ?? '';
+$_y                 = $_GET['y'] ?? '';
+$personal_area_page = carbon_get_theme_option( 'personal_area_page' );
+$is_personal_area   = $personal_area_page && ( (int) $personal_area_page[0]['id'] == $id );
+$route              = $_GET['route'] ?? '';
+$order              = $_GET['order'] ?? '';
+$orderby            = $_GET['orderby'] ?? '';
+$filter             = $_GET['filter'] ?? '';
+$filters            = array();
+$category           = $_GET['category'] ?? '';
+$category           = explode( ',', $category );
+$filter_form_url    = $url;
+if ( $_certificates ) {
+	$_certificates = ! is_array( $_certificates ) ? explode( ',', $_certificates ) : $_certificates;
+}
+if ( $_type ) {
+	$_type = ! is_array( $_type ) ? explode( ',', $_type ) : $_type;
+}
+if ( $_processing_types ) {
+	$_processing_types = ! is_array( $_processing_types ) ? explode( ',', $_processing_types ) : $_processing_types;
+}
+if ( $_packages ) {
+	$_packages = ! is_array( $_packages ) ? explode( ',', $_packages ) : $_packages;
+}
+if ( $_units_measurement ) {
+	$_units_measurement = ! is_array( $_units_measurement ) ? explode( ',', $_units_measurement ) : $_units_measurement;
+}
+if ( $_delivery_methods ) {
+	$_delivery_methods = ! is_array( $_delivery_methods ) ? explode( ',', $_delivery_methods ) : $_delivery_methods;
+}
+
 ?>
 
-    <section class="section-user  " <?php echo $attr; ?>>
-        <div class="user-farming__head"
-             style="background:url(<?php echo $head_banner; ?>) no-repeat top center/cover">
+<main class="content" <?php echo $attr; ?>>
+	<?php if ( $user_company_gallery ): ?>
+        <section class="section-head">
             <div class="container">
-                <div class="user-farming__title">
-					<?php echo $user_company_name; ?>
+                <div class="head-slider head-seller-slider">
+					<?php foreach ( $user_company_gallery as $image_id ): ?>
+                        <div>
+                            <div class="head-slider__item head-seller-slider__item">
+                                <img src="<?php _u( $image_id ); ?>" alt="<?php echo $user_company_name; ?>"/>
+                            </div>
+                        </div>
+					<?php endforeach; ?>
                 </div>
             </div>
-        </div>
+        </section>
+	<?php endif; ?>
+    <section class="section-info">
         <div class="container">
-            <div class="user-farming pad_bot_40 pad_top_40">
-                <div class="faq js-collapse">
-                    <div class="faq-item js-collapse-item">
-                        <div class="faq-item__title js-collapse-title">Фермерське господарство<span></span></div>
-                        <div class="faq-item__content js-collapse-content">
-                            <div class="farming-info">
-                                <div class="farming-info__left">
-                                    <div class="farming-info__list">
-                                        <div class="farming-info__list-item">
-                                            <div class="farming-info__list-item-title">Рейтинг:</div>
-                                            <div class="farming-info__list-item-main">
-                                                <ul class="product-item__reviews">
-                                                    <li>
-                                                        <a class="move-to-element" href="#reviews-section">
-															<?php echo $seller_count_review ?> відгуків
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <span class="reviews-rating"> <strong><?php echo $seller_rating; ?> </strong></span>
-                                                    </li>
-                                                </ul>
+            <div class="info-top">
+                <div class="info-top__user">
+					<?php if ( $user_company_logo ): ?>
+                        <div class="info-top__user-media">
+                            <img src="<?php _u( $user_company_logo ); ?>" alt="<?php echo $user_company_name; ?>"/>
+                        </div>
+					<?php endif; ?>
+                    <div class="info-top__user-content">
+                        <div class="info-top__user-suptitle">Вас вітає!</div>
+                        <div class="info-top__user-title"><?php echo $user_company_name; ?></div>
+                    </div>
+                </div>
+                <div class="info-top__nav">
+                    <a class="active" href="<?php echo $user_link; ?>">Каталог продавця</a>
+                    <a href="<?php echo $user_link . '?route=about'; ?>">Про продавця</a>
+                    <a href="<?php echo $user_link . '?route=reviews'; ?>">
+                        Відгуки (<?php echo $seller_count_review ?: 0; ?>)
+                    </a>
+                    <a href="<?php echo $user_link . '?route=contacts'; ?>">Контакти</a>
+                </div>
+            </div>
+            <div class="info-catalog">
+                <div class="info-catalog__filter-wrap">
+                    <div class="info-catalog__filter">
+                        <div class="info-catalog__filter-top">
+                            <div class="info-catalog__filter-title">Фільтр</div>
+                            <div class="filter-close"></div>
+                        </div>
+                        <div class="filter-list-wrap"></div>
+                        <form class="filter-form" method="get" action="<?php echo $user_link; ?>">
+                            <div class="filter-form-box" style="display:none;"></div>
+	                        <?php
+	                        if ( $order ) {
+		                        echo "<input type='hidden' name='order' value='$order'>";
+	                        }
+	                        if ( $orderby ) {
+		                        echo "<input type='hidden' name='orderby' value='$orderby'>";
+	                        }
+	                        ?>
+                            <div class="filter-list">
+                                <div class="filter-list__item active">
+                                    <div class="filter-list__item-title">Ціна</div>
+                                    <div class="filter-list__item-content">
+                                        <div class="filter-range">
+                                            <div class="filter-range__info">
+                                                Від<input class="input_st js-input-from" name="min-price" type="text"
+                                                          readonly
+                                                          value="<?php echo $_min_price; ?>"/>
+                                                до <input class="input_st js-input-to" name="max-price" type="text"
+                                                          readonly
+                                                          value="<?php echo $_max_price; ?>"/>
                                             </div>
+                                            <input class="js-range" type="text"
+                                                   data-min="<?php echo( $products_data['min_price'] ?: '1' ); ?>"
+                                                   data-max="<?php echo( $products_data['max_price'] ?: '10000000' ); ?>"
+                                                   data-from="<?php echo $_min_price; ?>"
+                                                   data-to="<?php echo $_max_price; ?>" data-type="double"/>
                                         </div>
-                                        <div class="farming-info__list-item">
-                                            <div class="farming-info__list-item-title">Господарство:</div>
-                                            <div class="farming-info__list-item-main">
-                                                <strong>
-													<?php echo $user_company_name; ?>
-                                                </strong>
-                                            </div>
-                                        </div>
-										<?php if ( $user_phone ): ?>
-                                            <div class="farming-info__list-item">
-                                                <div class="farming-info__list-item-title">Номер телефону:</div>
-                                                <div class="farming-info__list-item-main">
-                                                    <a href="<?php the_phone_link( $user_phone ); ?>">
-                                                        <strong><?php echo $user_phone; ?></strong>
-                                                    </a>
-                                                </div>
-                                            </div>
-										<?php endif; ?>
-										<?php if ( $user_company_address ): ?>
-                                            <div class="farming-info__list-item">
-                                                <div class="farming-info__list-item-title">Адреса:</div>
-                                                <div class="farming-info__list-item-main">
-													<?php echo $user_company_address; ?>
-                                                </div>
-                                            </div>
-										<?php endif; ?>
-										<?php if ( $author_id == $current_user_id ): ?>
-                                            <div class="farming-info__list-item">
-                                                <div class="farming-info__list-item-title">Колір фону сторінки:</div>
-                                                <div class="farming-info__list-item-main">
-                                                    <input type="color" name="user_color"
-                                                           value="<?php echo $user_company_color; ?>"
-                                                           class="user-color-input">
-                                                </div>
-                                            </div>
-										<?php endif; ?>
                                     </div>
                                 </div>
-                                <div class="farming-info__right">
-									<?php if ( $verification ): ?>
-                                        <div class="product-verified">
-                                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                                 style="enable-background:new 0 0 15 15" viewBox="0 0 15 15">
-                                                <path d="M8.2.3C8 .1 7.8 0 7.5 0c-.3 0-.5.1-.7.3l-.9.9h-.2L4.5.9c-.2-.1-.5 0-.7.1-.3.1-.5.4-.5.6l-.4 1.3V3h-.1l-1.2.3c-.2 0-.5.2-.6.4-.1.3-.2.6-.1.8l.3 1.2v.2l-.9.9c-.2.2-.3.4-.3.7 0 .3.1.5.3.7l.9.9v.2l-.3 1.2c-.1.3 0 .5.1.8.1.2.4.4.6.5l1.2.3h.1v.1l.3 1.2c.1.3.2.5.5.6.2.1.5.2.8.1l1.2-.3h.2l.9.9c.2.2.4.3.7.3.3 0 .5-.1.7-.3l.9-.9h.2l1.2.3c.3.1.5 0 .8-.1.2-.1.4-.4.5-.6l.3-1.2v-.1h.1l1.2-.3c.3-.1.5-.2.6-.5.1-.2.2-.5.1-.8l-.3-1.2v-.2l.9-.9c.2-.2.3-.4.3-.7 0-.3-.1-.5-.3-.7l-.9-.9v-.2l.3-1.2c.1-.3 0-.5-.1-.8-.1-.2-.4-.4-.6-.5l-1.2-.3h-.1v-.1l-.3-1.2c-.1-.3-.2-.5-.5-.6-.2-.1-.5-.2-.8-.1l-1.3.3H9L8.2.3zm-1.8 10c.1 0 .2 0 .3-.1L10.9 6c.2-.2.2-.6 0-.8l-.3-.3c-.2-.2-.6-.2-.8 0L6.4 8.4 5.1 7.1c-.2-.2-.6-.2-.8 0l-.2.2c-.2.2-.2.6 0 .8l2 2.1c.1 0 .2.1.3.1z"
-                                                      style="fill-rule:evenodd;clip-rule:evenodd;fill:#4d76ff"/>
-                                            </svg>
-                                            Верифікований
-                                        </div>
-									<?php endif; ?>
-                                    <div class="farming-info__text">
-                                        <div class="text-group">
-											<?php _t( $company_description ); ?>
+								<?php if ( $categories ): $subtitem = 0; ?>
+                                    <div class="filter-list__item ">
+                                        <div class="filter-list__item-title "> Категорія продукту</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="form-group quarter ">
+                                                <select class="select_st categories-select-js "
+                                                        data-selector=".sub-categories-select-js" data-name="category"
+                                                >
+                                                    <option disabled="disabled" selected="selected">Категорія продукту
+                                                    </option>
+													<?php foreach ( $categories as $item ):
+														$attr = '';
+														if ( in_array( $item->term_id, $category ) ) {
+															$attr     = 'selected';
+															$subtitem = $item->term_id;
+															$filters  = get_filter_by_category( $subtitem );
+														}
+														?>
+                                                        <option <?php echo $attr ?>
+                                                                value="<?php echo $item->term_id; ?>">
+															<?php echo $item->name; ?>
+                                                        </option>
+													<?php endforeach; ?>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
+                                    <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
+                                        <div class="filter-list__item-title "> Підкатегорія продукту</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
+                                                <select class="select_st sub-categories-select-js categories-select-js"
+                                                        data-name="category"
+                                                        data-selector=".internal-categories-select-js">
+                                                    <option disabled="disabled" selected="selected">Підкатегорія
+                                                        продукту
+                                                    </option>
+                                                    <option value="">Зробіть вибір</option>
+													<?php if ( $subtitem ) {
+														$subcategories = get_terms( array(
+															'taxonomy'   => 'categories',
+															'hide_empty' => false,
+															'parent'     => $subtitem,
+														) );
+														$subtitem      = 0;
+														if ( $subcategories ) {
+															foreach ( $subcategories as $subcategory ) {
+																$attr = '';
+																if ( in_array( $subcategory->term_id, $category ) ) {
+																	$attr     = 'selected';
+																	$subtitem = $subcategory->term_id;
+																	$filters  = get_filter_by_category( $subtitem );
+																}
+																?>
+                                                                <option <?php echo $attr ?>
+                                                                        value="<?php echo $subcategory->term_id; ?>">
+																	<?php echo $subcategory->name; ?>
+                                                                </option>
+																<?php
+															}
+														}
+													} ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
+                                        <div class="filter-list__item-title "> Тип або вид продукту</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
+                                                <select class="select_st categories-select-js internal-categories-select-js"
+                                                        data-name="category"
+                                                        data-selector=".sub-internal-categories-select-js">
+                                                    <option disabled="disabled">Тип або вид продукту</option>
+                                                    <option value="">Зробіть вибір</option>
+													<?php if ( $subtitem ) {
+														$subcategories = get_terms( array(
+															'taxonomy'   => 'categories',
+															'hide_empty' => false,
+															'parent'     => $subtitem,
+														) );
+														$subtitem      = 0;
+														if ( $subcategories ) {
+															foreach ( $subcategories as $subcategory ) {
+																$attr = '';
+																if ( in_array( $subcategory->term_id, $category ) ) {
+																	$attr     = 'selected';
+																	$subtitem = $subcategory->term_id;
+																	$filters  = get_filter_by_category( $subtitem );
+																}
+																?>
+                                                                <option <?php echo $attr ?>
+                                                                        value="<?php echo $subcategory->term_id; ?>">
+																	<?php echo $subcategory->name; ?>
+                                                                </option>
+																<?php
+															}
+														}
+													} ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
+                                        <div class="filter-list__item-title ">
+                                            Підкатегорія типу або виду продукту
+                                        </div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
+                                                <select class="select_st  sub-internal-categories-select-js"
+                                                        data-name="category"
+                                                >
+                                                    <option disabled="disabled">Підкатегорія типу або виду продукту
+                                                    </option>
+                                                    <option value="">Зробіть вибір</option>
+													<?php if ( $subtitem ) {
+														$subcategories = get_terms( array(
+															'taxonomy'   => 'categories',
+															'hide_empty' => false,
+															'parent'     => $subtitem,
+														) );
+														$subtitem      = 0;
+														if ( $subcategories ) {
+															foreach ( $subcategories as $subcategory ) {
+																$attr = '';
+																if ( in_array( $subcategory->term_id, $category ) ) {
+																	$attr     = 'selected';
+																	$subtitem = $subcategory->term_id;
+																	$filters  = get_filter_by_category( $subtitem );
+																}
+																?>
+                                                                <option <?php echo $attr ?>
+                                                                        value="<?php echo $subcategory->term_id; ?>">
+																	<?php echo $subcategory->name; ?>
+                                                                </option>
+																<?php
+															}
+														}
+													} ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="<?php echo $filters ? '' : 'hidden'; ?> filter-list__item ">
+                                        <div class="filter-list__item-title "> Додаткові фільтри продукту</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="form-group quarter <?php echo $filters ? '' : ' not-active'; ?>">
+                                                <select class="select_st filter-select-js" multiple
+                                                        name="filter[]">
+                                                    <option disabled="disabled">Додаткові фільтри продукту</option>
+													<?php
+													if ( $filters ) {
+														foreach ( $filters as $filter_id ) {
+															$filter_item = get_term_by( 'id', $filter_id, 'filters' );
+															if ( $filter_item ) {
+																$attr_filter_item = 'disabled';
+																?>
+                                                                <option <?php echo $attr_filter_item; ?>
+                                                                value="<?php echo $filter_item->term_id; ?>"><?php echo $filter_item->name; ?></option><?php
+																$values = get_term_children( $filter_id, 'filters' );
+																if ( $values ) {
+																	foreach ( $values as $value ) {
+																		$child = get_term_by( 'id', $value, 'filters' );
+																		$attr  = '';
+																		if ( $filter ) {
+																			foreach ( $filter as $_filter ) {
+																				if ( in_array( $child->term_id, $filter ) ) {
+																					$attr = 'selected';
+																				}
+																			}
+																		}
+																		?>
+                                                                    <option <?php echo $attr; ?>
+                                                                            value="<?php echo $child->term_id; ?>">
+                                                                        --<?php echo $child->name; ?></option><?php
+																	}
+																}
+															}
+														}
+													}
+
+													?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+								<?php endif; ?>
+								<?php if ( $product_types ): ?>
+                                    <div class="filter-list__item ">
+                                        <div class="filter-list__item-title "> Тип продукту</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="filter-check">
+												<?php foreach ( $product_types as $type ):
+													$test = $_type && in_array( $type->term_id, $_type );
+													$attr = $test ? 'checked' : '';
+													?>
+                                                    <div class="filter-check__item">
+                                                        <label class="check-item">
+                                                            <input class="check_st filter-check-input"
+                                                                   data-name="type"
+																<?php echo $attr; ?>
+                                                                   value="<?php echo $type->term_id; ?>"
+                                                                   type="checkbox"/>
+                                                            <span></span>
+                                                            <i class="check-item__text"><?php echo $type->name; ?></i>
+                                                        </label>
+                                                    </div>
+												<?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+								<?php endif; ?>
+								<?php if ( $certificates ): ?>
+                                    <div class="filter-list__item " style="display:none;">
+                                        <div class="filter-list__item-title "> Сертифікати</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="filter-check">
+												<?php foreach ( $certificates as $type ):
+													$test = $_certificates && in_array( $type->term_id, $_certificates );
+													$attr = $test ? 'checked' : '';
+													?>
+                                                    <div class="filter-check__item">
+                                                        <label class="check-item">
+                                                            <input class="check_st filter-check-input"
+                                                                   data-name="certificate"
+																<?php echo $attr; ?>
+                                                                   value="<?php echo $type->term_id; ?>"
+                                                                   type="checkbox"/>
+                                                            <span></span>
+                                                            <i class="check-item__text"><?php echo $type->name; ?></i>
+                                                        </label>
+                                                    </div>
+												<?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+								<?php endif; ?>
+								<?php if ( $processing_types ): ?>
+                                    <div class="filter-list__item ">
+                                        <div class="filter-list__item-title ">Тип обробки</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="filter-check">
+												<?php foreach ( $processing_types as $type ):
+													$test = $_processing_types && in_array( $type->term_id, $_processing_types );
+													$attr = $test ? 'checked' : '';
+													?>
+                                                    <div class="filter-check__item">
+                                                        <label class="check-item">
+                                                            <input class="check_st filter-check-input"
+                                                                   data-name="processing_types" <?php echo $attr; ?>
+                                                                   value="<?php echo $type->term_id; ?>"
+                                                                   type="checkbox"
+                                                            />
+                                                            <span></span>
+                                                            <i class="check-item__text"><?php echo $type->name; ?></i>
+                                                        </label>
+                                                    </div>
+												<?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+								<?php endif; ?>
+								<?php if ( $package ): ?>
+                                    <div class="filter-list__item ">
+                                        <div class="filter-list__item-title ">Тип пакування</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="filter-check">
+												<?php foreach ( $package as $item ):
+													$test = $_packages && in_array( $item->term_id, $_packages );
+													$attr = $test ? 'checked' : '';
+													?>
+                                                    <div class="filter-check__item">
+                                                        <label class="check-item">
+                                                            <input class="check_st filter-check-input"
+                                                                   data-name="packages" <?php echo $attr; ?>
+                                                                   value="<?php echo $item->term_id; ?>"
+                                                                   type="checkbox"/>
+                                                            <span> </span>
+                                                            <i class="check-item__text"><?php echo $item->name; ?></i>
+                                                        </label>
+                                                    </div>
+												<?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+								<?php endif; ?>
+								<?php if ( $units_measurement ): ?>
+                                    <div class="filter-list__item ">
+                                        <div class="filter-list__item-title ">Одиниці вимірювання</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="filter-check">
+												<?php foreach ( $units_measurement as $item ):
+													$test = $_units_measurement && in_array( $item['unit'], $_units_measurement );
+													$attr = $test ? 'checked' : '';
+													?>
+                                                    <div class="filter-check__item">
+                                                        <label class="check-item">
+                                                            <input class="check_st filter-check-input"
+                                                                   data-name="units_measurement"
+                                                                   value="<?php echo $item['unit']; ?>"
+																<?php echo $attr; ?>
+                                                                   type="checkbox"/>
+                                                            <span> </span>
+                                                            <i class="check-item__text"><?php echo $item['unit']; ?></i>
+                                                        </label>
+                                                    </div>
+												<?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+								<?php endif; ?>
+								<?php if ( $delivery_types ): ?>
+                                    <div class="filter-list__item ">
+                                        <div class="filter-list__item-title ">Умови доставки</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <div class="filter-check">
+
+												<?php foreach ( $delivery_types as $key => $item ):
+													$test = $_delivery_methods && in_array( $key, $_delivery_methods );
+													$attr = $test ? 'checked' : '';
+													?>
+                                                    <div class="filter-check__item">
+                                                        <label class="check-item">
+                                                            <input class="check_st filter-check-input"
+                                                                   data-name="delivery_methods"
+                                                                   value="<?php echo $key; ?>"
+																<?php echo $attr; ?>
+                                                                   type="checkbox"/>
+                                                            <span> </span>
+                                                            <i class="check-item__text"><?php echo $item; ?></i>
+                                                        </label>
+                                                    </div>
+												<?php endforeach; ?>
+
+                                            </div>
+                                        </div>
+                                    </div>
+								<?php endif; ?>
+                                <div class="filter-list__item ">
+                                    <div class="filter-list__item-title ">Рік врожаю/виготовлення</div>
+                                    <div class="filter-list__item-content js-collapse-content">
+                                        <select class="select_st trigger-submit-on-change" name="y">
+                                            <option value="">Зробіть вибір</option>
+											<?php for ( $a = $current_year; $a >= ( $current_year - 60 ); $a -- ):
+												$attr = $a == $_y ? 'selected' : '';
+												?>
+                                                <option value="<?php echo $a; ?>" <?php echo $attr; ?>>
+													<?php echo $a; ?>
+                                                </option>
+											<?php endfor; ?>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
+                        <div class="filter-bot">
+                            <a class="btn_st b_red w100" href="<?php echo $user_link; ?>">
+                                <span> <svg
+                                            xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                            style="enable-background:new 0 0 13 15" viewBox="0 0 13 15">
+                                            <path d="M11.8 1.9H9v-.5C9 .6 8.3 0 7.5 0h-2C4.7 0 4 .6 4 1.4v.5H1.2C.6 1.9 0 2.4 0 3v1c0 .3.2.5.5.5h12c.3 0 .5-.3.5-.5V3c0-.6-.6-1.1-1.2-1.1zM5 1.4c0-.3.2-.5.5-.5h2c.3 0 .5.2.5.5v.5H5v-.5zM.9 5.4c-.1 0-.2.1-.2.2l.4 8.1c0 .8.7 1.3 1.5 1.3h7.6c.8 0 1.5-.6 1.5-1.3l.4-8.1c0-.1-.1-.2-.2-.2H.9zm7.6 1.2c0-.3.2-.5.5-.5s.5.2.5.5v6.1c0 .3-.2.5-.5.5s-.5-.2-.5-.5V6.6zM6 6.6c0-.3.2-.5.5-.5s.5.2.5.5v6.1c0 .3-.2.5-.5.5s-.5-.3-.5-.5V6.6zm-2.5 0c0-.3.2-.5.5-.5s.5.2.5.5v6.1c0 .3-.2.5-.5.5s-.5-.2-.5-.5V6.6z"
+                                                  style="fill:#fc3636"/>
+                                        </svg><span>Очистити фільтр</span></span></a></div>
                     </div>
                 </div>
-            </div>
-			<?php if ( $user_company_gallery ): ?>
-                <div class="user-farming-gal pad_bot_40 line_bot">
-                    <div class="title-section-group">
-                        <div class="title-sm">Фото господарства</div>
-                        <div class="nav-slider">
-                            <button class="slick-prev"></button>
-                            <button class="slick-next"></button>
-                        </div>
-                    </div>
-                    <div class="farming-gal">
-						<?php foreach ( $user_company_gallery as $image_id ): ?>
-                            <div>
-                                <a class="farming-gal__item"
-                                   href="<?php _u( $image_id ); ?>"
-                                   data-fancybox="farming-gal">
-                                    <img src="<?php _u( $image_id ); ?>" alt=""/>
-                                </a>
-                            </div>
-						<?php endforeach; ?>
-                    </div>
-                </div>
-			<?php endif; ?>
-            <div class="sort-wrap pad_top_40">
-                <div class="search-wrap">
-                    <a class="tog-filter" href="#">
-                        <span>Фільтр<svg
-                                    xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                                    style="enable-background:new 0 0 15 15" viewBox="0 0 15 15">
-                                    <path d="M15 12.7c0 .1 0 .2-.1.3 0 .1-.1.2-.2.2-.1.1-.2.1-.2.2-.1 0-.2.1-.3.1H7.4c-.2.4-.4.8-.8 1.1-.4.3-.9.4-1.3.4-.5 0-.9-.1-1.3-.4-.4-.3-.7-.6-.8-1.1H.8c-.2 0-.4-.1-.5-.2-.2-.2-.3-.4-.3-.6 0-.2.1-.4.2-.5.2-.1.4-.2.6-.2h2.4c.2-.4.4-.8.8-1.1.4-.3.8-.4 1.3-.4s.9.1 1.3.4c.4.3.7.6.8 1.1h6.9c.1 0 .2 0 .3.1.1 0 .2.1.2.2.1.1.1.2.2.2v.2zm-.8-6h-1.6c-.2-.4-.4-.8-.8-1.1-.4-.3-.8-.4-1.3-.4s-.9.2-1.3.5c-.4.2-.7.6-.8 1H.8c-.2 0-.4.1-.6.3-.1.1-.2.3-.2.5s.1.4.2.5c.1.1.3.2.5.2h7.6c.2.4.4.8.8 1.1.4.3.8.4 1.3.4s.9-.1 1.3-.4c.4-.3.7-.6.8-1.1h1.6c.2 0 .4-.1.5-.2.3-.1.4-.3.4-.5s-.1-.4-.2-.5c-.2-.2-.4-.3-.6-.3zM.8 3h3.9c.2.4.4.8.8 1.1.4.3.8.4 1.3.4s.9-.1 1.3-.4c.3-.3.6-.7.8-1.1h5.4c.2 0 .4-.1.5-.2.1-.2.2-.4.2-.6 0-.2-.1-.4-.2-.5-.1-.1-.3-.2-.5-.2H8.9C8.7 1.1 8.4.7 8 .4 7.7.1 7.2 0 6.8 0s-1 .1-1.3.4c-.4.3-.7.7-.9 1.1H.8c-.2 0-.4.1-.5.2-.2.2-.3.4-.3.5 0 .2.1.4.2.5.2.2.4.3.6.3z"
-                                          style="fill:#262c40"/>
-                                </svg></span>
-                    </a>
-                </div>
-                <div class="sort-group">
-                    <form method="get" action="<?php echo get_author_posts_url( $user_id ); ?>">
-                        <input type="hidden" name="order" value="desc">
-						<?php
-						if ( $_GET ) {
-							foreach ( $_GET as $name => $value ) {
-								if ( $name && $value ) {
-									echo "<input type='hidden' name='$name' value='$value'>";
+                <div class="info-catalog__main">
+                    <div class="info-catalog__main-top">
+                        <div class="info-catalog__main-title">Всі товари</div>
+                        <form class="info-catalog-sort" method="get" action="<?php echo $user_link; ?>">
+                            <input type="hidden" name="order" value="desc">
+							<?php
+							if ( $_GET ) {
+								foreach ( $_GET as $name => $value ) {
+									if ( $name && $value ) {
+                                        if(is_array($value)){
+                                            foreach ($value as $item){
+	                                            echo "<input type='hidden' name='$name".'[]'."' value='$item'>";
+                                            }
+                                        }else{
+	                                        echo "<input type='hidden' name='$name' value='$value'>";
+                                        }
+									}
 								}
 							}
-						}
-						?>
-                        <div class="form-horizontal">
-                            <div class="half" style="margin-left: auto;">
-                                <select class="select_st sort-select trigger-on-change" name="orderby">
-                                    <option value="">Сортувати</option>
-                                    <option
-										<?php echo $_order == 'desc' && $_orderby == 'date' ? 'selected' : ''; ?>
-                                            value="date" data-order="desc">Спочатку новіші
-                                    </option>
-                                    <option
-										<?php echo $_order == 'asc' && $_orderby == 'date' ? 'selected' : ''; ?>
-                                            value="date" data-order="asc">Спочатку старіші
-                                    </option>
-                                </select>
+							?>
+                            <label class="info-catalog-sort__item">
+                                <input type="radio" name="orderby"/>
+                                <span> За популярністю</span>
+                            </label>
+                            <label class="info-catalog-sort__item">
+                                <input type="radio" name="orderby"/>
+                                <span> Дешевші</span>
+                            </label>
+                            <label class="info-catalog-sort__item">
+                                <input type="radio" name="orderby"/>
+                                <span> Дорожчі</span>
+                            </label>
+                        </form>
+                    </div>
+                    <div class="catalog container-js">
+						<?php
+						$query = get_query_index_data( array( 'author__in' => array( $user_id ) ) );
+						if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post(); ?>
+							<?php the_mini_product(); ?>
+						<?php endwhile; else : ?>
+                            <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
+                                Не знайдено!
                             </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="catalog-in pad_section_sm_top pad_bot_40 line_bot">
-                <div class="catalog container-js">
-					<?php
-					$query = get_query_index_data( array( 'author__in' => array( $user_id ) ) );
-					if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post(); ?>
-						<?php the_product(); ?>
-					<?php endwhile; else : ?>
-                        <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
-                            Не знайдено!
-                        </div>
-					<?php endif;
-					wp_reset_postdata();
-					wp_reset_query(); ?>
-                </div>
-                <div class="btn_center pagination-js">
-					<?php echo _get_more_author_link( $query->max_num_pages, $author_id ); ?>
+						<?php endif;
+						wp_reset_postdata();
+						wp_reset_query(); ?>
+                    </div>
+                    <div class="btn-center pagination-js">
+						<?php echo _get_more_author_link( $query->max_num_pages, $author_id ); ?>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+</main>
 
-    <section class="seller-reviews-section pad_top_40" id="reviews-section" <?php echo $attr; ?>>
-        <div class="container">
-			<?php the_user_testimonials( $user_id ); ?>
-        </div>
-    </section>
-
-<?php get_footer(); ?>
+<?php get_footer( 'seller' ); ?>

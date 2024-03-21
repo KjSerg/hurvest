@@ -950,7 +950,13 @@ function get_next_posts( $type = '', $link = false ) {
 		foreach ( $_GET as $key => $value ) {
 			if ( $key != 'pagenumber' && $key != 'type' ) {
 				$res = $res . '&';
-				$res = $res . "$key=$value";
+				if ( is_array( $value ) ) {
+					foreach ( $value as $item ) {
+						$res = $res . "$key" . '[]' . "=$item";
+					}
+				} else {
+					$res = $res . "$key=$value";
+				}
 			}
 		}
 	}
@@ -1169,8 +1175,11 @@ function get_products_data() {
 		'posts_per_page' => - 1,
 	);
 	if ( $queried_object ) {
-		$term_id  = $queried_object->term_id ?? '';
-		$taxonomy = $queried_object->taxonomy ?? '';
+		$term_id     = $queried_object->term_id ?? '';
+		$taxonomy    = $queried_object->taxonomy ?? '';
+		$post_author = $queried_object->post_author ?? '';
+		$user_ID     = $queried_object->ID ?? '';
+		$user_login  = $queried_object->user_login ?? '';
 		if ( $taxonomy && $term_id ) {
 			$args['tax_query'] = array(
 				array(
@@ -1180,11 +1189,16 @@ function get_products_data() {
 				)
 			);
 		}
+		if ( $user_ID && $user_login ) {
+			$args['author__in'] = array( (int) $user_ID );
+		} elseif ( $post_author ) {
+			$args['author__in'] = array( (int) $post_author );
+		}
 	}
 	$query = new WP_Query( $args );
 	if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post();
 		$_id   = get_the_ID();
-		$price = carbon_get_post_meta( $_id, 'product_price' );
+		$price = (float) carbon_get_post_meta( $_id, 'product_price' );
 		if ( $min_price == 0 ) {
 			$min_price = $price;
 		}
@@ -1520,7 +1534,7 @@ function get_seller_rating( $user_id ) {
 		$res = round( $res, 1 );
 	}
 
-	return number_format( ($res ?: 5 ), 1 );
+	return number_format( ( $res ?: 5 ), 1 );
 }
 
 function v( $var ) {
@@ -2129,7 +2143,7 @@ function get_closest( $productID ) {
 			$categories_ids[] = $category->term_id;
 		}
 	}
-	$args = array(
+	$args  = array(
 		'post_type'      => 'products',
 		'post_status'    => 'publish',
 		'posts_per_page' => 20,
@@ -2625,4 +2639,27 @@ function get_work_time_json_string( $days_prefix = 'days' ) {
 	}
 
 	return json_encode( $work_time_organization );
+}
+
+function get_seller_page_link( $user_id ) {
+	$link      = '#';
+	$user_post = carbon_get_user_meta( $user_id, 'user_post' );
+	if ( $user_post && get_post( $user_post ) ) {
+		$link = get_the_permalink( $user_post );
+	}
+
+	return $link;
+}
+
+function get_product_purchases_number( $productID ) {
+	$res = 0;
+	if ( $purchases = carbon_get_post_meta( $productID, 'product_purchases' ) ) {
+		foreach ( $purchases as $purchase ) {
+			$purchased = $purchase['purchased'] ?: 0;
+			$purchased = (float) $purchased;
+			$res       = $res + $purchased;
+		}
+	}
+
+	return $res;
 }

@@ -67,11 +67,7 @@ $personal_page       = carbon_get_theme_option( 'personal_area_page' );
 $_url                = $personal_page ? get_the_permalink( $personal_page[0]['id'] ) : $url;
 $product_views ++;
 carbon_set_post_meta( $id, 'product_views', $product_views );
-$author_link = '#';
-$user_post   = carbon_get_user_meta( $author_id, 'user_post' );
-if ( $user_post && get_post( $user_post ) ) {
-	$author_link = get_the_permalink( $user_post );
-}
+$author_link = get_seller_page_link( $author_id );
 $_order            = $_GET['order'] ?? '';
 $_orderby          = $_GET['orderby'] ?? '';
 $pagenum           = $_GET['pagenum'] ?? 1;
