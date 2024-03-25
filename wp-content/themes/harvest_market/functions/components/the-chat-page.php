@@ -1,27 +1,31 @@
 <?php
 function the_chat_page() {
 	the_header_cabinet();
-	$var                  = variables();
-	$set                  = $var['setting_home'];
-	$assets               = $var['assets'];
-	$url                  = $var['url'];
-	$url_home             = $var['url_home'];
-	$admin_ajax           = $var['admin_ajax'];
-	$user_id              = get_current_user_id();
-	$permalink            = get_the_permalink() ?: $url;
-	$route                = $_GET['route'] ?? '';
-	$subpage              = $_GET['subpage'] ?? '';
-	$get_product_id       = $_GET['product_id'] ?? '';
-	$personal_page        = carbon_get_theme_option( 'personal_area_page' );
-	$_url                 = $personal_page ? get_the_permalink( $personal_page[0]['id'] ) : $url;
-	$current_user         = get_user_by( 'ID', $user_id );
-	$email                = $current_user->user_email ?: '';
-	$display_name         = $current_user->display_name ?: '';
-	$first_name           = $current_user->first_name ?: '';
-	$last_name            = $current_user->last_name ?: '';
-	$name                 = $first_name ?: $display_name;
-	$user_avatar          = carbon_get_user_meta( $user_id, 'user_avatar' );
-	$correspondence       = $_GET['correspondence'] ?? 0;
+	$var            = variables();
+	$set            = $var['setting_home'];
+	$assets         = $var['assets'];
+	$url            = $var['url'];
+	$url_home       = $var['url_home'];
+	$admin_ajax     = $var['admin_ajax'];
+	$user_id        = get_current_user_id();
+	$permalink      = get_the_permalink() ?: $url;
+	$route          = $_GET['route'] ?? '';
+	$subpage        = $_GET['subpage'] ?? '';
+	$get_product_id = $_GET['product_id'] ?? '';
+	$personal_page  = carbon_get_theme_option( 'personal_area_page' );
+	$_url           = $personal_page ? get_the_permalink( $personal_page[0]['id'] ) : $url;
+	$current_user   = get_user_by( 'ID', $user_id );
+	$email          = $current_user->user_email ?: '';
+	$display_name   = $current_user->display_name ?: '';
+	$first_name     = $current_user->first_name ?: '';
+	$last_name      = $current_user->last_name ?: '';
+	$name           = $first_name ?: $display_name;
+	$user_avatar    = carbon_get_user_meta( $user_id, 'user_avatar' );
+	$correspondence = $_GET['correspondence'] ?? 0;
+	if ( ! get_post( $correspondence ) ) {
+		$correspondence = 0;
+	}
+	$product              = $_GET['product'] ?? 0;
 	$message_sender_id    = 0;
 	$message_recipient_id = 0;
 	$message_product_id   = 0;
@@ -30,9 +34,17 @@ function the_chat_page() {
 	if ( $correspondence ) {
 		$message_sender_id    = carbon_get_post_meta( $correspondence, 'message_sender_id' );
 		$message_recipient_id = carbon_get_post_meta( $correspondence, 'message_recipient_id' );
-		$message_product_id   = carbon_get_post_meta( $correspondence, 'message_product_id' );
-		$message_user_id      = $message_sender_id == $user_id ? $message_recipient_id : $message_sender_id;
-		$message_user_avatar  = carbon_get_user_meta( $message_user_id, 'user_avatar' );
+        if($user_id == $message_sender_id || $user_id == $message_recipient_id){
+	        $message_user_id      = $message_sender_id == $user_id ? $message_recipient_id : $message_sender_id;
+	        $message_user_avatar  = carbon_get_user_meta( $message_user_id, 'user_avatar' );
+        }else{
+	        $message_sender_id    = 0;
+	        $message_recipient_id = 0;
+	        $message_product_id   = 0;
+	        $message_user_id      = false;
+	        $message_user_avatar  = false;
+	        $correspondence = 0;
+        }
 	}
 	$args = array(
 		'post_type'      => 'message',
@@ -40,47 +52,31 @@ function the_chat_page() {
 		'post_status'    => 'publish',
 		'post_parent'    => 0,
 		'orderby'        => 'date',
-		'order'          => 'asc',
-		'meta_query'     => array()
+		'order'          => 'desc',
+		'meta_query'     => array(
+			'relation' => 'OR',
+			array(
+				'key'   => '_message_sender_id',
+				'value' => $user_id,
+			),
+			array(
+				'key'   => '_message_recipient_id',
+				'value' => $user_id,
+			),
+		)
 	);
-	if ( $get_product_id ) {
-		$args['meta_query'][] = array(
-			'key'   => '_message_product_id',
-			'value' => $get_product_id
-		);
-	}
 	require_once ABSPATH . 'wp-admin/includes/image.php';
 	require_once ABSPATH . 'wp-admin/includes/file.php';
 	require_once ABSPATH . 'wp-admin/includes/media.php';
 	?>
     <div class="create-item-main">
         <div class="chat-group">
-            <div class="chat-group__left js-tab">
-                <ul class="nav-announcement">
-                    <li>
-                        <a class="js-tab-link <?php echo $message_recipient_id == $user_id || $message_recipient_id == 0 ? 'active' : ''; ?> "
-                           href="#"
-                           data-target="target_1">
-                            Продаю
-                        </a>
-                    </li>
-                    <li>
-                        <a class="js-tab-link <?php echo $message_sender_id == $user_id ? 'active' : ''; ?> " href="#"
-                           data-target="target_2">
-                            Купую
-                        </a>
-                    </li>
-                </ul>
+            <div class="chat-group__left ">
                 <div class="chat-tab">
-                    <div class="chat-tab__item js-tab-item <?php echo $message_recipient_id == $user_id || $message_recipient_id == 0 ? 'active' : ''; ?>"
-                         data-target="target_1">
+                    <div class="chat-tab__item">
 						<?php
-						$recipient_args                 = $args;
-						$recipient_args['meta_query'][] = array(
-							'key'   => '_message_recipient_id',
-							'value' => $user_id
-						);
-						$query                          = new WP_Query( $recipient_args );
+						$recipient_args = $args;
+						$query          = new WP_Query( $recipient_args );
 						if ( $query->have_posts() ):
 							?>
                             <div class="chat-nav-wrap">
@@ -88,99 +84,20 @@ function the_chat_page() {
 									<?php
 									while ( $query->have_posts() ):
 										$query->the_post();
-										$_id               = get_the_ID();
-										$_sender_id        = carbon_get_post_meta( $_id, 'message_sender_id' );
-										$_recipient_id     = carbon_get_post_meta( $_id, 'message_recipient_id' );
-										$_product_id       = carbon_get_post_meta( $_id, 'message_product_id' );
-										$userID            = $_sender_id == $user_id ? $_recipient_id : $_sender_id;
-										$_user_avatar      = carbon_get_user_meta( $userID, 'user_avatar' );
-										$_sender_user      = get_user_by( 'ID', $userID );
-										$_email            = $_sender_user->user_email ?: '';
-										$_display_name     = $_sender_user->display_name ?: '';
-										$_first_name       = $_sender_user->first_name ?: '';
-										$_last_name        = $_sender_user->last_name ?: '';
-										$_name             = $_first_name ?: $_display_name;
-										$last_message_data = get_last_message( $_id );
-										$is_read           = $last_message_data['is_read'] ?? true;
-										$cls               = '';
-										if ( $correspondence == $_id ) {
-											$cls = 'active';
+										$_id           = get_the_ID();
+										$_sender_id    = carbon_get_post_meta( $_id, 'message_sender_id' );
+										$_recipient_id = carbon_get_post_meta( $_id, 'message_recipient_id' );
+										$userID        = $_sender_id == $user_id ? $_recipient_id : $_sender_id;
+										$_user_avatar  = carbon_get_user_meta( $userID, 'user_avatar' );
+										$_sender_user  = get_user_by( 'ID', $userID );
+										$_email        = $_sender_user->user_email ?: '';
+										$_display_name = $_sender_user->display_name ?: '';
+										$_first_name   = $_sender_user->first_name ?: '';
+										$_last_name    = $_sender_user->last_name ?: '';
+										$_name         = $_first_name ?: $_display_name;
+										if ( $arr_name = explode( '@', $_name ) ) {
+											$_name = $arr_name[0];
 										}
-										if ( ! $is_read ) {
-											$cls .= ' not-read';
-										}
-										?>
-                                        <div data-url="<?php echo $_url . '?route=message&correspondence=' . $_id; ?>"
-                                             data-product="<?php echo $_product_id; ?>"
-                                             data-user="<?php echo $userID; ?>"
-                                             class="chat-contact__item correspondence-link <?php echo $cls; ?> ">
-                                            <div class="chat-contact__item-ava">
-												<?php if ( $_user_avatar ): ?>
-                                                    <img src="<?php _u( $_user_avatar ); ?>" alt=""/>
-												<?php endif; ?>
-                                            </div>
-                                            <div class="chat-contact__item-info">
-                                                <div class="chat-contact__item-title">
-													<?php echo $_name; ?>
-                                                </div>
-                                                <div class="chat-contact__item-subtitle">
-													<?php echo get_the_title( $_product_id ); ?>
-                                                </div>
-                                                <div class="chat-contact__item-date">
-													<?php echo $last_message_data['time'] ?? ''; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-									<?php endwhile; ?>
-                                </div>
-                            </div>
-						<?php else: ?>
-                            <div class="chat-nav-wrap">
-                                <div class="chat-not-contact">
-                                    <div class="text-group">
-                                        <h6>Повідомлень поки немає</h6>
-                                        <p>Як тільки ви отримаєте повідомлення, воно з'явиться тут.</p>
-                                        <p>
-                                            Якщо ви щось продаєте чи надаєте послуги, почніть з
-                                            <a href="<?php echo $url; ?>">публікації оголошення</a>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-						<?php
-						endif;
-						wp_reset_postdata();
-						wp_reset_query();
-						?>
-                    </div>
-                    <div class="chat-tab__item js-tab-item <?php echo $message_sender_id == $user_id ? 'active' : ''; ?>"
-                         data-target="target_2">
-						<?php
-						$sender_args                 = $args;
-						$sender_args['meta_query'][] = array(
-							'key'   => '_message_sender_id',
-							'value' => $user_id
-						);
-						$query                       = new WP_Query( $sender_args );
-						if ( $query->have_posts() ):
-							?>
-                            <div class="chat-nav-wrap">
-                                <div class="chat-contact">
-									<?php
-									while ( $query->have_posts() ):
-										$query->the_post();
-										$_id               = get_the_ID();
-										$_sender_id        = carbon_get_post_meta( $_id, 'message_sender_id' );
-										$_recipient_id     = carbon_get_post_meta( $_id, 'message_recipient_id' );
-										$_product_id       = carbon_get_post_meta( $_id, 'message_product_id' );
-										$userID            = $_sender_id == $user_id ? $_recipient_id : $_sender_id;
-										$_user_avatar      = carbon_get_user_meta( $userID, 'user_avatar' );
-										$_sender_user      = get_user_by( 'ID', $userID );
-										$_email            = $_sender_user->user_email ?: '';
-										$_display_name     = $_sender_user->display_name ?: '';
-										$_first_name       = $_sender_user->first_name ?: '';
-										$_last_name        = $_sender_user->last_name ?: '';
-										$_name             = $_first_name ?: $_display_name;
 										$last_message_data = get_last_message( $_id );
 										$is_read           = $last_message_data['is_read'] ?? true;
 										$cls               = '';
@@ -193,7 +110,6 @@ function the_chat_page() {
 										?>
                                         <div data-url="<?php echo $_url . '?route=message&correspondence=' . $_id; ?>"
                                              data-user="<?php echo $userID; ?>"
-                                             data-product="<?php echo $_product_id; ?>"
                                              class="chat-contact__item correspondence-link <?php echo $cls; ?> ">
                                             <div class="chat-contact__item-ava">
 												<?php if ( $_user_avatar ): ?>
@@ -205,7 +121,7 @@ function the_chat_page() {
 													<?php echo $_name; ?>
                                                 </div>
                                                 <div class="chat-contact__item-subtitle">
-													<?php echo get_the_title( $_product_id ); ?>
+													<?php echo $last_message_data['msg'] ?? ''; ?>
                                                 </div>
                                                 <div class="chat-contact__item-date">
 													<?php echo $last_message_data['time'] ?? ''; ?>
@@ -250,7 +166,7 @@ function the_chat_page() {
 									<?php echo get_user_by( 'ID', $message_user_id )->first_name ?: get_user_by( 'ID', $message_user_id )->nickname; ?>
                                 </div>
                                 <div class="chat-contact__item-date">
-                                    Онлайн <?php echo get_user_last_time_online( $message_user_id ); ?>
+									<?php echo get_user_last_time_online( $message_user_id ); ?>
                                 </div>
                             </div>
                         </div>
@@ -277,6 +193,7 @@ function the_chat_page() {
                             <input type="hidden" name="correspondence" value="<?php echo $correspondence; ?>">
                             <input type="hidden" name="message_sender_id" value="<?php echo $user_id; ?>">
                             <input type="hidden" name="message_recipient_id" value="<?php echo $message_user_id; ?>">
+                            <input type="hidden" name="product" value="<?php echo $product; ?>">
                             <div class="chat-form">
                                 <label class="chat-file">
                                     <input
@@ -289,10 +206,16 @@ function the_chat_page() {
                                             data-src="<?php echo $assets; ?>img/chat-file.svg"
                                             alt=""/>
                                 </label>
-                                <textarea class="chat-input"
-                                          data-autoresize="data-autoresize" required="required"
-                                          name="text"
-                                          placeholder="Напишіть повідомлення..."></textarea>
+                                <label for="input"></label>
+                                <input id="message-input"
+                                       value="<?php
+								       if ( $product ) {
+									       echo 'Доброго дня! Цікавить товар ' . get_the_title( $product ) . ' [ID:' . $product . ']';
+								       }
+								       ?>"
+                                       type="text" class="chat-input" required="required" name="text"
+                                       placeholder="Напишіть повідомлення..."/>
+
                                 <button class="chat-btn" type="submit">
                                     <img src="<?php echo $assets; ?>img/send.svg" alt=""/>
                                 </button>
@@ -341,8 +264,10 @@ function the_correspondence_messages( $correspondence, $page_num = 1 ) {
 						foreach ( $messages as $message_id ) {
 							if ( get_post( $message_id ) ):
 								$message_text = base64_decode( strip_tags( get_content_by_id( $message_id ) ) );
+								$pattern = '/(https?:\/\/[^\s]+)/';
+								$replacement = '<a target="_blank" href="$1">$1</a>';
+								$message_text = preg_replace($pattern, $replacement, $message_text);
 								$message_time = get_the_date( 'H:i', $message_id );
-								$product_id   = carbon_get_post_meta( $message_id, 'message_product_id' );
 								$sender_id    = carbon_get_post_meta( $message_id, 'message_sender_id' );
 								$recipient_id = carbon_get_post_meta( $message_id, 'message_recipient_id' );
 								$media        = carbon_get_post_meta( $message_id, 'message_media' );

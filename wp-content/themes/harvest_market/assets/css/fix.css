@@ -649,7 +649,7 @@ main.content.showing {
 }
 
 .reviews-rating strong {
-    color: #fff!important;
+    color: #fff !important;
 }
 
 .reviews-rating {
@@ -686,8 +686,43 @@ main.content.showing {
 .upfile_logo {
     display: none;
 }
+
 .seller-shedule__title {
     width: 20rem;
+}
+
+input.chat-input {
+    padding-top: 0;
+}
+
+.dialog-item__text a {
+    color: #4D76FF;
+    text-decoration: underline;
+}
+
+.dialog-item__text a:hover {
+    text-decoration: none;
+}
+
+.iw-product-media {
+    width: 30rem;
+    height: 30rem;
+}
+
+.iw-product-media .product-item__slider, .iw-product-media .product-item__slider .slick-slide {
+    height: 30rem;
+}
+
+.iw-content {
+    width: -webkit-calc(100% - 30rem);
+    width: calc(100% - 30rem);
+}
+.iw-content .product-item__reviews li.reviews-rating{
+    padding: 3px 8px;
+    margin-right: 2rem;
+}
+.iw-content .product-item__reviews li.reviews-rating::before{
+    display: none;
 }
 @media (max-width: 1600px) {
     .advertise-item {

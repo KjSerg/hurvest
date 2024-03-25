@@ -189,12 +189,12 @@ function get_locations() {
 			$product_latitude  = (float) carbon_get_post_meta( $id, 'product_latitude' );
 			$product_longitude = (float) carbon_get_post_meta( $id, 'product_longitude' );
 			$unit              = carbon_get_post_meta( $id, 'product_unit' );
-			$rating            = carbon_get_post_meta( $id, 'product_rating' );
+			$author_id         = get_post_field( 'post_author', $id );
+			$rating            = get_seller_rating( $author_id );
 			$delivery_methods  = carbon_get_post_meta( $id, 'product_delivery_methods' );
 			$min_order         = carbon_get_post_meta( $id, 'product_min_order' );
 			$max_value         = carbon_get_post_meta( $id, 'product_max_value' );
 			$is_favorite       = is_in_favorite( $id );
-			$author_id         = get_post_field( 'post_author', $id );
 			$user_verification = carbon_get_user_meta( $author_id, 'user_verification' );
 			$currency          = carbon_get_theme_option( 'currency' );
 			$user_location     = get_user_location();
@@ -685,6 +685,7 @@ function new_product() {
 					$res['url'] = $_url . '?route=advertisement';
 				}
 				set_product_status( $_id, get_the_date( 'U', $_id ) );
+				$res['productID'] = get_product_custom_ID( $_id );
 			} else {
 				if ( is_wp_error( $_id ) ) {
 					$res['msg'] = $_id->get_error_message();
@@ -2232,18 +2233,22 @@ function get_correspondence_link() {
 add_action( 'wp_ajax_nopriv_new_message', 'new_message' );
 add_action( 'wp_ajax_new_message', 'new_message' );
 function new_message() {
-	$correspondence = $_POST['correspondence'] ?? '';
-	$text           = $_POST['text'] ?? '';
-	$recipient_id   = $_POST['message_recipient_id'] ?? '';
-	$sender_id      = get_current_user_id();
+	$time             = time();
+	$current_datetime = current_time( 'mysql', false );
+	$correspondence   = $_POST['correspondence'] ?? '';
+	$text             = $_POST['text'] ?? '';
+	$recipient_id     = $_POST['message_recipient_id'] ?? '';
+	$sender_id        = get_current_user_id();
 	if ( $correspondence && $sender_id ) {
-		$message_product_id = carbon_get_post_meta( $correspondence, 'message_product_id' );
+		$message_product_id = $_POST['product'] ?? '';
 		$post_data          = array(
-			'post_type'    => 'message',
-			'post_title'   => 'message',
-			'post_status'  => 'publish',
-			'post_parent'  => $correspondence,
-			'post_content' => base64_encode( $text ),
+			'post_type'     => 'message',
+			'post_title'    => 'message',
+			'post_status'   => 'publish',
+			'post_parent'   => $correspondence,
+			'post_content'  => base64_encode( $text ),
+			'post_date'     => $current_datetime,
+			'post_date_gmt' => get_gmt_from_date( $current_datetime ),
 		);
 		$_id                = wp_insert_post( $post_data, true );
 		$post               = get_post( $_id );
@@ -3022,8 +3027,10 @@ function get_service_price( $id, $regions ) {
 }
 
 function set_notification( $array = array() ) {
-	$notification_id = 0;
-	$type            = $array['type'] ?? 'message';
+	$notification_id  = 0;
+	$time             = time();
+	$current_datetime = current_time( 'mysql', false );
+	$type             = $array['type'] ?? 'message';
 	if ( $type == 'message' ) {
 		$message_product_id = $array['product_id'] ?? '';
 		$sender_id          = $array['sender_id'] ?? '';
@@ -3037,7 +3044,7 @@ function set_notification( $array = array() ) {
 		$notification_id    = wp_insert_post( $notification_data, true );
 		$notification_post  = get_post( $notification_id );
 		if ( ! is_wp_error( $notification_id ) && $notification_post ) {
-			$notification_html = "<a href='#' data-product='$message_product_id' class='move-to-correspondence'>Відкрити переписку</a>";
+			$notification_html = "<a href='#' data-user='$sender_id' class='move-to-correspondence'>Відкрити переписку</a>";
 			carbon_set_post_meta( $notification_id, 'notification_text', $notification_html );
 			carbon_set_post_meta( $notification_id, 'notification_sender_id', $sender_id );
 			carbon_set_post_meta( $notification_id, 'notification_recipient_id', $recipient_id );
@@ -3047,9 +3054,11 @@ function set_notification( $array = array() ) {
 		$sender_id         = $array['sender_id'] ?? '';
 		$recipient_id      = $array['recipient_id'] ?? '';
 		$notification_data = array(
-			'post_type'   => 'notifications',
-			'post_title'  => '%user% запросив керувати оголошеннями',
-			'post_status' => 'publish',
+			'post_type'     => 'notifications',
+			'post_title'    => '%user% запросив керувати оголошеннями',
+			'post_status'   => 'publish',
+			'post_date'     => $current_datetime,
+			'post_date_gmt' => get_gmt_from_date( $current_datetime ),
 		);
 		$notification_id   = wp_insert_post( $notification_data, true );
 		$notification_post = get_post( $notification_id );

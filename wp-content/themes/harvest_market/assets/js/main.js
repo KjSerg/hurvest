@@ -702,13 +702,11 @@ function initMapList() {
         map1Latitude = mapElement.getAttribute('data-lat'),
         map1Longtitude = mapElement.getAttribute('data-long'),
         saveCenter = mapElement.getAttribute('data-save-center') || '',
-        // mapPin = mapElement.getAttribute('data-pin'),
         clusterPin = mapElement.getAttribute('data-cluster'),
         json = mapElement.getAttribute('data-json'),
         mapId = mapElement.getAttribute('data-map'),
-        map; // var jsonStringify = JSON.stringify(json)
-    // var jsonParse = JSON.parse(jsonStringify);
-    // console.log(jsonParse)
+        map;
+
     if (lastMapCenter && saveCenter === 'true') {
         lastMapCenter = JSON.parse(lastMapCenter);
         map1Latitude = lastMapCenter.lat;
@@ -724,7 +722,7 @@ function initMapList() {
         var mapOptions = {
             zoom: 14,
             styles: style,
-            center: center, // disableDefaultUI: true,
+            center: center,
             scrollwheel: true
         };
         var lastMapZoom = localStorage.getItem('lastMapZoom');
@@ -794,7 +792,7 @@ function initMapList() {
                     '<div class="product-item__slider">' + str_slider + '</div>' + '</div>' +
                     '<div class="iw-content">' + '<a class="product-item__title" href="' + link[i] + '">' + title[i] +  '</a>' +
                     '<a href="' + sellerLink[i] + '" target="_blank" class="iw-product-subtitle">' + subtitle[i] + verified_html + '</a>' +
-                    '<ul class="product-item__reviews"><li>' + reviews[i] + '</li> <li> <strong>' + rating[i] + '</strong> ' + ratingSvg() + '</li>' + '</ul>' +
+                    '<ul class="product-item__reviews"> <li class="reviews-rating"> <strong>' + rating[i] + '</strong> </li><li>' + reviews[i] + '</li>' + '</ul>' +
                     '<ul class="iw-product-place"> <li>' + place + '</li><li>' + distance + '</li></ul>' +
 
                     '<div class="product-item__bot">' +
@@ -833,8 +831,7 @@ function initMapList() {
             gmarkers1.push(marker1); // Marker click listener
 
             var infowindow = new google.maps.InfoWindow({
-                // Assign a maximum value for the width of the infowindow allows
-                // greater control over the various content elements
+
                 maxWidth: 700
             });
             infoWindows.push(infowindow);

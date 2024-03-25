@@ -8,6 +8,7 @@ $url_home            = $var['url_home'];
 $admin_ajax          = $var['admin_ajax'];
 $current_user_id     = get_current_user_id();
 $id                  = get_the_ID();
+$productID           = get_product_custom_ID($id);
 $author_id           = get_post_field( 'post_author', $id );
 $seller_rating       = get_seller_rating( $author_id );
 $seller_count_review = get_seller_count_review( $author_id );
@@ -164,7 +165,7 @@ $user_id           = $current_author_id;
 									<?php echo $title; ?>
                                 </div>
                                 <div class="product-card__list-main">
-                                    ID: <?php echo $id; ?>
+                                    ID: <?php echo $productID; ?>
                                 </div>
                             </div>
                             <div class="product-card__list">

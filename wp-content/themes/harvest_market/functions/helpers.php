@@ -1718,13 +1718,16 @@ function get_correspondence_id( $from_id, $to_id ) {
 		wp_reset_query();
 	}
 	if ( ! $res ) {
-		$post_data = array(
-			'post_type'   => 'message',
-			'post_title'  => 'correspondence',
-			'post_status' => 'publish',
+		$current_datetime = current_time( 'mysql', false );
+		$post_data        = array(
+			'post_type'     => 'message',
+			'post_title'    => 'correspondence',
+			'post_status'   => 'publish',
+			'post_date'     => $current_datetime,
+			'post_date_gmt' => get_gmt_from_date( $current_datetime ),
 		);
-		$_id       = wp_insert_post( $post_data );
-		$post      = get_post( $_id );
+		$_id              = wp_insert_post( $post_data );
+		$post             = get_post( $_id );
 		if ( $post ) {
 			carbon_set_post_meta( $_id, 'message_sender_id', $from_id );
 			carbon_set_post_meta( $_id, 'message_recipient_id', $to_id );
@@ -1736,6 +1739,7 @@ function get_correspondence_id( $from_id, $to_id ) {
 }
 
 function get_last_message( $_id ) {
+	date_default_timezone_set( 'Europe/Kiev' );
 	$time  = time();
 	$res   = array();
 	$args  = array(
@@ -1749,9 +1753,13 @@ function get_last_message( $_id ) {
 		while ( $query->have_posts() ) {
 			$query->the_post();
 			$id             = get_the_ID();
-			$_time          = get_the_date( 'U', $id );
-			$res['time']    = human_time_diff( $_time, $time );
+			$_date          = get_the_date( 'Y-m-d H:i:s', $id );
+			$timestamp      = strtotime( $_date );
+			$res['time']    = human_time_diff( $timestamp, $time );
 			$res['is_read'] = carbon_get_post_meta( $id, 'message_is_read' );
+			$msg            = base64_decode( strip_tags( get_content_by_id( $id ) ) );
+			$msg            = mb_substr( $msg, 0, 100, 'UTF-8' );
+			$res['msg']     = $msg;
 		}
 	}
 	wp_reset_postdata();
@@ -1761,12 +1769,14 @@ function get_last_message( $_id ) {
 }
 
 function get_user_last_time_online( $user_id ) {
-	$res  = '';
+	$res = '';
+	date_default_timezone_set( 'Europe/Kiev' );
 	$time = time();
 	if ( $user_id ) {
 		$user_online = carbon_get_user_meta( $user_id, 'user_online' );
 		if ( $user_online ) {
-			$diff = $time - $user_online;
+			$user_online = (int) $user_online;
+			$diff        = $time - $user_online;
 			if ( $diff > 60 ) {
 				$res = date( 'd.m.Y H:i', $user_online );
 			}
@@ -1774,7 +1784,7 @@ function get_user_last_time_online( $user_id ) {
 
 	}
 
-	return $res;
+	return 'Онлайн ' . $res;
 }
 
 function get_notifications_count() {
@@ -2672,4 +2682,48 @@ function get_product_purchases_number( $productID ) {
 	}
 
 	return $res;
+}
+
+function get_product_custom_ID( $id ) {
+	$productID = carbon_get_post_meta( $id, 'product_id' );
+	if ( ! $productID ) {
+		$productID = generate_random_number();
+		$product_id = get_product_by_custom_id( $productID );
+        if($product_id){
+            return get_product_custom_ID( $id );
+        }else{
+	        carbon_set_post_meta( $id, 'product_id', $productID );
+        }
+	}
+    return $productID;
+}
+
+function get_product_by_custom_id( $custom_id ) {
+	$res   = 0;
+	$args  = array(
+		'post_type'      => 'products',
+		'post_status'    => array( 'publish', 'pending' ),
+		'posts_per_page' => 1,
+		'meta_query'     => array(
+			array(
+				'key'   => '_product_id',
+				'value' => $custom_id
+			),
+		)
+	);
+	$query = new WP_Query( $args );
+	if ( $query->have_posts() ) {
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$res = get_the_ID();
+		}
+	}
+	wp_reset_postdata();
+	wp_reset_query();
+
+	return $res;
+}
+
+function generate_random_number() {
+	return mt_rand( 100000, 999999 );
 }

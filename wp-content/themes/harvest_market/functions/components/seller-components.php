@@ -388,12 +388,15 @@ function the_seller_contacts_page() {
 		$distance     = getDistance( $user_address, $user_company_address, "K" );
 	}
 	$user_payment_methods_names = array();
-	foreach ( $user_payment_methods as $method ) {
-		$_payment_method              = get_method_by_value( $method, $payment_methods );
-		$_type_item                   = $_payment_method['_type'];
-		$_title_item                  = $_payment_method['title'];
-		$user_payment_methods_names[] = $_title_item;
-	}
+    if($user_payment_methods){
+	    foreach ( $user_payment_methods as $method ) {
+		    $_payment_method              = get_method_by_value( $method, $payment_methods );
+		    $_type_item                   = $_payment_method['_type'];
+		    $_title_item                  = $_payment_method['title'];
+		    $user_payment_methods_names[] = $_title_item;
+	    }
+    }
+
 	?>
 
     <div class="about-seller">
@@ -429,15 +432,19 @@ function the_seller_contacts_page() {
                             </div>
                         </div>
                     </div>
-                    <div class="seller-contact__item">
-                        <div class="seller-contact__item-ico"><img src="<?php echo $assets; ?>img/seller-contact3.svg"
-                                                                   alt=""/></div>
-                        <div class="seller-contact__item-main">
-                            <div class="seller-contact__item-main-item">
-                                <a href="#">Почати чат</a>
+					<?php if ($current_user_id != $current_author_id ): ?>
+                        <div class="seller-contact__item">
+                            <div class="seller-contact__item-ico"><img
+                                        src="<?php echo $assets; ?>img/seller-contact3.svg"
+                                        alt=""/></div>
+                            <div class="seller-contact__item-main">
+                                <div class="seller-contact__item-main-item">
+                                    <a class="move-to-correspondence" data-user="<?php echo $current_author_id; ?>"
+                                       href="#">Почати чат</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+					<?php endif; ?>
                     <div class="seller-contact__item">
                         <div class="seller-contact__item-ico">
                             <img src="<?php echo $assets; ?>img/seller-contact4.svg" alt=""/>

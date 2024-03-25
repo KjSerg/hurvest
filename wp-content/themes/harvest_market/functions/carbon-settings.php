@@ -548,6 +548,7 @@ function crb_attach_in_products() {
 		         'Інформація',
 		         array(
 			         Field::make( "separator", "crb_style_inform", "Основна інформація" ),
+			         Field::make( 'text', 'product_id', 'ID' ),
 			         Field::make( 'text', 'product_price', 'Ціна' )->set_width( 40 )
 			              ->set_attribute( 'type', 'number' )->set_attribute( 'step', '0.01' ),
 			         Field::make( "html", "crb_information_text", 'Активна валюта' )->set_width( 20 )
@@ -772,6 +773,7 @@ function crb_attach_in_message() {
 	         ->add_fields( array(
 		         Field::make( "text", "message_sender_id", "Відправник" ),
 		         Field::make( "text", "message_recipient_id", "Отримувач" ),
+		         Field::make( "text", "message_product_id", "ID товара" ),
 		         Field::make( "text", "message_notification_id", "ID сповіщення" ),
 		         Field::make( "checkbox", "message_is_read", "Прочитано" ),
 		         Field::make( "text", "message_media", "Зображення" ),
@@ -795,6 +797,7 @@ function crb_attach_in_reviews() {
 		         )
 	         );
 }
+
 
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_applications' );
 function crb_attach_in_applications() {

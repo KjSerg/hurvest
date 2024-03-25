@@ -7,10 +7,10 @@
 
 function harvest_scripts() {
 
-    $correct_path = '';
-    if(is_singular('post') || is_author()){
-	    $correct_path = '/seller';
-    }
+	$correct_path = '';
+	if ( is_singular( 'post' ) || is_author() ) {
+		$correct_path = '/seller';
+	}
 
 	wp_enqueue_style( 'harvest-style', get_stylesheet_uri() );
 
@@ -38,15 +38,15 @@ function harvest_scripts() {
 add_action( 'wp_enqueue_scripts', 'harvest_scripts' );
 
 function enqueue_admin_scripts() {
-	wp_enqueue_style('custom-admin-css', get_template_directory_uri() . '/assets/css/admin.css', array(), '1.0');
-	wp_enqueue_script('custom-admin-scripts', get_template_directory_uri(). '/assets/js/admin.js', array('jquery'), '1.0', true);
+	wp_enqueue_style( 'custom-admin-css', get_template_directory_uri() . '/assets/css/admin.css', array(), '1.0' );
+	wp_enqueue_script( 'custom-admin-scripts', get_template_directory_uri() . '/assets/js/admin.js', array( 'jquery' ), '1.0', true );
 }
 
-add_action('admin_enqueue_scripts', 'enqueue_admin_scripts');
+add_action( 'admin_enqueue_scripts', 'enqueue_admin_scripts' );
 
 get_template_part( 'functions/helpers' );
-get_template_part( 'functions/settings' );
 get_template_part( 'functions/carbon-settings' );
+get_template_part( 'functions/settings' );
 get_template_part( 'functions/components' );
 get_template_part( 'functions/google-distance' );
 get_template_part( 'functions/ajax-functions' );
@@ -121,8 +121,6 @@ function my_custom_menu_page() {
 	);
 }
 
-//add_action( 'admin_enqueue_scripts', 'custom_admin_assets' );
-
 function custom_admin_assets() {
 
 	wp_enqueue_script( 'custom-admin-jquery', get_template_directory_uri() . '/assets/js/jquery.js', array(), null, true );
@@ -143,7 +141,7 @@ function custom_export_page_html() {
 	$terms          = $_POST['terms'] ?? '';
 	$parent_parents = $_POST['parent_parents'] ?? '';
 	if ( $action == 'add__tags' ) {
-        echo '<pre>';
+		echo '<pre>';
 		$args = array(
 			'taxonomy' => $taxonomy,
 			'terms'    => array_unique( explode(
@@ -158,15 +156,15 @@ function custom_export_page_html() {
 				'parent'     => (int) $parent_parents,
 				'taxonomy'   => $taxonomy
 			) );
-            if($children){
-                foreach ($children as $child){
-                    if($child->name != 'Інше'){
-	                    $args['id'] =  $child->term_id;
-	                    var_dump( $args );
-	                    add_terms( $args );
-                    }
-                }
-            }
+			if ( $children ) {
+				foreach ( $children as $child ) {
+					if ( $child->name != 'Інше' ) {
+						$args['id'] = $child->term_id;
+						var_dump( $args );
+						add_terms( $args );
+					}
+				}
+			}
 		} else {
 			if ( $parent ) {
 				$args['id'] = (int) $parent;
@@ -194,4 +192,15 @@ function custom_export_page_html() {
     </div>
 	<?php
 
+}
+
+add_action( 'init', 'set_user_time_visit' );
+
+function set_user_time_visit() {
+	$current_user_id = get_current_user_id();
+	if ( ! is_admin() && $current_user_id ) {
+		date_default_timezone_set( 'Europe/Kiev' );
+		$time = time();
+		carbon_set_user_meta( $current_user_id, 'user_online', $time );
+	}
 }

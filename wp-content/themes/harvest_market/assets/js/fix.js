@@ -1406,8 +1406,11 @@ $doc.ready(function () {
     $doc.on('click', ".correspondence-link", function (e) {
         e.preventDefault();
         var $t = $(this);
+        var isActive = $t.hasClass('active');
         if (load) return;
         load = true;
+        $doc.find('.correspondence-link').removeClass('active');
+        $t.addClass('active');
         showPreloader();
         var url = $t.attr('href') || $t.attr('data-url');
         var $container = $doc.find('.chat-main');
@@ -1418,10 +1421,19 @@ $doc.ready(function () {
         $.ajax(dataAjax).done(function (r) {
             var $r = $(parser.parseFromString(r, "text/html"));
             var $r_container = $r.find('.chat-main');
-            $container.html($r_container.html());
+            if(isActive){
+                $container.find('.chat-main__top').html($r_container.find('.chat-main__top').html());
+                $container.find('.chat-main__content').html($r_container.find('.chat-main__content').html());
+            }else {
+                $container.html($r_container.html());
+            }
             load = false;
             hidePreloader();
             $doc.find('.chat-group__right.chat-empty').removeClass('chat-empty');
+            if ($doc.find('.dialog-item').last().length === 0) return;
+            $doc.find('.chat-main__content').animate({
+                scrollTop: $doc.find('.dialog-item').last().offset().top
+            }, 1000);
         });
     });
     $doc.on('change', '.place-list .check_st', function () {
@@ -2353,6 +2365,7 @@ function checkingNotifications() {
             if (!isNaN(num)) {
                 if (num > 0) {
                     $doc.find('.btn_notification span').removeClass('hidden');
+                    $doc.find('.chat-contact__item.correspondence-link.active').trigger('click');
                 } else {
                     $doc.find('.btn_notification span').addClass('hidden');
                 }
