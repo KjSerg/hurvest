@@ -67,7 +67,7 @@ $personal_page       = carbon_get_theme_option( 'personal_area_page' );
 $_url                = $personal_page ? get_the_permalink( $personal_page[0]['id'] ) : $url;
 $product_views ++;
 carbon_set_post_meta( $id, 'product_views', $product_views );
-$author_link = get_seller_page_link( $author_id );
+$author_link       = get_seller_page_link( $author_id );
 $_order            = $_GET['order'] ?? '';
 $_orderby          = $_GET['orderby'] ?? '';
 $pagenum           = $_GET['pagenum'] ?? 1;
@@ -273,7 +273,8 @@ $user_id           = $current_author_id;
                                 <ul class="product-item__reviews">
                                     <li><?php echo $seller_count_review ?: 0; ?> відгуків</li>
                                     <li>
-                                        <div class="reviews-rating"> <strong><?php echo  $seller_rating ; ?> </strong></div>
+                                        <div class="reviews-rating"><strong><?php echo $seller_rating; ?> </strong>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -297,7 +298,7 @@ $user_id           = $current_author_id;
                             <div class="product-card__btn w_100_btn">
                                 <a class="btn_st move-to-correspondence"
                                    data-product="<?php echo $id; ?>"
-                                   data-user="<?php echo $current_user_id; ?>"
+                                   data-user="<?php echo $author_id; ?>"
                                    href="#">
                                     <span>Написати повідомлення </span>
                                 </a>

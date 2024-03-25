@@ -640,8 +640,13 @@ function get_query_index_data( $array = array() ) {
 		'paged'       => $paged,
 	);
 	if ( $_orderby || $_order ) {
-		if ( $_orderby ) {
-			$args['orderby'] = $_orderby;
+		if ( 'price' == $_orderby ) {
+			$args['orderby']  = 'meta_value_num';
+			$args['meta_key'] = '_product_price';
+		} else {
+			if ( $_orderby ) {
+				$args['orderby'] = $_orderby;
+			}
 		}
 		if ( $_order ) {
 			$args['order'] = $_order;
@@ -1668,43 +1673,49 @@ function get_user_promo( $user_id ) {
 	return $res;
 }
 
-function get_correspondence_id( $product_id, $user_id ) {
+function get_correspondence_id( $from_id, $to_id ) {
 	$res       = 0;
 	$author_id = 0;
-	if ( $product_id && get_post( $product_id ) ) {
-		$author_id = get_post_field( 'post_author', $product_id );
-		if ( $author_id ) {
-			$args  = array(
-				'post_type'      => 'message',
-				'post_status'    => 'publish',
-				'posts_per_page' => 1,
-				'post_parent'    => 0,
-				'meta_query'     => array(
-					array(
-						'key'   => '_message_product_id',
-						'value' => $product_id,
-					),
+	if ( $from_id && $to_id ) {
+		$args  = array(
+			'post_type'      => 'message',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'post_parent'    => 0,
+			'meta_query'     => array(
+				'relation' => 'OR',
+				array(
 					array(
 						'key'   => '_message_sender_id',
-						'value' => $user_id,
+						'value' => $from_id,
 					),
 					array(
 						'key'   => '_message_recipient_id',
-						'value' => $author_id,
+						'value' => $to_id,
 					),
 				),
-			);
-			$query = new WP_Query( $args );
-			if ( $query->have_posts() ) {
-				while ( $query->have_posts() ) {
-					$query->the_post();
-					$id  = get_the_ID();
-					$res = $id;
-				}
+				array(
+					array(
+						'key'   => '_message_sender_id',
+						'value' => $to_id,
+					),
+					array(
+						'key'   => '_message_recipient_id',
+						'value' => $from_id,
+					),
+				)
+			),
+		);
+		$query = new WP_Query( $args );
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$id  = get_the_ID();
+				$res = $id;
 			}
-			wp_reset_postdata();
-			wp_reset_query();
 		}
+		wp_reset_postdata();
+		wp_reset_query();
 	}
 	if ( ! $res ) {
 		$post_data = array(
@@ -1715,9 +1726,8 @@ function get_correspondence_id( $product_id, $user_id ) {
 		$_id       = wp_insert_post( $post_data );
 		$post      = get_post( $_id );
 		if ( $post ) {
-			carbon_set_post_meta( $_id, 'message_sender_id', $user_id );
-			carbon_set_post_meta( $_id, 'message_recipient_id', $author_id );
-			carbon_set_post_meta( $_id, 'message_product_id', $product_id );
+			carbon_set_post_meta( $_id, 'message_sender_id', $from_id );
+			carbon_set_post_meta( $_id, 'message_recipient_id', $to_id );
 			$res = $_id;
 		}
 	}

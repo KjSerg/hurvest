@@ -1,6 +1,20 @@
 "use strict";
 
 $(document).ready(function () {
+  $('.open_filter_seller').on('click', function (e) {
+    e.preventDefault();
+    $('body').addClass('open_filter_sel');
+  });
+  $('.filter-close').on('click', function () {
+    $('body').removeClass('open_filter_sel');
+  });
+  $(document).on('click', function (e) {
+    if (!$(e.target).closest('.info-catalog__filter-wrap, .open_filter_seller').length) {
+      $('body').removeClass('open_filter_sel');
+    }
+
+    e.stopPropagation();
+  });
   $('.head-slider ').slick({
     infinite: true,
     adaptiveHeight: true,
@@ -39,10 +53,7 @@ $(document).ready(function () {
   });
   $('.select_st').selectric({
     disableOnMobile: false,
-    nativeOnMobile: false,
-    onChange: function onChange(element) {// var label_val = $(this).closest('.wrap_select').find('span.label').text();
-      // $(this).closest('.wrap_select').find('.hide_input').val(label_val);
-    }
+    nativeOnMobile: false
   });
   $('.counter_product').each(function () {
     var parent = $(this);
@@ -68,74 +79,6 @@ $(document).ready(function () {
       }
     });
   });
-  $('.js-range').each(function () {
-    var this_ = $(this);
-    var min = $(this).attr('data-min');
-    var max = $(this).attr('data-max');
-    var from_input = this_.closest('.filter-range').find('.js-input-from');
-    var to_input = this_.closest('.filter-range').find('.js-input-to');
-    var from = 0;
-    var to = 0;
-    this_.ionRangeSlider({
-      hide_min_max: true,
-      hide_from_to: true,
-      // from: 2,
-      onStart: function onStart(data) {
-        from = data.from;
-        to = data.to;
-        from_input.val(from);
-        to_input.val(to); // $('.range-grid__item').eq(from).addClass('active');
-      },
-      onChange: function onChange(data) {
-        // $('.range-grid__item').removeClass('active');
-        from = data.from;
-        to = data.to;
-        from_input.val(from);
-        to_input.val(to); // $('.range-grid__item').eq(from).addClass('active');
-      }
-    });
-    var instance = this_.data("ionRangeSlider");
-    from_input.keyup(delay(function (e) {
-      var val = $(this).val(); // validate
-
-      var t_ = to_input.length;
-      var val_m = 0;
-
-      if (t_ > 0) {
-        val_m = to_input.val();
-      } else {
-        val_m = Number(max);
-      }
-
-      if (Number(val) < Number(min)) {
-        val = Number(min);
-      } else if (val > Number(val_m)) {
-        val = val_m;
-      }
-
-      $(this).val(val);
-      instance.update({
-        from: val
-      });
-    }, 500));
-    to_input.keyup(delay(function (e) {
-      var val1 = $(this).val(); // validate
-
-      console.log(val1, from, to);
-      var val_s = from_input.val();
-
-      if (val1 < Number(val_s)) {
-        val1 = Number(val_s);
-      } else if (val1 > Number(max)) {
-        val1 = Number(max);
-      }
-
-      $(this).val(val1);
-      instance.update({
-        to: val1
-      });
-    }, 500));
-  });
   $('.scroll_top').click(function () {
     $('body,html').animate({
       scrollTop: 0
@@ -146,6 +89,36 @@ $(document).ready(function () {
   if ($('#seller-map').length > 0) {
     initMap();
   }
+
+  $('.more-text').click(function (e) {
+    if ($(this).hasClass('active')) {
+      $(this).find('span').text($(this).attr('data-text'));
+    } else {
+      $(this).find('span').text($(this).attr('data-show'));
+    }
+
+    $(this).toggleClass('active');
+    e.preventDefault();
+    $(this).parent().find('.hidden-text').slideToggle();
+  });
+  $(document).on("mouseenter", "label.rating-item", function () {
+    $(this).addClass("prev").removeClass("next").nextAll().addClass("next"), $(this).prevAll().addClass("prev").removeClass("next"), $(this).nextAll().removeClass("prev");
+  });
+  $(document).on("mouseleave", "label.rating-item", function () {
+    $(this).prevAll().removeClass("next"), $(this).prevAll().removeClass("prev"), $(this).nextAll().removeClass("prev"), $(this).nextAll().removeClass("next"), $(this).removeClass("next"), $(this).removeClass("prev");
+  });
+  $(document).on("click", "label.rating-item", function () {
+    $("label.rating-item").removeClass("active__prev"), $("label.rating-item").removeClass("active"), $("label.rating-item").removeClass("next"), $(this).addClass("active").prevAll().addClass("active__prev");
+  });
+  $(" .search-input").focus(function () {
+    $(this).addClass('active focus');
+  }).blur(function () {
+    if ($(this).val() == "") {
+      $(this).removeClass('active');
+    }
+
+    $(this).removeClass('focus');
+  });
 });
 
 function delay(callback, ms) {

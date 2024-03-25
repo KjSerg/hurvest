@@ -1451,9 +1451,11 @@ function add_enterprise() {
 	$office_type            = $_POST['office_type'] ?? '';
 	$social_network         = $_POST['social_network'] ?? '';
 	$social_network_urls    = $_POST['social_network_url'] ?? '';
+	$upfile_logo_id         = $_POST['upfile_logo_id'] ?? '';
 	$application            = get_application( $user_id );
 	$work_time_organization = get_work_time_json_string( $days_prefix );
 	$phone                  = implode( ',', $phone );
+	$files_store            = $_FILES;
 	if ( $user_id ) {
 		if ( $delivery_types ) {
 			$__arr = array();
@@ -1477,7 +1479,11 @@ function add_enterprise() {
 			}
 			carbon_set_user_meta( $user_id, 'user_payment_methods', $__arr );
 		}
-		if ( $social_network && $social_network_urls ) {
+		foreach ( get_social_networks_name() as $social_network_name ) {
+			$social_network_name = strtolower( $social_network_name );
+			update_user_meta( $user_id, $social_network_name, '' );
+		}
+		if ( $social_network && $social_network_urls && $social_network_urls != '' ) {
 			foreach ( $social_network as $social_network_index => $network_name ) {
 				$social_network_url = $social_network_urls[ $social_network_index ] ?? '';
 				if ( filter_var( $social_network_url, FILTER_VALIDATE_URL ) === false ) {
@@ -1513,6 +1519,7 @@ function add_enterprise() {
 				carbon_set_post_meta( $_id, 'application_phone', $phone );
 				carbon_set_post_meta( $_id, 'application_work_time_organization', $work_time_organization ?: '' );
 				carbon_set_user_meta( $user_id, 'user_company_office_type', $office_type ?: '' );
+
 				$files         = $_FILES["upfile"];
 				$arr           = array();
 				$res['$files'] = $files;
@@ -1532,8 +1539,33 @@ function add_enterprise() {
 					}
 				}
 				carbon_set_user_meta( $user_id, 'user_company_gallery', $arr );
-				$res['$arr'] = $arr;
-				$res['msg']  = 'Ми розглянемо вашу заявку';
+				$res['$arr']   = $arr;
+				$_FILES        = $files_store;
+				$files         = $_FILES["upfilelogo"];
+				$arr           = array();
+				$res['$files'] = $files;
+				foreach ( $files['name'] as $key => $value ) {
+					if ( $files['name'][ $key ] ) {
+						$file   = array(
+							'name'     => $files['name'][ $key ],
+							'type'     => $files['type'][ $key ],
+							'tmp_name' => $files['tmp_name'][ $key ],
+							'error'    => $files['error'][ $key ],
+							'size'     => $files['size'][ $key ]
+						);
+						$_FILES = array( "file" => $file );
+						foreach ( $_FILES as $file => $array ) {
+							$arr[] = my_handle_attachment( $file );
+						}
+					}
+				}
+				if ( $arr ) {
+					carbon_set_user_meta( $user_id, 'user_company_logo', $arr[0] );
+					if ( $upfile_logo_id ) {
+						wp_delete_attachment( $upfile_logo_id );
+					}
+				}
+				$res['msg'] = 'Ми розглянемо вашу заявку';
 				send_message( "Користувач ID: $user_id подав заявку на створення фермерського господарства '$name'. Перейдіть в адмін-панель щоб розглянути заявку.", get_bloginfo( 'admin_email' ), 'Заявка на створення нового господарства' );
 			} else {
 				$res['type'] = 'error';
@@ -1562,7 +1594,6 @@ function add_enterprise() {
 					}
 					carbon_set_user_meta( $user_id, 'user_company_gallery', array() );
 				}
-
 				carbon_set_post_meta( $_id, 'application_company_postcode', $postcode );
 				carbon_set_post_meta( $_id, 'application_company_country', $country );
 				carbon_set_post_meta( $_id, 'application_company_country_code', $country_code );
@@ -1591,7 +1622,14 @@ function add_enterprise() {
 
 				carbon_set_user_meta( $user_id, 'user_work_time_organization', $work_time_organization ?: '' );
 				carbon_set_user_meta( $user_id, 'user_company_office_type', $office_type ?: '' );
-
+				if ( $upfile_logo_id ) {
+					carbon_set_user_meta( $user_id, 'user_company_logo', $upfile_logo_id );
+				} else {
+					if ( $upfile_logo_id = carbon_get_user_meta( $user_id, 'user_company_logo' ) ) {
+						wp_delete_attachment( (int) $upfile_logo_id );
+					}
+					carbon_set_user_meta( $user_id, 'user_company_logo', '' );
+				}
 				$res['msg']    = 'Інформацію змінено';
 				$files         = $_FILES["upfile"];
 				$arr           = array();
@@ -1612,7 +1650,29 @@ function add_enterprise() {
 					}
 				}
 				carbon_set_user_meta( $user_id, 'user_company_gallery', $arr );
-				$res['$arr']                   = $arr;
+				$res['$arr']   = $arr;
+				$_FILES        = $files_store;
+				$files         = $_FILES["upfilelogo"];
+				$arr           = array();
+				$res['$files'] = $files;
+				foreach ( $files['name'] as $key => $value ) {
+					if ( $files['name'][ $key ] ) {
+						$file   = array(
+							'name'     => $files['name'][ $key ],
+							'type'     => $files['type'][ $key ],
+							'tmp_name' => $files['tmp_name'][ $key ],
+							'error'    => $files['error'][ $key ],
+							'size'     => $files['size'][ $key ]
+						);
+						$_FILES = array( "file" => $file );
+						foreach ( $_FILES as $file => $array ) {
+							$arr[] = my_handle_attachment( $file );
+						}
+					}
+				}
+				if ( ! empty( $arr ) ) {
+					carbon_set_user_meta( $user_id, 'user_company_logo', $arr[0] );
+				}
 				$r                             = edit_zoho_account( array(
 					'name'        => $name,
 					'description' => $text,
@@ -1622,6 +1682,24 @@ function add_enterprise() {
 				) );
 				$res['$r']                     = $r;
 				$res['work_time_organization'] = $work_time_organization;
+				$user_post                     = carbon_get_user_meta( $user_id, 'user_post' );
+				if ( $user_post && get_post( $user_post ) ) {
+					$post_data    = array(
+						'ID'           => $user_post,
+						'post_content' => $text,
+						'post_title'   => $name,
+					);
+					$post_updated = wp_update_post( $post_data );
+					if ( $post_updated ) {
+						update_post_meta( $user_post, '_yoast_wpseo_metadesc', $text );
+						if ( $logo = carbon_get_user_meta( $user_id, 'user_company_logo' ) ) {
+							$res['$logo'] = $logo;
+							set_post_thumbnail( $user_post, $logo );
+						} else {
+							set_post_thumbnail( $user_post, 0 );
+						}
+					}
+				}
 			} else {
 				$res['type'] = 'error';
 				$res['msg']  = 'Помилка';
@@ -1839,12 +1917,12 @@ function change_order_status() {
 		if ( $order_cart ) {
 			foreach ( $order_cart as $item ) {
 				$_item_id  = $item['id'];
-				$_item_qnt = $item['qnt'];
+				$_item_qnt = (int) $item['qnt'];
 				if ( $_item_id && get_post( $_item_id ) ) {
 					$product_purchased = carbon_get_post_meta( $_item_id, 'product_purchased' ) ?: 0;
 					$product_purchases = carbon_get_post_meta( $_item_id, 'product_purchases' ) ?: array();
 					if ( $status == 'delivered' ) {
-						$product_purchased = $product_purchased + 1;
+						$product_purchased = $product_purchased + $_item_qnt;
 						carbon_set_post_meta( $_item_id, 'product_purchased', $product_purchased );
 						$product_purchases[] = array(
 							'order_id'  => $id,
@@ -1853,7 +1931,7 @@ function change_order_status() {
 						carbon_set_post_meta( $_item_id, 'product_purchases', $product_purchases );
 						$message_text .= ' доставлено';
 					} else {
-						$product_purchased = $product_purchased - 1;
+						$product_purchased = $product_purchased - $_item_qnt;
 						$product_purchased = max( 0, $product_purchased );
 						carbon_set_post_meta( $_item_id, 'product_purchased', $product_purchased );
 						$product_purchases_new = array();
@@ -1866,6 +1944,27 @@ function change_order_status() {
 						}
 						carbon_set_post_meta( $_item_id, 'product_purchases', $product_purchases_new );
 						$message_text .= ' в процесі';
+					}
+					$max_value = carbon_get_post_meta( $_item_id, 'product_max_value' );
+					if ( $max_value ) {
+						$max_value        = (float) $max_value;
+						$purchases_number = $product_purchased;
+						$_time            = get_the_date( 'U', $_item_id );
+						$_product_time    = carbon_get_post_meta( $_item_id, 'product_time' );
+						$my_post          = array();
+						$my_post['ID']    = $_item_id;
+						if ( $purchases_number >= $max_value && $_time > 1 ) {
+							$my_post['post_date'] = date( 'Y-m-d H:i:s', 1 );
+							$ID                   = wp_update_post( $my_post, true );
+							if ( ! is_wp_error( $ID ) ) {
+								carbon_set_post_meta( $_item_id, 'product_time', $_time );
+							}
+						} else {
+							if ( $_time == 1 ) {
+								$my_post['post_date'] = date( 'Y-m-d H:i:s', (int) $_product_time );
+								$ID                   = wp_update_post( $my_post, true );
+							}
+						}
 					}
 					send_message( $message_text, $post_author->user_email, 'Замовлення ID:' . $id . ' було опрацьовано продавцем' );
 				}
@@ -2096,14 +2195,15 @@ add_action( 'wp_ajax_get_correspondence_link', 'get_correspondence_link' );
 function get_correspondence_link() {
 	$res     = array();
 	$user_id = get_current_user_id();
-	$ID      = $_POST['product_id'] ?? '';
 	$userID  = $_POST['user_id'] ?? '';
-	if ( $user_id && $ID ) {
-		$correspondence_id = get_correspondence_id( $ID, $user_id );
+	$product = $_POST['product'] ?? '';
+	if ( $user_id && $userID ) {
+		$correspondence_id = get_correspondence_id( $user_id, $userID );
 		if ( $correspondence_id ) {
 			$personal_area_page = carbon_get_theme_option( 'personal_area_page' );
+			$link               = '';
 			if ( $personal_area_page ) {
-				$res['url'] = get_the_permalink( $personal_area_page[0]['id'] ) . '?route=message&correspondence=' . $correspondence_id;
+				$link = get_the_permalink( $personal_area_page[0]['id'] ) . '?route=message&correspondence=' . $correspondence_id;
 			} else {
 				$var        = variables();
 				$set        = $var['setting_home'];
@@ -2111,8 +2211,12 @@ function get_correspondence_link() {
 				$url        = $var['url'];
 				$url_home   = $var['url_home'];
 				$admin_ajax = $var['admin_ajax'];
-				$res['url'] = $url . '?route=message&correspondence=' . $correspondence_id;
+				$link       = $url . '?route=message&correspondence=' . $correspondence_id;
 			}
+			if ( $product ) {
+				$link .= '&product=' . $product;
+			}
+			$res['url'] = $link;
 		} else {
 			$res['type'] = 'error';
 			$res['msg']  = 'Помилка';

@@ -63,8 +63,9 @@ add_action( 'admin_footer-post.php', 'true_append_post_status_list' ); // стр
 
 function true_status_display( $statuses ) {
 	global $post;
-	if ( get_query_var( 'post_status' ) != 'archive' ) { // проверка, что мы не находимся на странице всех постов данного статуса
-		if ( $post->post_status == 'archive' ) { // если статус поста - Архив
+	$post_status = $post->post_status ?? '';
+	if ( get_query_var( 'post_status' ) != 'archive' ) {
+		if ( $post_status == 'archive' ) {
 			return array( 'Неактивний' );
 		}
 	}

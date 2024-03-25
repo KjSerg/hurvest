@@ -95,6 +95,76 @@ function the_product( $id = false ) {
 	<?php
 }
 
+function the_mini_product( $id = false ) {
+	$id          = $id ?: get_the_ID();
+	$is_favorite = is_in_favorite( $id );
+	$cls         = $is_favorite ? 'active' : '';
+	$img         = get_the_post_thumbnail_url( $id );
+	$title       = get_the_title( $id );
+	$gallery     = carbon_get_post_meta( $id, 'product_gallery' );
+	$price       = carbon_get_post_meta( $id, 'product_price' );
+	$unit        = carbon_get_post_meta( $id, 'product_unit' );
+	$max_value   = carbon_get_post_meta( $id, 'product_max_value' );
+	$product_cls = '';
+	if ( $max_value ) {
+		$max_value        = (float) $max_value;
+		$purchases_number = carbon_get_post_meta( $id, 'product_purchased' ) ?: 0;
+		$purchases_number = (float) $purchases_number;
+		if ( $purchases_number >= $max_value ) {
+			$product_cls = 'disabled';
+		}
+	}
+	?>
+
+    <div class="product-item <?php echo $product_cls; ?>">
+        <a class="product-item__favorite add-to-favorite <?php echo $cls; ?>" data-id="<?php echo $id; ?>" href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 659.3 578.6"
+                 viewBox="0 0 659.3 578.6">
+                                        <path d="m78 325 231.8 217.7c8 7.5 12 11.2 16.7 12.2 2.1.4 4.3.4 6.4 0 4.7-.9 8.7-4.7 16.7-12.2L581.3 325c65.2-61.3 73.1-162.1 18.3-232.7L589.3 79C523.7-5.6 392 8.6 345.9 105.2c-6.5 13.6-25.9 13.6-32.4 0C267.4 8.6 135.7-5.6 70.1 79L59.7 92.3C4.9 163 12.8 263.8 78 325z"
+                                              style="fill:none;stroke:#fff;stroke-width:46.6667;stroke-miterlimit:133.3333"/>
+                                    </svg>
+        </a>
+        <div class="product-item__slider">
+			<?php if ( $gallery ): foreach ( $gallery as $j => $image_id ): if ( $j < 3 ): ?>
+                <div>
+                    <img src="<?php _u( $image_id ); ?>" alt="<?php echo $title; ?>"/>
+                </div>
+			<?php endif; endforeach; elseif ( $img ): ?>
+                <div>
+                    <img src="<?php echo $img; ?>" alt="<?php echo $title; ?>"/>
+                </div>
+			<?php endif; ?>
+        </div>
+        <div class="product-item__content">
+            <a class="product-item__title" href="<?php echo get_the_permalink( $id ); ?>"> <?php echo $title; ?> </a>
+            <div class="product-item__bot">
+                <div class="product-item__price">
+					<?php echo get_price_html( $id ); ?>
+                </div>
+                <div class="product-item__btn">
+                    <div class="counter_product">
+                        <div class="btn_count num_minus disabled"><span> </span></div>
+                        <input class="counter_input" type="text" readonly="" value="1"/>
+                        <div class="btn_count num_pluss active"><span></span></div>
+                    </div>
+                    <a class="product-item_add" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                             style="enable-background:new 0 0 16 13" viewBox="0 0 16 13">
+                                                    <path d="M15.2 4.4c0-.2 0-.3-.1-.5-.1-.1-.3-.2-.4-.2H1.3c-.2 0-.3.1-.4.2-.1.1-.2.3-.1.5 0 0 .8 4.6 1.1 6.9.2 1 1 1.7 2 1.7h8.2c1 0 1.9-.7 2-1.7l1.1-6.9zm-1.2.4-1 6.3c-.1.4-.5.8-.9.8H3.9c-.5 0-.8-.3-.9-.8L2 4.8h12z"
+                                                          style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>
+                            <path d="M12.9 4 10.7.3c-.1-.3-.5-.4-.8-.2-.2.1-.3.5-.1.7L12 4.6c.2.3.5.3.8.2.2-.2.3-.6.1-.8zM4 4.6 6.2.9c.2-.3.1-.6-.2-.8-.2-.2-.6-.1-.7.2L3.1 4c-.2.2-.1.6.1.7.3.2.7.1.8-.1zM7.4 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6s-.6.3-.6.6zM4.5 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6-.4 0-.6.3-.6.6zM10.4 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6s-.6.3-.6.6z"
+                                  style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>
+                            <path d="M15.4 3.7H.6c-.3 0-.6.3-.6.6s.3.6.6.6h14.9c.3 0 .6-.2.6-.6-.1-.3-.3-.6-.7-.6z"
+                                  style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>
+                                                </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+	<?php
+}
+
 function the_product_labels( $id ) {
 	$html              = '<div class="product-labels">';
 	$time              = time();
@@ -270,7 +340,7 @@ function _get_more_reviews_link( $max_page, $current_author_id ) {
 	if ( $nextpage <= $max_page ) {
 		$current_author    = $wp_query->get_queried_object();
 		$current_author_id = $current_author_id ?: $current_author->ID;
-		$next_posts_link   = get_author_posts_url( $current_author_id ) . '?pagenum=' . $nextpage;
+		$next_posts_link   = get_seller_page_link( $current_author_id ) . '?route=reviews&pagenum=' . $nextpage;
 
 		return '<a class="btn_st b_yelloow reviews-next-link next-post-link-js" href="' . $next_posts_link . '">
                 <span>Більше відгуків' . $image . '</span></a>';
@@ -429,6 +499,7 @@ function the_seller_review( $id = false ) {
     </div>
 	<?php
 }
+
 
 function the_vip_catalog() {
 	$time           = time();
@@ -933,16 +1004,25 @@ function the_work_time_row( $args = array() ) {
 	<?php
 }
 
+function get_user_current_social_networks( $user_id ) {
+	$names = get_social_networks_name();
+	$items = array();
+	if ( $names ) {
+		foreach ( $names as $str ) {
+			$value = get_user_meta( $user_id, strtolower( $str ), true );
+			if ( $value ) {
+				$items[ $str ] = $value;
+			}
+		}
+	}
+
+	return $items;
+}
+
 function the_user_social_networks() {
 	$names   = get_social_networks_name();
 	$user_id = get_current_user_id();
-	$items   = array();
-	if ( $names ) {
-		foreach ( $names as $str ) {
-			$value         = get_user_meta( $user_id, strtolower( $str ), true );
-			$items[ $str ] = $value;
-		}
-	}
+	$items   = get_user_current_social_networks( $user_id );
 	?>
     <div class="user-social-networks-wrapper">
         <div class="faq-item__title">Соціальні мережі</div>
@@ -960,13 +1040,11 @@ function the_user_social_networks() {
 						'is_remove_button' => $is_remove_button,
 					) );
 				}
-			} else {
-				the_social_network_row( array(
-					'names' => $names
-				) );
 			}
+			the_social_network_row( array(
+				'names' => $names
+			) );
 			?>
-			<?php the_social_network_row(); ?>
         </div>
     </div>
 	<?php
@@ -976,14 +1054,8 @@ function get_social_networks_name() {
 	return array(
 		'Facebook',
 		'Instagram',
-		'LinkedIn',
-		'MySpace',
-		'Pinterest',
-		'SoundCloud',
-		'Tumblr',
-		'Twitter',
 		'YouTube',
-		'Wikipedia',
+		'TikTok',
 	);
 }
 

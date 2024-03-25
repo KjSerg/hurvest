@@ -686,7 +686,9 @@ main.content.showing {
 .upfile_logo {
     display: none;
 }
-
+.seller-shedule__title {
+    width: 20rem;
+}
 @media (max-width: 1600px) {
     .advertise-item {
         width: -webkit-calc(33.333% - 2rem);

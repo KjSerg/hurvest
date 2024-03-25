@@ -25,32 +25,46 @@ function crb_attach_theme_options() {
 		         Field::make( "text", "header_tel", "Телефон в шапці" )->set_width( 33 )->set_required( true ),
 		         Field::make( "separator", "crb_style_inform2", "Підвал сайту" ),
 		         Field::make( "text", "copyright", "Копірайт" ),
+		         Field::make( "separator", "crb_style_inform3", "Підвал сайту сторінки продавця" ),
+		         Field::make( "image", "footer_logo", "Логотип в підвалі" )->set_width( 20 ),
+		         Field::make( "textarea", "footer_description", "Опис в підвалі" )->set_width( 80 ),
+		         Field::make( 'complex', 'footer_contacts', 'Контакти' )
+		              ->setup_labels( $labels )
+		              ->add_fields( array(
+			              Field::make( "text", "title", "Заголовок" )->set_required( true ),
+			              Field::make( "rich_text", "text", "Значення" )->set_required( true ),
+		              ) )
 	         ) );
 	Container::make( 'theme_options', "Настройка доставки" )
 	         ->set_page_parent( 'edit.php?post_type=products' )
 	         ->add_fields( array(
 		         Field::make( 'complex', 'delivery_types', 'Методи доставки' )
+		              ->set_layout( 'tabbed-vertical' )
 		              ->setup_labels( $labels )
 		              ->add_fields( 'pickup', 'Самовивіз', array(
 			              Field::make( "text", "title", "Заголовок" )->set_required( true ),
 			              Field::make( "checkbox", "is_error", "Повідомлення помилки" ),
 			              Field::make( "text", "text", "Текст повідомлення" ),
+			              Field::make( "image", "image", "Іконка доставки" ),
 		              ) )
 		              ->add_fields( 'market', 'Ринок', array(
 			              Field::make( "text", "title", "Заголовок" )->set_required( true ),
 			              Field::make( "checkbox", "is_error", "Повідомлення помилки" ),
 			              Field::make( "text", "text", "Текст повідомлення" ),
+			              Field::make( "image", "image", "Іконка доставки" ),
 		              ) )
 		              ->add_fields( 'delivery_service', 'Служба доставки', array(
 			              Field::make( "checkbox", "is_nova_post", "Підключити поштові відділення НОВОЇ ПОШТИ" ),
 			              Field::make( "text", "title", "Заголовок" )->set_required( true ),
 			              Field::make( "checkbox", "is_error", "Повідомлення помилки" ),
 			              Field::make( "text", "text", "Текст повідомлення" ),
+			              Field::make( "image", "image", "Іконка доставки" ),
 		              ) )
 		              ->add_fields( 'own_service', 'Власна доставка', array(
 			              Field::make( "text", "title", "Заголовок" )->set_required( true ),
 			              Field::make( "checkbox", "is_error", "Повідомлення помилки" ),
 			              Field::make( "text", "text", "Текст повідомлення" ),
+			              Field::make( "image", "image", "Іконка доставки" ),
 		              ) )
 	         ) );
 	Container::make( 'theme_options', "Настройка магазину" )
@@ -758,7 +772,6 @@ function crb_attach_in_message() {
 	         ->add_fields( array(
 		         Field::make( "text", "message_sender_id", "Відправник" ),
 		         Field::make( "text", "message_recipient_id", "Отримувач" ),
-		         Field::make( "text", "message_product_id", "Товар" ),
 		         Field::make( "text", "message_notification_id", "ID сповіщення" ),
 		         Field::make( "checkbox", "message_is_read", "Прочитано" ),
 		         Field::make( "text", "message_media", "Зображення" ),
@@ -974,11 +987,7 @@ function crb_attach_in_users() {
 		'plural_name'   => 'элементы',
 		'singular_name' => 'элемент',
 	);
-	Container::make( 'user_meta', 'Мережі' )
-	         ->add_fields(
-		         array(
-			         Field::make( 'text', 'tiktok' ),
-		         ) );
+
 	Container::make( 'user_meta', 'Інформація' )
 	         ->add_fields(
 		         array(

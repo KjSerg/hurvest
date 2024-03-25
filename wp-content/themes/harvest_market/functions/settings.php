@@ -21,6 +21,7 @@ get_template_part( 'functions/components/create-advertisement' );
 get_template_part( 'functions/components/the-chat-page' );
 get_template_part( 'functions/components/notifications' );
 get_template_part( 'functions/components/promo' );
+get_template_part( 'functions/components/seller-components' );
 
 add_filter( 'get_the_archive_title', function ( $title ) {
 	return preg_replace( '~^[^:]+: ~', '', $title );
@@ -45,6 +46,7 @@ function post_unpublished( $new_status, $old_status, $post ) {
 	if ( $post_type == 'applications' && $old_status != 'publish' && $new_status == 'publish' ) {
 		$user_seller = carbon_get_user_meta( $author_id, 'user_seller' );
 		if ( ! $user_seller ) {
+			$user_company_description         = get_content_by_id($id) ?: '';
 			$work_time                        = carbon_get_post_meta( $id, 'application_work_time_organization' ) ?: '';
 			$application_company_postcode     = carbon_get_post_meta( $id, 'application_company_postcode' ) ?: '';
 			$application_company_country      = carbon_get_post_meta( $id, 'application_company_country' ) ?: '';
@@ -80,10 +82,11 @@ function post_unpublished( $new_status, $old_status, $post ) {
 			$_l                 = $personal_area_page ? get_the_permalink( $personal_area_page[0]['id'] ) : $url;
 			$permalink          = $_l . '?route=create';
 			$post_data          = array(
-				'post_type'   => 'post',
-				'post_title'  => $company_name,
-				'post_status' => 'publish',
-				'post_author' => $author_id
+				'post_type'    => 'post',
+				'post_title'   => $company_name,
+				'post_status'  => 'publish',
+				'post_author'  => $author_id,
+				'post_content' => $user_company_description,
 			);
 			$_id                = wp_insert_post( $post_data );
 			$post               = get_post( $_id );
@@ -96,6 +99,12 @@ function post_unpublished( $new_status, $old_status, $post ) {
 				$link_seller  = "<a href='$_permalink' target='_blank'>Ваша сторінка продавця</a>";
 				$message_text = "Вітаємо! <br> Ви стали продавцем у нас на сайті. <br> $link <br> $link_seller";
 				send_message( $message_text, $post_author->user_email, $company_name . ' офіційний продавець на сайті' );
+				update_post_meta( $_id, '_yoast_wpseo_metadesc', $user_company_description );
+				if ( $logo = carbon_get_user_meta( $author_id, 'user_company_logo' ) ) {
+					set_post_thumbnail( $_id, $logo );
+				} else {
+					set_post_thumbnail( $_id, 0 );
+				}
 			}
 			$r = create_zoho_account( array(
 				'name'        => $company_name,
@@ -179,3 +188,29 @@ add_filter( 'nsl_register_new_user', function ( $user_id, $provider ) {
 		'description' => $provider,
 	) );
 }, 10, 2 );
+
+add_action( 'show_user_profile', 'add_tiktok_field' );
+add_action( 'edit_user_profile', 'add_tiktok_field' );
+function add_tiktok_field( $user ) {
+	?>
+    <h3>Інформація про TikTok</h3>
+    <table class="form-table">
+        <tr>
+            <th><label for="tiktok">TikTok</label></th>
+            <td>
+                <input type="text" name="tiktok" id="tiktok"
+                       value="<?php echo esc_attr( get_the_author_meta( 'tiktok', $user->ID ) ); ?>"
+                       class="regular-text"/><br/>
+                <span class="description"> ім'я користувача TikTok.</span>
+            </td>
+        </tr>
+    </table>
+	<?php
+}
+
+add_action( 'personal_options_update', 'save_tiktok_field' );
+add_action( 'edit_user_profile_update', 'save_tiktok_field' );
+
+function save_tiktok_field( $user_id ) {
+	update_user_meta( $user_id, 'tiktok', $_POST['tiktok'] ?? '' );
+}

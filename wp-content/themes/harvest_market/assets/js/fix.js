@@ -32,6 +32,41 @@ $doc.ready(function () {
     checkingStorage();
     setFilterCurrentList($doc.find('.filter-form'));
     $('input[type=tel]').mask("+99(999) 999-99-99");
+    $doc.on('click', '.remove-company-logo', function (e) {
+        e.preventDefault();
+        var $t = $(this);
+        var $preview = $t.closest('.cabinet-item').find('img');
+        $preview.attr('src', '').removeClass('visible');
+        $t.closest('.cabinet-item').find('input.upfile_logo').val('');
+        $t.closest('.cabinet-item').find('input.upfile-logo-id').val('');
+    });
+    $doc.on('change', '.upfile_logo', function (e) {
+        var $t = $(this);
+        var val = $t.val();
+        var filesList = this.files;
+        var file = filesList[0];
+        var $preview = $t.closest('.cabinet-item').find('img');
+        if (file) {
+            showPreloader();
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (event) {
+                var result = event.target.result;
+                $preview.attr('src', result).addClass('visible');
+                hidePreloader();
+            };
+        } else {
+            $preview.attr('src', '').removeClass('visible');
+        }
+    });
+    $doc.on('change', '.sort-form-js input', function (e) {
+        var $t = $(this);
+        var $form = $t.closest('form');
+        var val = $t.val();
+        var order = $t.attr('data-order') || 'desc';
+        $form.find('input[name="order"]').val(order);
+        $form.trigger('submit');
+    });
     $doc.on('submit', '.google-places-form', function (e) {
         e.preventDefault();
         var user_confirm_city_old = getCookie('user_confirm_city') || '';
@@ -504,6 +539,7 @@ $doc.ready(function () {
     });
     $doc.on('change', '.categories-select-js', function (e) {
         var $this = $(this);
+        console.log($this)
         setSubCategories($this);
     });
     $doc.on('click', 'label[for="photos"]', function (e) {
@@ -1251,17 +1287,19 @@ $doc.ready(function () {
         if (load) return;
         $t.addClass('not-active');
         load = true;
-        var productID = $t.attr('data-product');
         var userID = $t.attr('data-user');
+        var product = $t.attr('data-product') || false;
+        if (userID === undefined) return;
         showPreloader();
+        var data = {
+            'action': 'get_correspondence_link',
+            'user_id': userID,
+        };
+        if (product) data.product = product;
         $.ajax({
             type: 'POST',
             url: admin_ajax,
-            data: {
-                'action': 'get_correspondence_link',
-                'product_id': productID,
-                'user_id': userID,
-            }
+            data: data
         }).done(function (r) {
             hidePreloader();
             load = false;
@@ -2399,6 +2437,8 @@ function setSubCategories($select) {
     if ($next.length === 0) return;
     var $nextHTML = $next.html();
     var $selectric = $next.data('selectric');
+    console.log(val)
+    console.log($next)
     if (val === null || val === undefined || val === '') {
         $next.removeAttr('required');
         $next.html('');

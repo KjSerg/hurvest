@@ -81,6 +81,7 @@ $certificates       = get_terms( array(
 $units_measurement  = carbon_get_theme_option( 'units_measurement' );
 $delivery_types     = get_delivery_methods();
 $current_year       = date( "Y" );
+$route              = $_GET['route'] ?? '';
 $_type              = $_GET['type'] ?? '';
 $_certificates      = $_GET['certificate'] ?? '';
 $_processing_types  = $_GET['processing_types'] ?? '';
@@ -150,476 +151,500 @@ if ( $_delivery_methods ) {
                     </div>
                 </div>
                 <div class="info-top__nav">
-                    <a class="active" href="<?php echo $user_link; ?>">Каталог продавця</a>
-                    <a href="<?php echo $user_link . '?route=about'; ?>">Про продавця</a>
-                    <a href="<?php echo $user_link . '?route=reviews'; ?>">
+                    <a class="<?php echo $route == '' ? 'active' : ''; ?>" href="<?php echo $user_link; ?>">Каталог
+                        продавця</a>
+                    <a class="<?php echo $route == 'about' ? 'active' : ''; ?>"
+                       href="<?php echo $user_link . '?route=about'; ?>">Про продавця</a>
+                    <a class="<?php echo $route == 'reviews' ? 'active' : ''; ?>"
+                       href="<?php echo $user_link . '?route=reviews'; ?>">
                         Відгуки (<?php echo $seller_count_review ?: 0; ?>)
                     </a>
-                    <a href="<?php echo $user_link . '?route=contacts'; ?>">Контакти</a>
+                    <a class="<?php echo $route == 'contacts' ? 'active' : ''; ?>"
+                       href="<?php echo $user_link . '?route=contacts'; ?>">
+                        Контакти
+                    </a>
                 </div>
             </div>
-            <div class="info-catalog">
-                <div class="info-catalog__filter-wrap">
-                    <div class="info-catalog__filter">
-                        <div class="info-catalog__filter-top">
-                            <div class="info-catalog__filter-title">Фільтр</div>
-                            <div class="filter-close"></div>
-                        </div>
-                        <div class="filter-list-wrap"></div>
-                        <form class="filter-form" method="get" action="<?php echo $user_link; ?>">
-                            <div class="filter-form-box" style="display:none;"></div>
-	                        <?php
-	                        if ( $order ) {
-		                        echo "<input type='hidden' name='order' value='$order'>";
-	                        }
-	                        if ( $orderby ) {
-		                        echo "<input type='hidden' name='orderby' value='$orderby'>";
-	                        }
-	                        ?>
-                            <div class="filter-list">
-                                <div class="filter-list__item active">
-                                    <div class="filter-list__item-title">Ціна</div>
-                                    <div class="filter-list__item-content">
-                                        <div class="filter-range">
-                                            <div class="filter-range__info">
-                                                Від<input class="input_st js-input-from" name="min-price" type="text"
-                                                          readonly
-                                                          value="<?php echo $_min_price; ?>"/>
-                                                до <input class="input_st js-input-to" name="max-price" type="text"
-                                                          readonly
-                                                          value="<?php echo $_max_price; ?>"/>
+			<?php if ( $route == '' ): ?>
+                <div class="info-catalog">
+                    <div class="info-catalog__filter-wrap">
+                        <div class="info-catalog__filter">
+                            <div class="info-catalog__filter-top">
+                                <div class="info-catalog__filter-title">Фільтр</div>
+                                <div class="filter-close"></div>
+                            </div>
+                            <div class="filter-list-wrap"></div>
+                            <form class="filter-form" method="get" action="<?php echo $user_link; ?>">
+                                <div class="filter-form-box" style="display:none;"></div>
+								<?php
+								if ( $order ) {
+									echo "<input type='hidden' name='order' value='$order'>";
+								}
+								if ( $orderby ) {
+									echo "<input type='hidden' name='orderby' value='$orderby'>";
+								}
+								?>
+                                <div class="filter-list">
+                                    <div class="filter-list__item active">
+                                        <div class="filter-list__item-title">Ціна</div>
+                                        <div class="filter-list__item-content">
+                                            <div class="filter-range">
+                                                <div class="filter-range__info">
+                                                    Від<input class="input_st js-input-from" name="min-price"
+                                                              type="text"
+                                                              readonly
+                                                              value="<?php echo $_min_price; ?>"/>
+                                                    до <input class="input_st js-input-to" name="max-price" type="text"
+                                                              readonly
+                                                              value="<?php echo $_max_price; ?>"/>
+                                                </div>
+                                                <input class="js-range" type="text"
+                                                       data-min="<?php echo( $products_data['min_price'] ?: '1' ); ?>"
+                                                       data-max="<?php echo( $products_data['max_price'] ?: '10000000' ); ?>"
+                                                       data-from="<?php echo $_min_price; ?>"
+                                                       data-to="<?php echo $_max_price; ?>" data-type="double"/>
                                             </div>
-                                            <input class="js-range" type="text"
-                                                   data-min="<?php echo( $products_data['min_price'] ?: '1' ); ?>"
-                                                   data-max="<?php echo( $products_data['max_price'] ?: '10000000' ); ?>"
-                                                   data-from="<?php echo $_min_price; ?>"
-                                                   data-to="<?php echo $_max_price; ?>" data-type="double"/>
                                         </div>
                                     </div>
-                                </div>
-								<?php if ( $categories ): $subtitem = 0; ?>
-                                    <div class="filter-list__item ">
-                                        <div class="filter-list__item-title "> Категорія продукту</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="form-group quarter ">
-                                                <select class="select_st categories-select-js "
-                                                        data-selector=".sub-categories-select-js" data-name="category"
-                                                >
-                                                    <option disabled="disabled" selected="selected">Категорія продукту
-                                                    </option>
-													<?php foreach ( $categories as $item ):
-														$attr = '';
-														if ( in_array( $item->term_id, $category ) ) {
-															$attr     = 'selected';
-															$subtitem = $item->term_id;
-															$filters  = get_filter_by_category( $subtitem );
-														}
-														?>
-                                                        <option <?php echo $attr ?>
-                                                                value="<?php echo $item->term_id; ?>">
-															<?php echo $item->name; ?>
+									<?php if ( $categories ): $subtitem = 0; ?>
+                                        <div class="filter-list__item ">
+                                            <div class="filter-list__item-title "> Категорія продукту</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="form-group quarter ">
+                                                    <select class="select_st categories-select-js "
+                                                            data-selector=".sub-categories-select-js"
+                                                            data-name="category"
+                                                    >
+                                                        <option disabled="disabled" selected="selected">Категорія
+                                                            продукту
                                                         </option>
-													<?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
-                                        <div class="filter-list__item-title "> Підкатегорія продукту</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
-                                                <select class="select_st sub-categories-select-js categories-select-js"
-                                                        data-name="category"
-                                                        data-selector=".internal-categories-select-js">
-                                                    <option disabled="disabled" selected="selected">Підкатегорія
-                                                        продукту
-                                                    </option>
-                                                    <option value="">Зробіть вибір</option>
-													<?php if ( $subtitem ) {
-														$subcategories = get_terms( array(
-															'taxonomy'   => 'categories',
-															'hide_empty' => false,
-															'parent'     => $subtitem,
-														) );
-														$subtitem      = 0;
-														if ( $subcategories ) {
-															foreach ( $subcategories as $subcategory ) {
-																$attr = '';
-																if ( in_array( $subcategory->term_id, $category ) ) {
-																	$attr     = 'selected';
-																	$subtitem = $subcategory->term_id;
-																	$filters  = get_filter_by_category( $subtitem );
-																}
-																?>
-                                                                <option <?php echo $attr ?>
-                                                                        value="<?php echo $subcategory->term_id; ?>">
-																	<?php echo $subcategory->name; ?>
-                                                                </option>
-																<?php
+														<?php foreach ( $categories as $item ):
+															$attr = '';
+															if ( in_array( $item->term_id, $category ) ) {
+																$attr     = 'selected';
+																$subtitem = $item->term_id;
+																$filters  = get_filter_by_category( $subtitem );
 															}
-														}
-													} ?>
-                                                </select>
+															?>
+                                                            <option <?php echo $attr ?>
+                                                                    value="<?php echo $item->term_id; ?>">
+																<?php echo $item->name; ?>
+                                                            </option>
+														<?php endforeach; ?>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
-                                        <div class="filter-list__item-title "> Тип або вид продукту</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
-                                                <select class="select_st categories-select-js internal-categories-select-js"
-                                                        data-name="category"
-                                                        data-selector=".sub-internal-categories-select-js">
-                                                    <option disabled="disabled">Тип або вид продукту</option>
-                                                    <option value="">Зробіть вибір</option>
-													<?php if ( $subtitem ) {
-														$subcategories = get_terms( array(
-															'taxonomy'   => 'categories',
-															'hide_empty' => false,
-															'parent'     => $subtitem,
-														) );
-														$subtitem      = 0;
-														if ( $subcategories ) {
-															foreach ( $subcategories as $subcategory ) {
-																$attr = '';
-																if ( in_array( $subcategory->term_id, $category ) ) {
-																	$attr     = 'selected';
-																	$subtitem = $subcategory->term_id;
-																	$filters  = get_filter_by_category( $subtitem );
+                                        <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
+                                            <div class="filter-list__item-title "> Підкатегорія продукту</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
+                                                    <select class="select_st sub-categories-select-js categories-select-js"
+                                                            data-name="category"
+                                                            data-selector=".internal-categories-select-js">
+                                                        <option disabled="disabled" selected="selected">Підкатегорія
+                                                            продукту
+                                                        </option>
+                                                        <option value="">Зробіть вибір</option>
+														<?php if ( $subtitem ) {
+															$subcategories = get_terms( array(
+																'taxonomy'   => 'categories',
+																'hide_empty' => false,
+																'parent'     => $subtitem,
+															) );
+															$subtitem      = 0;
+															if ( $subcategories ) {
+																foreach ( $subcategories as $subcategory ) {
+																	$attr = '';
+																	if ( in_array( $subcategory->term_id, $category ) ) {
+																		$attr     = 'selected';
+																		$subtitem = $subcategory->term_id;
+																		$filters  = get_filter_by_category( $subtitem );
+																	}
+																	?>
+                                                                    <option <?php echo $attr ?>
+                                                                            value="<?php echo $subcategory->term_id; ?>">
+																		<?php echo $subcategory->name; ?>
+                                                                    </option>
+																	<?php
 																}
-																?>
-                                                                <option <?php echo $attr ?>
-                                                                        value="<?php echo $subcategory->term_id; ?>">
-																	<?php echo $subcategory->name; ?>
-                                                                </option>
-																<?php
 															}
-														}
-													} ?>
-                                                </select>
+														} ?>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
-                                        <div class="filter-list__item-title ">
-                                            Підкатегорія типу або виду продукту
-                                        </div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
-                                                <select class="select_st  sub-internal-categories-select-js"
-                                                        data-name="category"
-                                                >
-                                                    <option disabled="disabled">Підкатегорія типу або виду продукту
-                                                    </option>
-                                                    <option value="">Зробіть вибір</option>
-													<?php if ( $subtitem ) {
-														$subcategories = get_terms( array(
-															'taxonomy'   => 'categories',
-															'hide_empty' => false,
-															'parent'     => $subtitem,
-														) );
-														$subtitem      = 0;
-														if ( $subcategories ) {
-															foreach ( $subcategories as $subcategory ) {
-																$attr = '';
-																if ( in_array( $subcategory->term_id, $category ) ) {
-																	$attr     = 'selected';
-																	$subtitem = $subcategory->term_id;
-																	$filters  = get_filter_by_category( $subtitem );
+                                        <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
+                                            <div class="filter-list__item-title "> Тип або вид продукту</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
+                                                    <select class="select_st categories-select-js internal-categories-select-js"
+                                                            data-name="category"
+                                                            data-selector=".sub-internal-categories-select-js">
+                                                        <option disabled="disabled">Тип або вид продукту</option>
+                                                        <option value="">Зробіть вибір</option>
+														<?php if ( $subtitem ) {
+															$subcategories = get_terms( array(
+																'taxonomy'   => 'categories',
+																'hide_empty' => false,
+																'parent'     => $subtitem,
+															) );
+															$subtitem      = 0;
+															if ( $subcategories ) {
+																foreach ( $subcategories as $subcategory ) {
+																	$attr = '';
+																	if ( in_array( $subcategory->term_id, $category ) ) {
+																		$attr     = 'selected';
+																		$subtitem = $subcategory->term_id;
+																		$filters  = get_filter_by_category( $subtitem );
+																	}
+																	?>
+                                                                    <option <?php echo $attr ?>
+                                                                            value="<?php echo $subcategory->term_id; ?>">
+																		<?php echo $subcategory->name; ?>
+                                                                    </option>
+																	<?php
 																}
-																?>
-                                                                <option <?php echo $attr ?>
-                                                                        value="<?php echo $subcategory->term_id; ?>">
-																	<?php echo $subcategory->name; ?>
-                                                                </option>
-																<?php
 															}
-														}
-													} ?>
-                                                </select>
+														} ?>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="<?php echo $filters ? '' : 'hidden'; ?> filter-list__item ">
-                                        <div class="filter-list__item-title "> Додаткові фільтри продукту</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="form-group quarter <?php echo $filters ? '' : ' not-active'; ?>">
-                                                <select class="select_st filter-select-js" multiple
-                                                        name="filter[]">
-                                                    <option disabled="disabled">Додаткові фільтри продукту</option>
-													<?php
-													if ( $filters ) {
-														foreach ( $filters as $filter_id ) {
-															$filter_item = get_term_by( 'id', $filter_id, 'filters' );
-															if ( $filter_item ) {
-																$attr_filter_item = 'disabled';
-																?>
-                                                                <option <?php echo $attr_filter_item; ?>
-                                                                value="<?php echo $filter_item->term_id; ?>"><?php echo $filter_item->name; ?></option><?php
-																$values = get_term_children( $filter_id, 'filters' );
-																if ( $values ) {
-																	foreach ( $values as $value ) {
-																		$child = get_term_by( 'id', $value, 'filters' );
-																		$attr  = '';
-																		if ( $filter ) {
-																			foreach ( $filter as $_filter ) {
-																				if ( in_array( $child->term_id, $filter ) ) {
-																					$attr = 'selected';
+                                        <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item ">
+                                            <div class="filter-list__item-title ">
+                                                Підкатегорія типу або виду продукту
+                                            </div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="form-group quarter <?php echo $subtitem ? '' : ' not-active'; ?>">
+                                                    <select class="select_st  sub-internal-categories-select-js"
+                                                            data-name="category"
+                                                    >
+                                                        <option disabled="disabled">Підкатегорія типу або виду продукту
+                                                        </option>
+                                                        <option value="">Зробіть вибір</option>
+														<?php if ( $subtitem ) {
+															$subcategories = get_terms( array(
+																'taxonomy'   => 'categories',
+																'hide_empty' => false,
+																'parent'     => $subtitem,
+															) );
+															$subtitem      = 0;
+															if ( $subcategories ) {
+																foreach ( $subcategories as $subcategory ) {
+																	$attr = '';
+																	if ( in_array( $subcategory->term_id, $category ) ) {
+																		$attr     = 'selected';
+																		$subtitem = $subcategory->term_id;
+																		$filters  = get_filter_by_category( $subtitem );
+																	}
+																	?>
+                                                                    <option <?php echo $attr ?>
+                                                                            value="<?php echo $subcategory->term_id; ?>">
+																		<?php echo $subcategory->name; ?>
+                                                                    </option>
+																	<?php
+																}
+															}
+														} ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="<?php echo $filters ? '' : 'hidden'; ?> filter-list__item ">
+                                            <div class="filter-list__item-title "> Додаткові фільтри продукту</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="form-group quarter <?php echo $filters ? '' : ' not-active'; ?>">
+                                                    <select class="select_st filter-select-js" multiple
+                                                            name="filter[]">
+                                                        <option disabled="disabled">Додаткові фільтри продукту</option>
+														<?php
+														if ( $filters ) {
+															foreach ( $filters as $filter_id ) {
+																$filter_item = get_term_by( 'id', $filter_id, 'filters' );
+																if ( $filter_item ) {
+																	$attr_filter_item = 'disabled';
+																	?>
+                                                                    <option <?php echo $attr_filter_item; ?>
+                                                                    value="<?php echo $filter_item->term_id; ?>"><?php echo $filter_item->name; ?></option><?php
+																	$values = get_term_children( $filter_id, 'filters' );
+																	if ( $values ) {
+																		foreach ( $values as $value ) {
+																			$child = get_term_by( 'id', $value, 'filters' );
+																			$attr  = '';
+																			if ( $filter ) {
+																				foreach ( $filter as $_filter ) {
+																					if ( in_array( $child->term_id, $filter ) ) {
+																						$attr = 'selected';
+																					}
 																				}
 																			}
+																			?>
+                                                                        <option <?php echo $attr; ?>
+                                                                                value="<?php echo $child->term_id; ?>">
+                                                                            --<?php echo $child->name; ?></option><?php
 																		}
-																		?>
-                                                                    <option <?php echo $attr; ?>
-                                                                            value="<?php echo $child->term_id; ?>">
-                                                                        --<?php echo $child->name; ?></option><?php
 																	}
 																}
 															}
 														}
-													}
 
-													?>
-                                                </select>
+														?>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-								<?php endif; ?>
-								<?php if ( $product_types ): ?>
-                                    <div class="filter-list__item ">
-                                        <div class="filter-list__item-title "> Тип продукту</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="filter-check">
-												<?php foreach ( $product_types as $type ):
-													$test = $_type && in_array( $type->term_id, $_type );
-													$attr = $test ? 'checked' : '';
-													?>
-                                                    <div class="filter-check__item">
-                                                        <label class="check-item">
-                                                            <input class="check_st filter-check-input"
-                                                                   data-name="type"
-																<?php echo $attr; ?>
-                                                                   value="<?php echo $type->term_id; ?>"
-                                                                   type="checkbox"/>
-                                                            <span></span>
-                                                            <i class="check-item__text"><?php echo $type->name; ?></i>
-                                                        </label>
-                                                    </div>
-												<?php endforeach; ?>
+									<?php endif; ?>
+									<?php if ( $product_types ): ?>
+                                        <div class="filter-list__item ">
+                                            <div class="filter-list__item-title "> Тип продукту</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="filter-check">
+													<?php foreach ( $product_types as $type ):
+														$test = $_type && in_array( $type->term_id, $_type );
+														$attr = $test ? 'checked' : '';
+														?>
+                                                        <div class="filter-check__item">
+                                                            <label class="check-item">
+                                                                <input class="check_st filter-check-input"
+                                                                       data-name="type"
+																	<?php echo $attr; ?>
+                                                                       value="<?php echo $type->term_id; ?>"
+                                                                       type="checkbox"/>
+                                                                <span></span>
+                                                                <i class="check-item__text"><?php echo $type->name; ?></i>
+                                                            </label>
+                                                        </div>
+													<?php endforeach; ?>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-								<?php endif; ?>
-								<?php if ( $certificates ): ?>
-                                    <div class="filter-list__item " style="display:none;">
-                                        <div class="filter-list__item-title "> Сертифікати</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="filter-check">
-												<?php foreach ( $certificates as $type ):
-													$test = $_certificates && in_array( $type->term_id, $_certificates );
-													$attr = $test ? 'checked' : '';
-													?>
-                                                    <div class="filter-check__item">
-                                                        <label class="check-item">
-                                                            <input class="check_st filter-check-input"
-                                                                   data-name="certificate"
-																<?php echo $attr; ?>
-                                                                   value="<?php echo $type->term_id; ?>"
-                                                                   type="checkbox"/>
-                                                            <span></span>
-                                                            <i class="check-item__text"><?php echo $type->name; ?></i>
-                                                        </label>
-                                                    </div>
-												<?php endforeach; ?>
+									<?php endif; ?>
+									<?php if ( $certificates ): ?>
+                                        <div class="filter-list__item " style="display:none;">
+                                            <div class="filter-list__item-title "> Сертифікати</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="filter-check">
+													<?php foreach ( $certificates as $type ):
+														$test = $_certificates && in_array( $type->term_id, $_certificates );
+														$attr = $test ? 'checked' : '';
+														?>
+                                                        <div class="filter-check__item">
+                                                            <label class="check-item">
+                                                                <input class="check_st filter-check-input"
+                                                                       data-name="certificate"
+																	<?php echo $attr; ?>
+                                                                       value="<?php echo $type->term_id; ?>"
+                                                                       type="checkbox"/>
+                                                                <span></span>
+                                                                <i class="check-item__text"><?php echo $type->name; ?></i>
+                                                            </label>
+                                                        </div>
+													<?php endforeach; ?>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-								<?php endif; ?>
-								<?php if ( $processing_types ): ?>
-                                    <div class="filter-list__item ">
-                                        <div class="filter-list__item-title ">Тип обробки</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="filter-check">
-												<?php foreach ( $processing_types as $type ):
-													$test = $_processing_types && in_array( $type->term_id, $_processing_types );
-													$attr = $test ? 'checked' : '';
-													?>
-                                                    <div class="filter-check__item">
-                                                        <label class="check-item">
-                                                            <input class="check_st filter-check-input"
-                                                                   data-name="processing_types" <?php echo $attr; ?>
-                                                                   value="<?php echo $type->term_id; ?>"
-                                                                   type="checkbox"
-                                                            />
-                                                            <span></span>
-                                                            <i class="check-item__text"><?php echo $type->name; ?></i>
-                                                        </label>
-                                                    </div>
-												<?php endforeach; ?>
+									<?php endif; ?>
+									<?php if ( $processing_types ): ?>
+                                        <div class="filter-list__item ">
+                                            <div class="filter-list__item-title ">Тип обробки</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="filter-check">
+													<?php foreach ( $processing_types as $type ):
+														$test = $_processing_types && in_array( $type->term_id, $_processing_types );
+														$attr = $test ? 'checked' : '';
+														?>
+                                                        <div class="filter-check__item">
+                                                            <label class="check-item">
+                                                                <input class="check_st filter-check-input"
+                                                                       data-name="processing_types" <?php echo $attr; ?>
+                                                                       value="<?php echo $type->term_id; ?>"
+                                                                       type="checkbox"
+                                                                />
+                                                                <span></span>
+                                                                <i class="check-item__text"><?php echo $type->name; ?></i>
+                                                            </label>
+                                                        </div>
+													<?php endforeach; ?>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-								<?php endif; ?>
-								<?php if ( $package ): ?>
-                                    <div class="filter-list__item ">
-                                        <div class="filter-list__item-title ">Тип пакування</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="filter-check">
-												<?php foreach ( $package as $item ):
-													$test = $_packages && in_array( $item->term_id, $_packages );
-													$attr = $test ? 'checked' : '';
-													?>
-                                                    <div class="filter-check__item">
-                                                        <label class="check-item">
-                                                            <input class="check_st filter-check-input"
-                                                                   data-name="packages" <?php echo $attr; ?>
-                                                                   value="<?php echo $item->term_id; ?>"
-                                                                   type="checkbox"/>
-                                                            <span> </span>
-                                                            <i class="check-item__text"><?php echo $item->name; ?></i>
-                                                        </label>
-                                                    </div>
-												<?php endforeach; ?>
+									<?php endif; ?>
+									<?php if ( $package ): ?>
+                                        <div class="filter-list__item ">
+                                            <div class="filter-list__item-title ">Тип пакування</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="filter-check">
+													<?php foreach ( $package as $item ):
+														$test = $_packages && in_array( $item->term_id, $_packages );
+														$attr = $test ? 'checked' : '';
+														?>
+                                                        <div class="filter-check__item">
+                                                            <label class="check-item">
+                                                                <input class="check_st filter-check-input"
+                                                                       data-name="packages" <?php echo $attr; ?>
+                                                                       value="<?php echo $item->term_id; ?>"
+                                                                       type="checkbox"/>
+                                                                <span> </span>
+                                                                <i class="check-item__text"><?php echo $item->name; ?></i>
+                                                            </label>
+                                                        </div>
+													<?php endforeach; ?>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-								<?php endif; ?>
-								<?php if ( $units_measurement ): ?>
-                                    <div class="filter-list__item ">
-                                        <div class="filter-list__item-title ">Одиниці вимірювання</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="filter-check">
-												<?php foreach ( $units_measurement as $item ):
-													$test = $_units_measurement && in_array( $item['unit'], $_units_measurement );
-													$attr = $test ? 'checked' : '';
-													?>
-                                                    <div class="filter-check__item">
-                                                        <label class="check-item">
-                                                            <input class="check_st filter-check-input"
-                                                                   data-name="units_measurement"
-                                                                   value="<?php echo $item['unit']; ?>"
-																<?php echo $attr; ?>
-                                                                   type="checkbox"/>
-                                                            <span> </span>
-                                                            <i class="check-item__text"><?php echo $item['unit']; ?></i>
-                                                        </label>
-                                                    </div>
-												<?php endforeach; ?>
+									<?php endif; ?>
+									<?php if ( $units_measurement ): ?>
+                                        <div class="filter-list__item ">
+                                            <div class="filter-list__item-title ">Одиниці вимірювання</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="filter-check">
+													<?php foreach ( $units_measurement as $item ):
+														$test = $_units_measurement && in_array( $item['unit'], $_units_measurement );
+														$attr = $test ? 'checked' : '';
+														?>
+                                                        <div class="filter-check__item">
+                                                            <label class="check-item">
+                                                                <input class="check_st filter-check-input"
+                                                                       data-name="units_measurement"
+                                                                       value="<?php echo $item['unit']; ?>"
+																	<?php echo $attr; ?>
+                                                                       type="checkbox"/>
+                                                                <span> </span>
+                                                                <i class="check-item__text"><?php echo $item['unit']; ?></i>
+                                                            </label>
+                                                        </div>
+													<?php endforeach; ?>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-								<?php endif; ?>
-								<?php if ( $delivery_types ): ?>
-                                    <div class="filter-list__item ">
-                                        <div class="filter-list__item-title ">Умови доставки</div>
-                                        <div class="filter-list__item-content js-collapse-content">
-                                            <div class="filter-check">
+									<?php endif; ?>
+									<?php if ( $delivery_types ): ?>
+                                        <div class="filter-list__item ">
+                                            <div class="filter-list__item-title ">Умови доставки</div>
+                                            <div class="filter-list__item-content js-collapse-content">
+                                                <div class="filter-check">
 
-												<?php foreach ( $delivery_types as $key => $item ):
-													$test = $_delivery_methods && in_array( $key, $_delivery_methods );
-													$attr = $test ? 'checked' : '';
-													?>
-                                                    <div class="filter-check__item">
-                                                        <label class="check-item">
-                                                            <input class="check_st filter-check-input"
-                                                                   data-name="delivery_methods"
-                                                                   value="<?php echo $key; ?>"
-																<?php echo $attr; ?>
-                                                                   type="checkbox"/>
-                                                            <span> </span>
-                                                            <i class="check-item__text"><?php echo $item; ?></i>
-                                                        </label>
-                                                    </div>
-												<?php endforeach; ?>
+													<?php foreach ( $delivery_types as $key => $item ):
+														$test = $_delivery_methods && in_array( $key, $_delivery_methods );
+														$attr = $test ? 'checked' : '';
+														?>
+                                                        <div class="filter-check__item">
+                                                            <label class="check-item">
+                                                                <input class="check_st filter-check-input"
+                                                                       data-name="delivery_methods"
+                                                                       value="<?php echo $key; ?>"
+																	<?php echo $attr; ?>
+                                                                       type="checkbox"/>
+                                                                <span> </span>
+                                                                <i class="check-item__text"><?php echo $item; ?></i>
+                                                            </label>
+                                                        </div>
+													<?php endforeach; ?>
 
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-								<?php endif; ?>
-                                <div class="filter-list__item ">
-                                    <div class="filter-list__item-title ">Рік врожаю/виготовлення</div>
-                                    <div class="filter-list__item-content js-collapse-content">
-                                        <select class="select_st trigger-submit-on-change" name="y">
-                                            <option value="">Зробіть вибір</option>
-											<?php for ( $a = $current_year; $a >= ( $current_year - 60 ); $a -- ):
-												$attr = $a == $_y ? 'selected' : '';
-												?>
-                                                <option value="<?php echo $a; ?>" <?php echo $attr; ?>>
-													<?php echo $a; ?>
-                                                </option>
-											<?php endfor; ?>
-                                        </select>
+									<?php endif; ?>
+                                    <div class="filter-list__item ">
+                                        <div class="filter-list__item-title ">Рік врожаю/виготовлення</div>
+                                        <div class="filter-list__item-content js-collapse-content">
+                                            <select class="select_st trigger-submit-on-change" name="y">
+                                                <option value="">Зробіть вибір</option>
+												<?php for ( $a = $current_year; $a >= ( $current_year - 60 ); $a -- ):
+													$attr = $a == $_y ? 'selected' : '';
+													?>
+                                                    <option value="<?php echo $a; ?>" <?php echo $attr; ?>>
+														<?php echo $a; ?>
+                                                    </option>
+												<?php endfor; ?>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
-                        <div class="filter-bot">
-                            <a class="btn_st b_red w100" href="<?php echo $user_link; ?>">
+                            </form>
+                            <div class="filter-bot">
+                                <a class="btn_st b_red w100" href="<?php echo $user_link; ?>">
                                 <span> <svg
                                             xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                             style="enable-background:new 0 0 13 15" viewBox="0 0 13 15">
                                             <path d="M11.8 1.9H9v-.5C9 .6 8.3 0 7.5 0h-2C4.7 0 4 .6 4 1.4v.5H1.2C.6 1.9 0 2.4 0 3v1c0 .3.2.5.5.5h12c.3 0 .5-.3.5-.5V3c0-.6-.6-1.1-1.2-1.1zM5 1.4c0-.3.2-.5.5-.5h2c.3 0 .5.2.5.5v.5H5v-.5zM.9 5.4c-.1 0-.2.1-.2.2l.4 8.1c0 .8.7 1.3 1.5 1.3h7.6c.8 0 1.5-.6 1.5-1.3l.4-8.1c0-.1-.1-.2-.2-.2H.9zm7.6 1.2c0-.3.2-.5.5-.5s.5.2.5.5v6.1c0 .3-.2.5-.5.5s-.5-.2-.5-.5V6.6zM6 6.6c0-.3.2-.5.5-.5s.5.2.5.5v6.1c0 .3-.2.5-.5.5s-.5-.3-.5-.5V6.6zm-2.5 0c0-.3.2-.5.5-.5s.5.2.5.5v6.1c0 .3-.2.5-.5.5s-.5-.2-.5-.5V6.6z"
                                                   style="fill:#fc3636"/>
                                         </svg><span>Очистити фільтр</span></span></a></div>
+                        </div>
                     </div>
-                </div>
-                <div class="info-catalog__main">
-                    <div class="info-catalog__main-top">
-                        <div class="info-catalog__main-title">Всі товари</div>
-                        <form class="info-catalog-sort" method="get" action="<?php echo $user_link; ?>">
-                            <input type="hidden" name="order" value="desc">
-							<?php
-							if ( $_GET ) {
-								foreach ( $_GET as $name => $value ) {
-									if ( $name && $value ) {
-                                        if(is_array($value)){
-                                            foreach ($value as $item){
-	                                            echo "<input type='hidden' name='$name".'[]'."' value='$item'>";
-                                            }
-                                        }else{
-	                                        echo "<input type='hidden' name='$name' value='$value'>";
-                                        }
+                    <div class="info-catalog__main container-js">
+                        <div class="info-catalog__main-top">
+                            <div class="info-catalog__main-title">Всі товари</div>
+                            <form class="info-catalog-sort sort-form-js" method="get"
+                                  action="<?php echo $user_link; ?>">
+                                <input type="hidden" name="order" value="<?php echo $order ?: 'desc'; ?>">
+								<?php
+								if ( $_GET ) {
+									foreach ( $_GET as $name => $value ) {
+										if ( $name != 'order' && $name != 'orderby' ) {
+											if ( $name && $value ) {
+												if ( is_array( $value ) ) {
+													foreach ( $value as $item ) {
+														echo "<input type='hidden' name='$name" . '[]' . "' value='$item'>";
+													}
+												} else {
+													echo "<input type='hidden' name='$name' value='$value'>";
+												}
+											}
+										}
 									}
 								}
-							}
-							?>
-                            <label class="info-catalog-sort__item">
-                                <input type="radio" name="orderby"/>
-                                <span> За популярністю</span>
-                            </label>
-                            <label class="info-catalog-sort__item">
-                                <input type="radio" name="orderby"/>
-                                <span> Дешевші</span>
-                            </label>
-                            <label class="info-catalog-sort__item">
-                                <input type="radio" name="orderby"/>
-                                <span> Дорожчі</span>
-                            </label>
-                        </form>
-                    </div>
-                    <div class="catalog container-js">
-						<?php
-						$query = get_query_index_data( array( 'author__in' => array( $user_id ) ) );
-						if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post(); ?>
-							<?php the_mini_product(); ?>
-						<?php endwhile; else : ?>
-                            <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
-                                Не знайдено!
-                            </div>
-						<?php endif;
-						wp_reset_postdata();
-						wp_reset_query(); ?>
-                    </div>
-                    <div class="btn-center pagination-js">
-						<?php echo _get_more_author_link( $query->max_num_pages, $author_id ); ?>
+								?>
+                                <label class="info-catalog-sort__item">
+                                    <input type="radio" name="orderby" data-order="desc"
+                                           value="date" <?php echo $orderby == '' || $orderby == 'date' ? 'checked' : ''; ?>/>
+                                    <span>Спочатку нові</span>
+                                </label>
+                                <label class="info-catalog-sort__item">
+                                    <input type="radio" data-order="asc" value="price"
+                                           name="orderby" <?php echo $orderby == 'price' && $order == 'asc' ? 'checked' : ''; ?>/>
+                                    <span> Дешевші</span>
+                                </label>
+                                <label class="info-catalog-sort__item">
+                                    <input type="radio" data-order="desc" value="price"
+                                           name="orderby" <?php echo $orderby == 'price' && $order == 'desc' ? 'checked' : ''; ?>/>
+                                    <span> Дорожчі</span>
+                                </label>
+                            </form>
+                        </div>
+                        <div class="catalog ">
+							<?php
+							$query = get_query_index_data( array( 'author__in' => array( $user_id ) ) );
+							if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post(); ?>
+								<?php the_mini_product(); ?>
+							<?php endwhile; else : ?>
+                                <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
+                                    Не знайдено!
+                                </div>
+							<?php endif;
+							wp_reset_postdata();
+							wp_reset_query(); ?>
+                        </div>
+                        <div class="btn-center pagination-js">
+							<?php echo _get_more_author_link( $query->max_num_pages, $author_id ); ?>
+                        </div>
                     </div>
                 </div>
-            </div>
+			<?php elseif ( $route == 'about' ):
+				the_seller_about_page();
+            elseif ( $route == 'reviews' ):
+	            the_seller_reviews_page();
+            elseif ( $route == 'contacts' ):
+				the_seller_contacts_page();
+			endif; ?>
         </div>
     </section>
+
 </main>
 
 <?php get_footer( 'seller' ); ?>

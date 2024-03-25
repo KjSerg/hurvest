@@ -1575,6 +1575,7 @@ function the_organization_data_editing() {
 	$user_company_phones  = carbon_get_user_meta( $user_id, 'user_company_phone' );
 	$office_type          = carbon_get_user_meta( $user_id, 'user_company_office_type' ) ?: '';
 	$user_payment_methods = carbon_get_user_meta( $user_id, 'user_payment_methods' ) ?: '';
+	$company_logo         = carbon_get_user_meta( $user_id, 'user_company_logo' ) ?: '';
 	$user_company_phones  = explode( ',', $user_company_phones );
 	$author_link          = false;
 	if ( $user_post && get_post( $user_post ) ) {
@@ -1685,7 +1686,28 @@ function the_organization_data_editing() {
                                     <div class="form-group__info content-count-js">0/500</div>
                                 </div>
 								<?php the_organization_work_time(); ?>
-	                            <?php the_user_social_networks(); ?>
+								<?php the_user_social_networks(); ?>
+                                <div class="cabinet-item">
+                                    <div class="personal-ava">
+                                        <div class="personal-ava__media">
+                                            <label>
+                                                <input class="upfile_logo"
+                                                       type="file"
+                                                       name="upfilelogo[]"
+                                                       accept="image/png, image/jpeg"
+                                                />
+                                            </label>
+                                            <img src="<?php echo $company_logo ? _u( $company_logo, 1 ) : ''; ?>"
+                                                 class="<?php echo $company_logo ? 'visible' : ''; ?>"
+                                                 alt=""
+                                            />
+                                            <span class="remove-file remove-company-logo"></span>
+                                        </div>
+                                        <div class="personal-ava__info">
+                                            <div class="personal-ava__title">Завантажте логотип організації</div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="cabinet-item" title="Загрузіть що найменше 1 фото">
                                     <div class="cabinet-item__title">Фото*</div>
                                     <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
@@ -1850,6 +1872,32 @@ function the_organization_data_editing() {
 
 								<?php the_organization_work_time(); ?>
 								<?php the_user_social_networks(); ?>
+                                <div class="cabinet-item">
+                                    <div class="personal-ava">
+                                        <div class="personal-ava__media">
+                                            <input class="upfile-logo-id"
+                                                   type="hidden"
+                                                   name="upfile_logo_id"
+                                                   value="<?php echo $company_logo ?: ''; ?>"
+                                            />
+                                            <label>
+                                                <input class="upfile_logo"
+                                                       type="file"
+                                                       name="upfilelogo[]"
+                                                       accept="image/png, image/jpeg"
+                                                />
+                                            </label>
+                                            <img src="<?php echo $company_logo ? _u( $company_logo, 1 ) : ''; ?>"
+                                                 class="<?php echo $company_logo ? 'visible' : ''; ?>"
+                                                 alt=""
+                                            />
+                                            <span class="remove-file remove-company-logo"></span>
+                                        </div>
+                                        <div class="personal-ava__info">
+                                            <div class="personal-ava__title">Завантажте логотип організації</div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="cabinet-item">
                                     <div class="cabinet-item__title">Фото*</div>
                                     <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
