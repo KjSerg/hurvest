@@ -154,7 +154,7 @@ $user_id           = $current_author_id;
 						<?php endif; ?>
 					<?php endif; ?>
 
-					<?php the_user_testimonials( $author_id ); ?>
+
 
                 </div>
                 <div class="product-group__right">
@@ -324,6 +324,7 @@ $user_id           = $current_author_id;
                     </div>
                 </div>
             </div>
+	        <?php the_user_testimonials_row( $author_id ); ?>
         </div>
     </section>
 

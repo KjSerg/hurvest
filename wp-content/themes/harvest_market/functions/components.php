@@ -422,6 +422,100 @@ function the_filter_categories( $categories ) {
 	endforeach;
 }
 
+function the_seller_review_slide( $id = false ) {
+	$id            = $id ?: get_the_ID();
+	$review_rating = carbon_get_post_meta( $id, 'review_rating' ) ?: 5;
+	$_email        = carbon_get_post_meta( $id, 'review_author_email' );
+	$_user_id      = carbon_get_post_meta( $id, 'review_user_id' );
+	$author_id     = get_post_field( 'post_author', $id );
+	$current_user  = get_user_by( 'ID', $author_id );
+	$email         = $current_user->user_email ?: '';
+	$display_name  = $current_user->display_name ?: '';
+	$first_name    = $current_user->first_name ?: '';
+	$last_name     = $current_user->last_name ?: '';
+	$name          = $first_name ?: $display_name;
+	$user_avatar   = carbon_get_user_meta( $author_id, 'user_avatar' );
+	$avatar_url    = ! $_user_id && $_email ? get_avatar_url( $_email ) : ( $user_avatar ? _u( $user_avatar, 1 ) : get_avatar_url( $email ?: $author_id ) );
+	$content       = get_content_by_id( $id );
+	$string        = strip_tags( $content );
+	$title         = get_the_title( $id );
+	$title         = $title ?: ( $first_name . ' ' . $last_name );
+	if ( $arr = explode( '@', $title ) ) {
+		$title = $arr[0];
+	}
+	?>
+    <div>
+        <div class="testimonials-main__item">
+            <div class="testimonials-main__item-user">
+                <div class="testimonials-main__item-user-ava">
+                    <img src="<?php echo $avatar_url; ?>" alt=""/>
+                </div>
+                <div class="testimonials-main__item-user-content">
+                    <div class="testimonials-main__item-user-name">
+                        <?php echo $title; ?>
+                    </div>
+                    <ul class="product-item__reviews">
+                        <li>
+                            <div class="testimonials-main__item-user-date">
+		                        <?php echo get_the_date( 'd.m.Y', $id ); ?>
+                            </div>
+                        </li>
+                        <li><div class="reviews-rating"> <strong><?php echo $review_rating ?></strong></div></li>
+                    </ul>
+
+                </div>
+            </div>
+            <div class="testimonials-main__item-content">
+
+				<?php if ( mb_strlen( $string, 'UTF-8' ) > 100 ): ?>
+                    <div class="testimonials-main__item-text">
+                        <p>
+							<?php echo mb_strimwidth( $string, 0, 100, "...", 'UTF-8' ); ?>
+                        </p>
+                    </div>
+                    <a class="testimonials-more modal_open" href="#testimonials-main-modal-<?php echo $id ?>" >
+                        Показати ще <img src="<?php echo _i( 'arrow-right-blue' ); ?>" alt=""/>
+                    </a>
+                    <div class="modal modal-sm" id="testimonials-main-modal-<?php echo $id ?>">
+                        <div class="modal-content">
+                            <div class="testimonials-main__item-user">
+                                <div class="testimonials-main__item-user-ava">
+                                    <img src="<?php echo $avatar_url; ?>" alt=""/>
+                                </div>
+                                <div class="testimonials-main__item-user-content">
+                                    <div class="testimonials-main__item-user-name"><?php echo $title; ?></div>
+                                    <ul class="product-item__reviews">
+                                        <li>
+                                            <div class="testimonials-main__item-user-date">
+				                                <?php echo get_the_date( 'd.m.Y', $id ); ?>
+                                            </div>
+                                        </li>
+                                        <li><div class="reviews-rating"> <strong><?php echo $review_rating ?></strong></div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="testimonials-main__item-content">
+                                <div class="testimonials-main__item-text">
+                                    <div class="text-group ">
+										<?php echo $content; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+				<?php else: ?>
+                    <div class="testimonials-main__item-text">
+                        <div class="text-group ">
+							<?php echo $content; ?>
+                        </div>
+                    </div>
+				<?php endif; ?>
+            </div>
+        </div>
+    </div>
+	<?php
+}
+
 function the_seller_review( $id = false ) {
 	$id            = $id ?: get_the_ID();
 	$review_rating = carbon_get_post_meta( $id, 'review_rating' ) ?: 5;
@@ -833,6 +927,131 @@ function the_user_testimonials( $author_id ) {
 			<?php else: ?>
                 <div class="cabinet-item__title">Залишити відгук можуть тільки авторизовані користувачі</div>
 			<?php endif; ?>
+        </div>
+    </div>
+	<?php
+}
+
+
+function the_user_testimonials_row( $author_id ) {
+	$var                 = variables();
+	$set                 = $var['setting_home'];
+	$assets              = $var['assets'];
+	$url                 = $var['url'];
+	$url_home            = $var['url_home'];
+	$admin_ajax          = $var['admin_ajax'];
+	$current_user_id     = get_current_user_id();
+	$seller_rating       = get_seller_rating( $author_id );
+	$seller_count_review = get_seller_count_review( $author_id );
+	$_order              = $_GET['order'] ?? '';
+	$_orderby            = $_GET['orderby'] ?? '';
+	$pagenum             = $_GET['pagenum'] ?? 1;
+	$is_logged           = is_user_logged_in();
+	$current_author_id   = $author_id ?: get_queried_object()->ID;
+	$user_id             = $current_author_id;
+	?>
+    <div class="testimonials-main-group">
+        <div class="testimonials-main-left">
+            <div class="seller-testimonials__form">
+				<?php if ( $current_user_id ): ?>
+                    <div class="seller-testimonials__form-top">
+                        <div class="seller-testimonials__form-title">Залишити відгук</div>
+                    </div>
+                    <form class="form-js seller-comment-form" id="seller-comment-form" method="post" novalidate>
+                        <input type="hidden" name="action" value="new_seller_review">
+                        <input type="hidden" name="seller_id" value="<?php echo $current_author_id; ?>">
+                        <div class="form-horizontal">
+                            <div class="form-group half">
+                                <input class="input_st"
+                                       type="text"
+                                       name="name"
+                                       placeholder="Ім'я" required="required"/>
+                            </div>
+                            <div class="form-group half">
+                                <input class="input_st"
+                                       type="email"
+                                       name="email"
+                                       data-reg="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])"
+                                       placeholder="E-mail" required="required"/>
+                            </div>
+                            <div class="form-group">
+                                <div class="feedback-rating">
+                                    <div class="feedback-rating__text"> Оцініть товар:</div>
+                                    <div class="rating">
+										<?php for ( $a = 1; $a <= 5; $a ++ ): ?>
+                                            <label class="rating-item">
+                                                <input type="radio" name="rating" value="<?php echo $a ?>"/>
+                                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                                                     style="enable-background:new 0 0 12 11.2" viewBox="0 0 12 11.2">
+                                                    <path d="M12 4.2c-.1-.2-.3-.4-.5-.4L8 3.5 6.6.4C6.5.1 6.3 0 6 0s-.5.1-.6.4L4 3.5l-3.4.3c-.3 0-.5.2-.6.4 0 .3 0 .5.2.7l2.6 2.2-.8 3.3c-.1.2 0 .5.2.6.1.1.2.1.4.1.1 0 .2 0 .3-.1l3-1.7 3 1.7c.2.1.5.1.7 0 .2-.1.3-.4.2-.6l-.6-3.3 2.6-2.2c.2-.2.2-.4.2-.7z"
+                                                          style="fill:#ffc327"/>
+                                                </svg>
+                                            </label>
+										<?php endfor; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <textarea class="input_st" name="text"
+                                          placeholder="Ваш коментар"
+                                          required="required"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-bot">
+                            <div class="form-consent">
+                                <label>
+                                    <input class="check_st" name="consent" type="checkbox"/><span></span>
+                                </label>
+                                <div class="form-consent__text">
+                                    Даю згоду на обробку персональних даних та погоджуюся з <a href="#">політикою
+                                        конфіденційності </a>
+                                </div>
+                            </div>
+                            <button class="btn_st" type="submit">
+                                <span> Відправити відгук </span>
+                            </button>
+                        </div>
+                    </form>
+				<?php else: ?>
+                    <div class="seller-testimonials__form-top">
+                        <div class="seller-testimonials__form-title">
+                            Залишити відгук можуть тільки авторизовані користувачі
+                        </div>
+                    </div>
+				<?php endif; ?>
+            </div>
+        </div>
+        <div class="testimonials-main-right">
+            <div class="testimonials-main-top">
+                <div class="testimonials-main-top-text">
+                    <div class="reviews-rating"> <?php echo $seller_rating ?></div>
+                </div>
+                <div class="testimonials-main-top-text"><?php echo $seller_count_review; ?> відгуків</div>
+            </div>
+            <div class="testimonials-main">
+				<?php
+				$args  = array(
+					'post_type'   => 'reviews',
+					'post_status' => 'publish',
+					'paged'       => $pagenum,
+					'meta_key'    => '_review_seller_id',
+					'meta_value'  => $author_id
+				);
+				$query = new WP_Query( $args );
+				if ( $query->have_posts() ):
+					while ( $query->have_posts() ) :
+						$query->the_post();
+						the_seller_review_slide();
+					endwhile;
+					wp_reset_postdata();
+					wp_reset_query();
+					?>
+				<?php else: ?>
+                    <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
+						<?php echo $is_logged ? 'Залиште відгук першим!' : 'Відгуки відсутні!'; ?>
+                    </div>
+				<?php endif; ?>
+            </div>
         </div>
     </div>
 	<?php

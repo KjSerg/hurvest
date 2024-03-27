@@ -31,6 +31,26 @@ $doc.ready(function () {
     checkingNotificationsSchedules();
     checkingStorage();
     setFilterCurrentList($doc.find('.filter-form'));
+    $('.testimonials-main ').slick({
+        infinite: true,
+        prevArrow: '<button type="button" class="slick-prev"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 8.2 15" viewBox="0 0 8.2 15"><path d="M.2 7c-.3.3-.3.8 0 1.1l6.7 6.7c.3.3.8.3 1.1 0 .3-.3.3-.8 0-1.1L1.8 7.5 8 1.3c.3-.3.3-.8 0-1.1-.3-.3-.8-.3-1.1 0L.2 7z" style="fill:#fff"/></svg></button>',
+        nextArrow: '<button type="button" class="slick-next"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 8.2 15" viewBox="0 0 8.2 15"><path d="M8 8c.3-.3.3-.7 0-1L1.3.2C1-.1.5-.1.2.2c-.3.3-.3.8 0 1.1l6.2 6.2-6.2 6.2c-.3.3-.3.8 0 1.1.3.3.8.3 1.1 0L8 8z" style="fill:#fff"/></svg></button>',
+        slidesToShow: 2.1,
+        speed: 500,
+        autoplay: true,
+        autoplaySpeed: 3000,
+        responsive: [{
+            breakpoint: 767,
+            settings: {
+                slidesToShow: 2
+            }
+        }, {
+            breakpoint: 560,
+            settings: {
+                slidesToShow: 1
+            }
+        }]
+    });
     $('input[type=tel]').mask("+99(999) 999-99-99");
     $doc.on('click', '.remove-company-logo', function (e) {
         e.preventDefault();

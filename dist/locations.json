@@ -1,0 +1,126 @@
+[{
+    "id": 1,
+    "title": "Груша",
+    "link": "#1",
+    "verified":1,
+    "date": "16 сер.",
+    "lat": 49.423008,
+    "lng": 26.974753,
+    "subtitle": "Фермерське господарство Вітамін",
+    "delivery": "50 успішних доставок",
+    "place": "Хмельницький",
+    "distance": "Відстань: 2 км",
+    "price": "100",
+    "price_value": "грн/кг",
+    "reviews": "20 відгуків",
+    "rating": "4.5",
+    
+    "slider": [
+        "img/product1.webp",
+        "img/product2.webp",
+        "img/product2.webp"
+      ]
+
+
+      ,
+    "description": [{
+      "Доставка: ": "Власна доставка"
+    }, {
+      "Мінімальний заказ:": "від 50 кг"
+    }, {
+      "В наявності:": "500 кг"
+    }]
+
+  },
+  {
+    "id": 2,
+    "title": "Яклука",
+    "link": "#2",
+    "verified":0,
+    "date": "12 сер.",
+    "lat": 49.422983,
+    "lng": 26.9871331,
+    "subtitle": "2Aksa Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai.",
+    "delivery": "10 успішних доставок",
+    "place": "Хмельницький1",
+    "distance": "Відстань: 3 км",
+    "price": "200",
+    "price_value": "грн/кг",
+    "reviews": "10 відгуків",
+    "rating": "3.5",
+    "slider": [
+      "img/product2.webp",
+      "img/product1.webp",
+      "img/product3.webp"
+    ],
+    "description": [{
+      "Доставка: ": "Власна доставка"
+    }, {
+      "Мінімальний заказ:": "від 20 кг"
+    }, {
+      "В наявності:": "100 кг"
+    }]
+  },
+  {
+    "id": 3,
+    "title": "Дунаївецька оливкова олія",
+    "link": "#3",
+    "verified":1,
+    "date": "11 сер.",
+    "lat": 49.419364,
+    "lng": 27.022884,
+    "subtitle": "1Aksa Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai.",
+    "delivery": "0 успішних доставок",
+    "place": "Хмельницький3",
+    "distance": "Відстань: 5 км",
+    "price": "400",
+    "price_value": "грн/л",
+    "reviews": "10 відгуків",
+    "rating": "2.5",
+    "slider": [
+      "img/product3.webp",
+      "img/product1.webp",
+      "img/product2.webp"
+    ],
+    "description": [{
+      "Доставка: ": "Власна доставка"
+    }, {
+      "Мінімальний заказ:": "від 10 кг"
+    }, {
+      "В наявності:": "100 л"
+    }]
+
+  },
+  {
+    "id": 4,
+    "title": "Яйця курячі",
+    "link": "#56",
+    "verified":0,
+    "date": "10 сер.",
+    "lat": 49.400808,
+    "lng": 26.966896,
+    "subtitle": "Яйка Beach is a popular beach and a vacation spot in Aksa village at Malad, Mumbai.",
+    "delivery": "1 успішних доставок",
+    "place": "Хмельницький3",
+    "distance": "Відстань: 1 км",
+    "price": "7",
+    "price_value": "грн/ш",
+    "reviews": "10 відгуків",
+    "rating": "2.5",
+    "slider": [
+        "img/product4.webp",
+        "img/product1.webp",
+        "img/product3.webp"
+      ]
+
+      ,
+    "description": [{
+      "Доставка: ": "Власна доставка"
+    }, {
+      "Мінімальний заказ:": "від 50 шт"
+    }, {
+      "В наявності:": "500 шт"
+    }]
+  }
+
+]
