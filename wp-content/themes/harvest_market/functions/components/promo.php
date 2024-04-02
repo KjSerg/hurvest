@@ -11,25 +11,42 @@ function the_promo_page() {
 		die();
 	}
 	the_header_cabinet();
-	$regions      = get_terms( array(
+	$regions          = get_terms( array(
 		'taxonomy'   => 'regions',
 		'hide_empty' => false,
 		'parent'     => 0
 	) );
-	$user_id      = get_current_user_id();
-	$current_user = get_user_by( 'ID', $user_id );
-	$email        = $current_user->user_email ?: '';
-	$display_name = $current_user->display_name ?: '';
-	$first_name   = $current_user->first_name ?: '';
-	$last_name    = $current_user->last_name ?: '';
-	$products_ids = get_user_products_ids( $user_id );
+	$user_id          = get_current_user_id();
+	$current_user     = get_user_by( 'ID', $user_id );
+	$email            = $current_user->user_email ?: '';
+	$display_name     = $current_user->display_name ?: '';
+	$first_name       = $current_user->first_name ?: '';
+	$last_name        = $current_user->last_name ?: '';
+	$management_users = sellers_management( $user_id );
+	$products_ids     = get_user_products_ids( $user_id );
+	$users            = array();
+	if ( $management_users ):
+		foreach ( $management_users as $user ):
+			$ID                = $user->ID;
+			$is_active_manager = is_active_manager( $user_id, $ID );
+			if ( $user->allcaps['edit_posts'] && $is_active_manager ):
+				$products_ids = array_merge( $products_ids, get_user_products_ids( $ID ) );
+				$users[]      = $ID;
+			endif;
+		endforeach;
+	endif;
 	?>
     <div class="create-item-main">
         <div class="advertise">
 			<?php while ( $query->have_posts() ): $query->the_post();
 				$_id = get_the_ID();
 				the_promo_package(
-					array( 'regions' => $regions, 'products_ids' => $products_ids, 'id' => $_id )
+					array(
+						'users'        => $users,
+						'regions'      => $regions,
+						'products_ids' => $products_ids,
+						'id'           => $_id
+					)
 				);
 			endwhile; ?>
         </div>
@@ -40,9 +57,11 @@ function the_promo_page() {
 }
 
 function the_promo_package( $args = array() ) {
+	$user_id             = get_current_user_id();
 	$product_ID          = $_GET['product'] ?? '';
 	$id                  = $args['id'] ?? get_the_ID();
 	$user_products_ids   = $args['products_ids'];
+	$users               = $args['users'];
 	$price               = carbon_get_post_meta( $id, 'service_price' ) ?: 0;
 	$is_date             = carbon_get_post_meta( $id, 'service_date' );
 	$service_up          = carbon_get_post_meta( $id, 'service_up' );
@@ -58,10 +77,10 @@ function the_promo_package( $args = array() ) {
 		$formatted_price = number_format( $price, 2 );
 		$formatted_price .= " $currency";
 		$regions         = $args['regions'] ?? get_terms( array(
-				'taxonomy'   => 'regions',
-				'hide_empty' => false,
-				'parent'     => 0
-			) );
+			'taxonomy'   => 'regions',
+			'hide_empty' => false,
+			'parent'     => 0
+		) );
 		if ( $user_products_ids || ( $product_ID && get_post( $product_ID ) ) ):
 			?>
             <form novalidate id="checkout-service-<?php echo $id ?>"
@@ -123,6 +142,24 @@ function the_promo_package( $args = array() ) {
 
                     </ul>
                     <div class="advertise-item__select form-group">
+						<?php if ( $users ): ?>
+                            <div class="advertise-item__select-item">
+                                <div class="advertise-item__select-text"></div>
+                                <select class="select_st select-company" name="user" required>
+                                    <option disabled selected value="">
+                                        Оберіть господарство
+                                    </option>
+                                    <option value="<?php echo $user_id; ?>">
+										<?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?>
+                                    </option>
+									<?php foreach ( $users as $user ): ?>
+                                        <option value="<?php echo $user; ?>">
+											<?php echo carbon_get_user_meta( $user, 'user_company_name' ); ?>
+                                        </option>
+									<?php endforeach; ?>
+                                </select>
+                            </div>
+						<?php endif; ?>
                         <div class="advertise-item__select-item">
                             <div class="advertise-item__select-text"></div>
                             <select class="select_st select-region" name="regions[]" required multiple="multiple">
@@ -144,16 +181,18 @@ function the_promo_package( $args = array() ) {
                                     Оберіть оголошення
                                 </option>
 								<?php if ( $product_ID ): ?>
-                                    <option selected value="<?php echo $product_ID ?>">
+                                    <option selected value="<?php echo $product_ID ?>" data-author="<?php echo get_post_field( 'post_author', $product_ID ); ?>">
 										<?php echo get_the_title( $product_ID ); ?>
                                     </option>
 								<?php endif; ?>
 								<?php if ( $user_products_ids ): foreach ( $user_products_ids as $product_id ): if ( get_post( $product_id ) && $product_id != $product_ID ): ?>
-                                    <option value="<?php echo $product_id ?>">
+                                    <option value="<?php echo $product_id ?>"
+                                            data-author="<?php echo get_post_field( 'post_author', $product_id ); ?>">
 										<?php echo get_the_title( $product_id ); ?>
                                     </option>
 								<?php endif; endforeach; endif; ?>
                             </select>
+
                         </div>
                     </div>
 					<?php if ( $is_date ): ?>

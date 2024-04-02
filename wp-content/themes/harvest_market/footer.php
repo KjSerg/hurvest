@@ -158,7 +158,6 @@ $user_location = get_user_location();
                                 </div>
                             </div>
                         </div>
-
                         <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item js-collapse-item">
                             <div class="filter-list__item-title js-collapse-title"> Підкатегорія продукту</div>
                             <div class="filter-list__item-content js-collapse-content">
@@ -196,7 +195,6 @@ $user_location = get_user_location();
                                 </div>
                             </div>
                         </div>
-
                         <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item js-collapse-item">
                             <div class="filter-list__item-title js-collapse-title"> Тип або вид продукту</div>
                             <div class="filter-list__item-content js-collapse-content">
@@ -234,7 +232,6 @@ $user_location = get_user_location();
                                 </div>
                             </div>
                         </div>
-
                         <div class="<?php echo $subtitem ? '' : 'hidden'; ?> filter-list__item js-collapse-item">
                             <div class="filter-list__item-title js-collapse-title">
                                 Підкатегорія типу або виду продукту
@@ -274,7 +271,6 @@ $user_location = get_user_location();
                                 </div>
                             </div>
                         </div>
-
                         <div class="<?php echo $filters ? '' : 'hidden'; ?> filter-list__item js-collapse-item">
                             <div class="filter-list__item-title js-collapse-title"> Додаткові фільтри продукту</div>
                             <div class="filter-list__item-content js-collapse-content">
@@ -319,25 +315,7 @@ $user_location = get_user_location();
                             </div>
                         </div>
 					<?php endif; ?>
-                    <div class=" ">
-                        <div class="filter-list__item js-collapse-item">
-                            <div class="filter-list__item-title js-collapse-title">Ціна</div>
-                            <div class="filter-list__item-content js-collapse-content">
-                                <div class="filter-range">
-                                    <div class="filter-range__info">
-                                        Від<input class="input_st js-input-from" name="min-price" type="text" readonly
-                                                  value="<?php echo $_min_price; ?>"/>
-                                        до <input class="input_st js-input-to" name="max-price" type="text" readonly
-                                                  value="<?php echo $_max_price; ?>"/>
-                                    </div>
-                                    <input class="js-range" type="text"
-                                           data-min="<?php echo( $products_data['min_price'] ?: '1' ); ?>"
-                                           data-max="<?php echo( $products_data['max_price'] ?: '10000000' ); ?>"
-                                           data-from="<?php echo $_min_price; ?>"
-                                           data-to="<?php echo $_max_price; ?>" data-type="double"/>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="filter-body">
 						<?php if ( $product_types ): ?>
                             <div class="filter-list__item js-collapse-item">
                                 <div class="filter-list__item-title js-collapse-title"> Тип продукту</div>
@@ -346,6 +324,7 @@ $user_location = get_user_location();
 										<?php foreach ( $product_types as $type ):
 											$test = $_type && in_array( $type->term_id, $_type );
 											$attr = $test ? 'checked' : '';
+
 											?>
                                             <div class="filter-check__item">
                                                 <label class="check-item">
@@ -386,51 +365,89 @@ $user_location = get_user_location();
                                 </div>
                             </div>
 						<?php endif; ?>
-						<?php if ( $processing_types ): ?>
-                            <div class="filter-list__item js-collapse-item">
-                                <div class="filter-list__item-title js-collapse-title">Тип обробки</div>
-                                <div class="filter-list__item-content js-collapse-content">
-                                    <div class="filter-check">
-										<?php foreach ( $processing_types as $type ):
-											$test = $_processing_types && in_array( $type->term_id, $_processing_types );
-											$attr = $test ? 'checked' : '';
-											?>
-                                            <div class="filter-check__item">
-                                                <label class="check-item">
-                                                    <input class="check_st filter-check-input"
-                                                           data-name="processing_types" <?php echo $attr; ?>
-                                                           value="<?php echo $type->term_id; ?>"
-                                                           type="checkbox"
-                                                    />
-                                                    <span></span>
-                                                    <i class="check-item__text"><?php echo $type->name; ?></i>
-                                                </label>
-                                            </div>
-										<?php endforeach; ?>
-                                    </div>
-                                </div>
-                            </div>
-						<?php endif; ?>
 						<?php if ( $package ): ?>
                             <div class="filter-list__item js-collapse-item">
                                 <div class="filter-list__item-title js-collapse-title">Тип пакування</div>
                                 <div class="filter-list__item-content js-collapse-content">
                                     <div class="filter-check">
 										<?php foreach ( $package as $item ):
-											$test = $_packages && in_array( $item->term_id, $_packages );
-											$attr = $test ? 'checked' : '';
-											?>
-                                            <div class="filter-check__item">
-                                                <label class="check-item">
-                                                    <input class="check_st filter-check-input"
-                                                           data-name="packages" <?php echo $attr; ?>
-                                                           value="<?php echo $item->term_id; ?>"
-                                                           type="checkbox"/>
-                                                    <span> </span>
-                                                    <i class="check-item__text"><?php echo $item->name; ?></i>
-                                                </label>
-                                            </div>
-										<?php endforeach; ?>
+											$count_products = get_product_number( array(
+												'tax_query' => array(
+													array(
+														'taxonomy' => 'package',
+														'field'    => 'id',
+														'terms'    => array( $item->term_id )
+													)
+                                                )
+											) );
+											if ( $count_products > 0 ):
+												$test = $_packages && in_array( $item->term_id, $_packages );
+												$attr = $test ? 'checked' : '';
+												?>
+                                                <div class="filter-check__item">
+                                                    <label class="check-item">
+                                                        <input class="check_st filter-check-input"
+                                                               data-name="packages" <?php echo $attr; ?>
+                                                               value="<?php echo $item->term_id; ?>"
+                                                               type="checkbox"/>
+                                                        <span> </span>
+                                                        <i class="check-item__text"><?php echo $item->name; ?></i>
+                                                    </label>
+                                                </div>
+											<?php endif; endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+						<?php endif; ?>
+                        <div class="filter-list__item js-collapse-item">
+                            <div class="filter-list__item-title js-collapse-title">Ціна</div>
+                            <div class="filter-list__item-content js-collapse-content">
+                                <div class="filter-range">
+                                    <div class="filter-range__info">
+                                        Від<input class="input_st js-input-from" name="min-price" type="text" readonly
+                                                  value="<?php echo $_min_price; ?>"/>
+                                        до <input class="input_st js-input-to" name="max-price" type="text" readonly
+                                                  value="<?php echo $_max_price; ?>"/>
+                                    </div>
+                                    <input class="js-range" type="text"
+                                           data-min="<?php echo( $products_data['min_price'] ?: '1' ); ?>"
+                                           data-max="<?php echo( $products_data['max_price'] ?: '10000000' ); ?>"
+                                           data-from="<?php echo $_min_price; ?>"
+                                           data-to="<?php echo $_max_price; ?>" data-type="double"/>
+                                </div>
+                            </div>
+                        </div>
+						<?php if ( $processing_types ): ?>
+                            <div class="filter-list__item js-collapse-item">
+                                <div class="filter-list__item-title js-collapse-title">Тип обробки</div>
+                                <div class="filter-list__item-content js-collapse-content">
+                                    <div class="filter-check">
+										<?php foreach ( $processing_types as $type ):
+											$count_products = get_product_number( array(
+												'tax_query' => array(
+													array(
+														'taxonomy' => 'processing_type',
+														'field'    => 'id',
+														'terms'    => array( $type->term_id )
+													)
+                                                )
+											) );
+											if ( $count_products > 0 ):
+												$test = $_processing_types && in_array( $type->term_id, $_processing_types );
+												$attr = $test ? 'checked' : '';
+												?>
+                                                <div class="filter-check__item">
+                                                    <label class="check-item">
+                                                        <input class="check_st filter-check-input"
+                                                               data-name="processing_types" <?php echo $attr; ?>
+                                                               value="<?php echo $type->term_id; ?>"
+                                                               type="checkbox"
+                                                        />
+                                                        <span></span>
+                                                        <i class="check-item__text"><?php echo $type->name; ?></i>
+                                                    </label>
+                                                </div>
+											<?php endif; endforeach; ?>
                                     </div>
                                 </div>
                             </div>
@@ -441,21 +458,31 @@ $user_location = get_user_location();
                                 <div class="filter-list__item-content js-collapse-content">
                                     <div class="filter-check">
 										<?php foreach ( $units_measurement as $item ):
-											$test = $_units_measurement && in_array( $item['unit'], $_units_measurement );
-											$attr = $test ? 'checked' : '';
-											?>
-                                            <div class="filter-check__item">
-                                                <label class="check-item">
-                                                    <input class="check_st filter-check-input"
-                                                           data-name="units_measurement"
-                                                           value="<?php echo $item['unit']; ?>"
-														<?php echo $attr; ?>
-                                                           type="checkbox"/>
-                                                    <span> </span>
-                                                    <i class="check-item__text"><?php echo $item['unit']; ?></i>
-                                                </label>
-                                            </div>
-										<?php endforeach; ?>
+											$count_products = get_product_number( array(
+												'meta_query' => array(
+													array(
+														'key'     => '_product_unit',
+														'value'   => $item['unit'],
+														'compare' => 'IN'
+													)
+                                                )
+											) );
+											if ( $count_products > 0 ):
+												$test = $_units_measurement && in_array( $item['unit'], $_units_measurement );
+												$attr = $test ? 'checked' : '';
+												?>
+                                                <div class="filter-check__item">
+                                                    <label class="check-item">
+                                                        <input class="check_st filter-check-input"
+                                                               data-name="units_measurement"
+                                                               value="<?php echo $item['unit']; ?>"
+															<?php echo $attr; ?>
+                                                               type="checkbox"/>
+                                                        <span> </span>
+                                                        <i class="check-item__text"><?php echo $item['unit']; ?></i>
+                                                    </label>
+                                                </div>
+											<?php endif; endforeach; ?>
                                     </div>
                                 </div>
                             </div>
@@ -467,21 +494,31 @@ $user_location = get_user_location();
                                     <div class="filter-check">
 
 										<?php foreach ( $delivery_types as $key => $item ):
-											$test = $_delivery_methods && in_array( $key, $_delivery_methods );
-											$attr = $test ? 'checked' : '';
-											?>
-                                            <div class="filter-check__item">
-                                                <label class="check-item">
-                                                    <input class="check_st filter-check-input"
-                                                           data-name="delivery_methods"
-                                                           value="<?php echo $key; ?>"
-														<?php echo $attr; ?>
-                                                           type="checkbox"/>
-                                                    <span> </span>
-                                                    <i class="check-item__text"><?php echo $item; ?></i>
-                                                </label>
-                                            </div>
-										<?php endforeach; ?>
+											$count_products = get_product_number( array(
+												'meta_query' => array(
+													array(
+														'key'     => '_product_delivery_methods',
+														'value'   => $key,
+														'compare' => 'IN'
+													)
+                                                )
+											) );
+											if ( $count_products > 0 ):
+												$test = $_delivery_methods && in_array( $key, $_delivery_methods );
+												$attr = $test ? 'checked' : '';
+												?>
+                                                <div class="filter-check__item">
+                                                    <label class="check-item">
+                                                        <input class="check_st filter-check-input"
+                                                               data-name="delivery_methods"
+                                                               value="<?php echo $key; ?>"
+															<?php echo $attr; ?>
+                                                               type="checkbox"/>
+                                                        <span> </span>
+                                                        <i class="check-item__text"><?php echo $item; ?></i>
+                                                    </label>
+                                                </div>
+											<?php endif; endforeach; ?>
 
                                     </div>
                                 </div>
@@ -628,7 +665,8 @@ $user_location = get_user_location();
     </div>
 <?php endif; ?>
 <div class="scroll_top">
-    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 8 15" viewBox="0 0 8 15">
+    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 8 15"
+         viewBox="0 0 8 15">
             <path d="M4.7 14.3v-12l2.2 2.2c.6.6 1.6-.3.9-1L4.5.2c-.3-.3-.7-.3-.9 0L.2 3.6c-.1.1-.2.3-.2.5 0 .6.7.9 1.1.5l2.2-2.2v12c.1.9 1.4.8 1.4-.1z"
                   style="fill:#262c40"/>
         </svg>

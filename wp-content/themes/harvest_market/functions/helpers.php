@@ -889,7 +889,7 @@ function get_last_element( $category ) {
 			return get_last_element( $category );
 		}
 	} else {
-		return $category[0];
+		return (int) $category[0];
 	}
 
 }
@@ -1194,12 +1194,13 @@ function get_products_data() {
 				)
 			);
 		}
-		if ( $user_ID && $user_login ) {
-			$args['author__in'] = array( (int) $user_ID );
-		} elseif ( $post_author ) {
-			$args['author__in'] = array( (int) $post_author );
-		}
+//		if ( $user_ID && $user_login ) {
+//			$args['author__in'] = array( (int) $user_ID );
+//		} elseif ( $post_author ) {
+//			$args['author__in'] = array( (int) $post_author );
+//		}
 	}
+//    var_dump($args);
 	$query = new WP_Query( $args );
 	if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post();
 		$_id   = get_the_ID();
@@ -2687,15 +2688,16 @@ function get_product_purchases_number( $productID ) {
 function get_product_custom_ID( $id ) {
 	$productID = carbon_get_post_meta( $id, 'product_id' );
 	if ( ! $productID ) {
-		$productID = generate_random_number();
+		$productID  = generate_random_number();
 		$product_id = get_product_by_custom_id( $productID );
-        if($product_id){
-            return get_product_custom_ID( $id );
-        }else{
-	        carbon_set_post_meta( $id, 'product_id', $productID );
-        }
+		if ( $product_id ) {
+			return get_product_custom_ID( $id );
+		} else {
+			carbon_set_post_meta( $id, 'product_id', $productID );
+		}
 	}
-    return $productID;
+
+	return $productID;
 }
 
 function get_product_by_custom_id( $custom_id ) {
@@ -2726,4 +2728,59 @@ function get_product_by_custom_id( $custom_id ) {
 
 function generate_random_number() {
 	return mt_rand( 100000, 999999 );
+}
+
+function get_product_number( $array) {
+	$category = $_GET['category'] ?? '';
+	if ( ! $category ) {
+		return 1;
+	}
+	$args           = array(
+		'post_type'      => 'products',
+		'post_status'    => 'publish',
+		'posts_per_page' => - 1,
+		'tax_query'      => array(),
+	);
+	$args           = array_merge( $args, $array );
+	$queried_object = get_queried_object();
+	if ( $queried_object ) {
+		$term_id  = $queried_object->term_id ?? '';
+		$taxonomy = $queried_object->taxonomy ?? '';
+		if ( $taxonomy && $term_id ) {
+			$tax_query = array(
+				'taxonomy' => $taxonomy,
+				'field'    => 'id',
+				'terms'    => array( $term_id )
+			);
+			if ( isset( $args['tax_query'] ) ) {
+				$args['tax_query'][] = $tax_query;
+			} else {
+				$args['tax_query'] = array( $tax_query );
+			}
+		}
+	}
+	if ( $category ) {
+		$category = explode( ',', $category );
+		if ( $category ) {
+			$last_category = get_last_element( $category );
+			$tax_query     = array(
+				'taxonomy' => 'categories',
+				'field'    => 'id',
+				'terms'    => array( $last_category )
+			);
+			if ( isset( $args['tax_query'] ) ) {
+				$args['tax_query'][] = $tax_query;
+			} else {
+				$args['tax_query'] = array( $tax_query );
+			}
+		}
+	}
+//    echo '<pre>';
+//    var_dump($args);
+//	echo '</pre>';
+	$query = new WP_Query( $args );
+    $found_posts = $query->found_posts;
+    wp_reset_postdata();
+    wp_reset_query();
+	return $found_posts;
 }

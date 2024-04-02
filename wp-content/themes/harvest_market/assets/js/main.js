@@ -135,8 +135,6 @@ function _objectWithoutPropertiesLoose(source, excluded) {
     return target;
 }
 
-
-
 function delay(callback, ms) {
     var timer = 0;
     return function () {

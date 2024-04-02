@@ -51,7 +51,7 @@ $doc.ready(function () {
             }
         }]
     });
-    $('input[type=tel]').mask("+99(999) 999-99-99");
+    $('input[type=tel]').mask("+38(999) 999-99-99");
     $doc.on('click', '.remove-company-logo', function (e) {
         e.preventDefault();
         var $t = $(this);
@@ -1441,10 +1441,10 @@ $doc.ready(function () {
         $.ajax(dataAjax).done(function (r) {
             var $r = $(parser.parseFromString(r, "text/html"));
             var $r_container = $r.find('.chat-main');
-            if(isActive){
+            if (isActive) {
                 $container.find('.chat-main__top').html($r_container.find('.chat-main__top').html());
                 $container.find('.chat-main__content').html($r_container.find('.chat-main__content').html());
-            }else {
+            } else {
                 $container.html($r_container.html());
             }
             load = false;
@@ -1559,70 +1559,6 @@ $doc.ready(function () {
     $('.tog-filter').on('click', function (e) {
         e.preventDefault();
         $('body').addClass('open_filter');
-    });
-    $('.js-range').each(function () {
-        var this_ = $(this);
-        var min = $(this).attr('data-min');
-        var max = $(this).attr('data-max');
-        var from_input = this_.closest('.filter-range').find('.js-input-from');
-        var to_input = this_.closest('.filter-range').find('.js-input-to');
-        var from = 0;
-        var to = 0;
-        this_.ionRangeSlider({
-            hide_min_max: true,
-            hide_from_to: true,
-            onStart: function onStart(data) {
-                from = data.from;
-                to = data.to;
-                from_input.val(from);
-                to_input.val(to);
-            },
-            onChange: function onChange(data) {
-                from = data.from;
-                to = data.to;
-                from_input.val(from);
-                to_input.val(to);
-            },
-            onFinish: function onChange(data) {
-                var name = from_input.attr('data-name');
-                if (name !== undefined) from_input.attr('name', name);
-                this_.closest('form').trigger('submit');
-            }
-        });
-        var instance = this_.data("ionRangeSlider");
-        from_input.keyup(delay(function (e) {
-            var val = $(this).val(); // validate
-            var t_ = to_input.length;
-            var val_m = 0;
-            if (t_ > 0) {
-                val_m = to_input.val();
-            } else {
-                val_m = Number(max);
-            }
-            if (Number(val) < Number(min)) {
-                val = Number(min);
-            } else if (val > Number(val_m)) {
-                val = val_m;
-            }
-            $(this).val(val);
-            instance.update({
-                from: val
-            });
-        }, 500));
-        to_input.keyup(delay(function (e) {
-            var val1 = $(this).val();
-            var val_s = from_input.val();
-
-            if (val1 < Number(val_s)) {
-                val1 = Number(val_s);
-            } else if (val1 > Number(max)) {
-                val1 = Number(max);
-            }
-            $(this).val(val1);
-            instance.update({
-                to: val1
-            });
-        }, 500));
     });
     $(document).click(function (e) {
         var div = $(".content-field");
@@ -1780,6 +1716,7 @@ $doc.ready(function () {
     initNovaPostAutocomplete();
     showElements();
     showingContent();
+    initRange();
     $doc.on('input', '.np-autocomplete__search-input', initNovaPostAutocomplete);
     $doc.on('focus', '.np-autocomplete__search-input', function () {
         var $result = $doc.find('.np-autocomplete__result');
@@ -1971,8 +1908,86 @@ $doc.ready(function () {
             }
         }
     });
+    $doc.on('change', '.advertise-buy .select-company', function (e) {
+        e.preventDefault();
+        var $t = $(this);
+        var val = $t.val();
+        var $products = $t.closest('.advertise-buy').find('.select-product');
+        $products.find('option').removeAttr('selected');
+        $products.prop('selectedIndex', 0).selectric('refresh');
+        $products.find('option').removeAttr('disabled');
+        $products.find('option').not('[data-author="' + val + '"]').attr('disabled', 'disabled');
+        $products.selectric('refresh');
+    });
 
 });
+
+function initRange() {
+    $doc.find('.js-range').not('.irs-hidden-input').each(function () {
+        var this_ = $(this);
+        var min = $(this).attr('data-min');
+        var max = $(this).attr('data-max');
+        var from_input = this_.closest('.filter-range').find('.js-input-from');
+        var to_input = this_.closest('.filter-range').find('.js-input-to');
+        var from = 0;
+        var to = 0;
+        this_.ionRangeSlider({
+            hide_min_max: true,
+            hide_from_to: true,
+            onStart: function onStart(data) {
+                from = data.from;
+                to = data.to;
+                from_input.val(from);
+                to_input.val(to);
+            },
+            onChange: function onChange(data) {
+                from = data.from;
+                to = data.to;
+                from_input.val(from);
+                to_input.val(to);
+            },
+            onFinish: function onChange(data) {
+                var name = from_input.attr('data-name');
+                if (name !== undefined) from_input.attr('name', name);
+                this_.closest('form').trigger('submit');
+            }
+        });
+        var instance = this_.data("ionRangeSlider");
+        from_input.keyup(delay(function (e) {
+            var val = $(this).val(); // validate
+            var t_ = to_input.length;
+            var val_m = 0;
+            if (t_ > 0) {
+                val_m = to_input.val();
+            } else {
+                val_m = Number(max);
+            }
+            if (Number(val) < Number(min)) {
+                val = Number(min);
+            } else if (val > Number(val_m)) {
+                val = val_m;
+            }
+            $(this).val(val);
+            instance.update({
+                from: val
+            });
+        }, 500));
+        to_input.keyup(delay(function (e) {
+            var val1 = $(this).val();
+            var val_s = from_input.val();
+
+            if (val1 < Number(val_s)) {
+                val1 = Number(val_s);
+            } else if (val1 > Number(max)) {
+                val1 = Number(max);
+            }
+            $(this).val(val1);
+            instance.update({
+                to: val1
+            });
+        }, 500));
+    });
+}
 
 $w.on('load resize', changePromoHeight);
 
@@ -2716,6 +2731,7 @@ function renderCatalog(args) {
     var $catalog = $doc.find('.container-js').not('.testimonials');
     var $pagination = $doc.find('.pagination-js').not('.testimonials-pagination');
     var $mapBtnWrap = $doc.find('.map-btn');
+    var $filterBody = $doc.find('.filter-body');
     if (load) return;
     load = true;
     $pagination.addClass('not-active');
@@ -2730,11 +2746,31 @@ function renderCatalog(args) {
         var $r_catalog = $r.find('.container-js').not('.testimonials');
         $catalog.html($r_catalog.html());
         $mapBtnWrap.html($r.find('.map-btn').html());
+        $filterBody.html($r.find('.filter-body').html());
+        $filterBody.find('.select_st').selectric({
+            disableOnMobile: false,
+            nativeOnMobile: false
+        });
+        initRange();
+        $filterBody.find('.filter-list__item').each(function () {
+            var $item = $(this);
+            var $elements = $item.find('.check-item');
+            var $range = $item.find('.filter-range');
+            var $select = $item.find('select');
+            if ($range.length === 0 && $select.length === 0) {
+                if ($elements.length > 0) {
+                    $item.removeClass('hidden')
+                } else {
+                    $item.addClass('hidden')
+                }
+            }
+        });
         load = false;
         hidePreloader();
         $pagination.html($r.find('.pagination-js').not('.testimonials-pagination').html());
         $pagination.removeClass('not-active');
         initProductSliders();
+
     });
 }
 

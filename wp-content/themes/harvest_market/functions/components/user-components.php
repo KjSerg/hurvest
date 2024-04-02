@@ -257,8 +257,8 @@ function the_user_advertisement() {
                 <input type="hidden" name="post_status" value="<?php echo $post_status; ?>">
                 <select class="select_st trigger-on-change" name="management_user">
 					<?php if ( $management_users ): ?>
-                        <option <?php echo ( $management_user == '' ) ? 'selected' : ''; ?> value="">Обрати
-                            господарство
+                        <option <?php echo ( $management_user == '' ) ? 'selected' : ''; ?> value="">
+                            Обрати господарство
                         </option>
                         <option value=""><?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?></option>
 						<?php foreach ( $management_users as $user ):
@@ -274,8 +274,9 @@ function the_user_advertisement() {
                                 </option>
 							<?php endif; endforeach; ?>
 					<?php else: ?>
-                        <option selected
-                                value=""><?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?></option>
+                        <option selected value="">
+                            <?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?>
+                        </option>
 					<?php endif; ?>
                 </select>
                 <div class="sort-group">
@@ -283,8 +284,10 @@ function the_user_advertisement() {
 						<?php if ( $categories ): ?>
                             <div class="half">
                                 <select title="" class="select_st trigger-on-change" name="categories">
+                                    <option <?php echo '' == $_categories ? 'selected' : ''; ?> value="">
+                                        Категорія
+                                    </option>
 									<?php if ( count( $categories ) > 1 ): ?>
-                                        <option value="">Категорія</option>
 										<?php foreach ( $categories as $category ): ?>
                                             <option
 												<?php echo $category->term_id == $_categories ? 'selected' : ''; ?>
@@ -294,9 +297,7 @@ function the_user_advertisement() {
 										<?php endforeach; ?>
 									<?php elseif ( count( $categories ) == 1 ): ?>
 										<?php foreach ( $categories as $category ): ?>
-                                            <option
-                                                    selected
-                                                    value="<?php echo $category->term_id; ?>">
+                                            <option value="<?php echo $category->term_id; ?>">
 												<?php echo $category->name; ?>
                                             </option>
 										<?php endforeach; ?>
