@@ -584,7 +584,14 @@ $(document).ready(function () {
     } else {
       $(this).closest('.place-list').find('.check_st:checkbox:not(":checked")').parent('.check-item').addClass('disable');
     }
+  }); // fix 29.03.24
+
+  $('.similar-slider').each(function () {
+    var hItems_s = $(this).find(".product-item__title");
+    hBlock(hItems_s);
   });
+  var hItems = $('.catalog .product-item').find(".product-item__title");
+  hBlock(hItems); // end fix 29.03.24
 });
 
 function delay(callback, ms) {
@@ -1047,4 +1054,15 @@ var createHTMLMapMarker = function createHTMLMapMarker(_ref) {
   }(OverlayView);
 
   return new HTMLMapMarker();
-};
+}; // fix 29.03.24
+
+
+function hBlock(selector) {
+  var max = 0;
+  var itemsSelector = selector;
+  itemsSelector.each(function () {
+    var h = $(this).innerHeight();
+    max = h > max ? h : max;
+  });
+  itemsSelector.css('minHeight', max + 1 + 'px');
+} // end fix 27.03.24

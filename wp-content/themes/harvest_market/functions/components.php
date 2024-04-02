@@ -14,6 +14,7 @@ function the_product( $id = false ) {
 	$seller_rating       = get_seller_rating( $author_id );
 	$seller_count_review = get_seller_count_review( $author_id );
 	$user_company_name   = carbon_get_user_meta( $author_id, 'user_company_name' ) ?: '';
+	$user_verification   = carbon_get_user_meta( $author_id, 'user_verification' ) ?: '';
 	$img                 = get_the_post_thumbnail_url( $id );
 	$title               = get_the_title( $id );
 	$is_favorite         = is_in_favorite( $id );
@@ -24,6 +25,7 @@ function the_product( $id = false ) {
 	$user_lat            = $user_coordinates['lat'] ?? ( $user_location['lat'] ?? '' );
 	$user_lon            = $user_coordinates['lon'] ?? ( $user_location['lon'] ?? '' );
 	$distance            = 0;
+	$author_link         = '#';
 	if ( $product_latitude && $product_longitude && $user_lat && $user_lon ) {
 		$distance = getDistanceByCoordinates( array(
 			'location_from' => array(
@@ -42,18 +44,17 @@ function the_product( $id = false ) {
 		$distance     = getDistance( $user_address, $address, "K" );
 
 	}
-	$author_link = '#';
-	$user_post   = carbon_get_user_meta( $author_id, 'user_post' );
+	$user_post = carbon_get_user_meta( $author_id, 'user_post' );
 	if ( $user_post && get_post( $user_post ) ) {
 		$author_link = get_the_permalink( $user_post );
 	}
 	?>
 
-    <div class="product-item">
+    <div class="product-item pi__new">
 		<?php the_product_labels( $id ); ?>
         <a class="product-item__favorite add-to-favorite <?php echo $cls; ?>" data-id="<?php echo $id; ?>" href="#">
-            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-                 style="enable-background:new 0 0 659.3 578.6" viewBox="0 0 659.3 578.6">
+            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 659.3 578.6"
+                 viewBox="0 0 659.3 578.6">
                                     <path d="m78 325 231.8 217.7c8 7.5 12 11.2 16.7 12.2 2.1.4 4.3.4 6.4 0 4.7-.9 8.7-4.7 16.7-12.2L581.3 325c65.2-61.3 73.1-162.1 18.3-232.7L589.3 79C523.7-5.6 392 8.6 345.9 105.2c-6.5 13.6-25.9 13.6-32.4 0C267.4 8.6 135.7-5.6 70.1 79L59.7 92.3C4.9 163 12.8 263.8 78 325z"
                                           style="fill:none;stroke:#fff;stroke-width:46.6667;stroke-miterlimit:133.3333"/>
                                 </svg>
@@ -71,23 +72,50 @@ function the_product( $id = false ) {
         </div>
         <div class="product-item__content">
             <a class="product-item__title" href="<?php echo get_the_permalink( $id ); ?>">
-				<?php echo $title; ?> <span
-                        class="reviews-count"><?php echo $seller_count_review ?: 0; ?> відгуків</span>
+				<?php echo $title; ?>
             </a>
-            <a class="product-item__title product-item__organization" href="<?php echo $author_link; ?>">
-				<?php echo $user_company_name; ?>
-                <span class="reviews-rating">  <strong><?php echo $seller_rating; ?> </span></strong>
-
-            </a>
+            <div class="product-item__seller">
+                <div class="product-item__seller-title" title="<?php echo $user_company_name; ?>">
+					<?php echo $user_company_name; ?>
+                </div>
+				<?php if ( $user_verification ): ?>
+                    <img src="<?php echo _i( 'verified' ); ?>" alt=""/>
+				<?php endif; ?>
+            </div>
+            <ul class="product-item__reviews">
+                <li>
+					<?php echo $seller_count_review ?: 0; ?> відгуків
+                </li>
+                <li>
+                    <div class="rating-new"><?php echo $seller_rating; ?></div>
+                </li>
+            </ul>
             <ul class="product-item__place">
                 <li><?php echo $city ?: $address; ?></li>
-                <li>Відстань: <?php echo $distance; ?></li>
+                <li><?php echo $distance; ?></li>
             </ul>
+            <div class="product-item__price">
+				<?php echo get_price_html( $id ); ?>
+            </div>
             <div class="product-item__bot">
-                <div class="product-item__price">
-					<?php echo get_price_html( $id ); ?>
+                <div class="counter_product">
+                    <div class="btn_count num_minus disabled">
+                        <span> </span>
+                    </div>
+                    <input class="counter_input" type="text" readonly="" value="1"/>
+                    <div class="btn_count num_pluss active"><span></span></div>
                 </div>
-
+                <a class="add_btn" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 16 13"
+                         viewBox="0 0 16 13">
+                                            <path d="M15.2 4.4c0-.2 0-.3-.1-.5-.1-.1-.3-.2-.4-.2H1.3c-.2 0-.3.1-.4.2-.1.1-.2.3-.1.5 0 0 .8 4.6 1.1 6.9.2 1 1 1.7 2 1.7h8.2c1 0 1.9-.7 2-1.7l1.1-6.9zm-1.2.4-1 6.3c-.1.4-.5.8-.9.8H3.9c-.5 0-.8-.3-.9-.8L2 4.8h12z"
+                                                  style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>
+                        <path d="M12.9 4 10.7.3c-.1-.3-.5-.4-.8-.2-.2.1-.3.5-.1.7L12 4.6c.2.3.5.3.8.2.2-.2.3-.6.1-.8zM4 4.6 6.2.9c.2-.3.1-.6-.2-.8-.2-.2-.6-.1-.7.2L3.1 4c-.2.2-.1.6.1.7.3.2.7.1.8-.1zM7.4 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6s-.6.3-.6.6zM4.5 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6-.4 0-.6.3-.6.6zM10.4 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6s-.6.3-.6.6z"
+                              style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>
+                        <path d="M15.4 3.7H.6c-.3 0-.6.3-.6.6s.3.6.6.6h14.9c.3 0 .6-.2.6-.6-.1-.3-.3-.6-.7-.6z"
+                              style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>
+                                        </svg>
+                </a>
             </div>
         </div>
     </div>
@@ -230,7 +258,7 @@ function the_home_catalog() {
 
 //    v($query);
 	?>
-    <div class="catalog container-js">
+    <div class="catalog catalog_main container-js">
 		<?php
 		if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post(); ?>
 			<?php the_product(); ?>
@@ -238,9 +266,11 @@ function the_home_catalog() {
             <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
                 Не знайдено!
             </div>
-		<?php endif;
+		<?php
+		endif;
 		wp_reset_postdata();
-		wp_reset_query(); ?>
+		wp_reset_query();
+		?>
     </div>
 
     <div class="btn_center pagination-js">
@@ -452,15 +482,17 @@ function the_seller_review_slide( $id = false ) {
                 </div>
                 <div class="testimonials-main__item-user-content">
                     <div class="testimonials-main__item-user-name">
-                        <?php echo $title; ?>
+						<?php echo $title; ?>
                     </div>
                     <ul class="product-item__reviews">
                         <li>
                             <div class="testimonials-main__item-user-date">
-		                        <?php echo get_the_date( 'd.m.Y', $id ); ?>
+								<?php echo get_the_date( 'd.m.Y', $id ); ?>
                             </div>
                         </li>
-                        <li><div class="reviews-rating"> <strong><?php echo $review_rating ?></strong></div></li>
+                        <li>
+                            <div class="reviews-rating"><strong><?php echo $review_rating ?></strong></div>
+                        </li>
                     </ul>
 
                 </div>
@@ -473,7 +505,7 @@ function the_seller_review_slide( $id = false ) {
 							<?php echo mb_strimwidth( $string, 0, 100, "...", 'UTF-8' ); ?>
                         </p>
                     </div>
-                    <a class="testimonials-more modal_open" href="#testimonials-main-modal-<?php echo $id ?>" >
+                    <a class="testimonials-more modal_open" href="#testimonials-main-modal-<?php echo $id ?>">
                         Показати ще <img src="<?php echo _i( 'arrow-right-blue' ); ?>" alt=""/>
                     </a>
                     <div class="modal modal-sm" id="testimonials-main-modal-<?php echo $id ?>">
@@ -487,10 +519,13 @@ function the_seller_review_slide( $id = false ) {
                                     <ul class="product-item__reviews">
                                         <li>
                                             <div class="testimonials-main__item-user-date">
-				                                <?php echo get_the_date( 'd.m.Y', $id ); ?>
+												<?php echo get_the_date( 'd.m.Y', $id ); ?>
                                             </div>
                                         </li>
-                                        <li><div class="reviews-rating"> <strong><?php echo $review_rating ?></strong></div></li>
+                                        <li>
+                                            <div class="reviews-rating"><strong><?php echo $review_rating ?></strong>
+                                            </div>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>

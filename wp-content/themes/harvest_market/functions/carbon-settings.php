@@ -798,7 +798,6 @@ function crb_attach_in_reviews() {
 	         );
 }
 
-
 add_action( 'carbon_fields_register_fields', 'crb_attach_in_applications' );
 function crb_attach_in_applications() {
 	$labels = array(
