@@ -1,3 +1,46 @@
+.section-map .product-item-map, .section-map .iw-wrap, .iw-slider {
+    width: 26rem !important;
+}
+
+.iw-slider {
+    display: flex;
+    overflow: hidden;
+}
+
+.filter-hidden-element {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(225, 225, 225, .6);
+    margin-bottom: 2rem;
+}
+
+.iw-product-verified {
+    margin-top: 0;
+    margin-left: 5px;
+}
+
+.section-map .product-item__price {
+    margin-top: 2rem;
+}
+
+.section-map .product-item__title, .section-map .product-item__reviews {
+    margin-bottom: 2rem;
+}
+
+.section-map .product-item__slider, .product-item__slider .slick-slide {
+    /*height: 20rem;*/
+}
+
+.select-product__info strong.product-label {
+    display: flex;
+    min-width: 11rem;
+    margin-right: 1rem;
+}
+
+.select-product__info li span {
+    display: flex;
+}
+
+
 .wpcf7-not-valid-tip,
 .wpcf7-response-output {
     display: none !important;
@@ -496,19 +539,6 @@ main.content.showing {
     font-weight: inherit;
 }
 
-.iw-wrap .product-labels {
-    max-width: 100%;
-    padding: 0 4rem;
-    justify-content: flex-end;
-}
-
-.iw-wrap {
-    position: relative;
-    /*-webkit-border-radius: 4rem;*/
-    /*border-radius: 4rem;*/
-    /*padding: 3rem;*/
-    /*border: 1px solid #014433;*/
-}
 
 .iw-content .product-item__title {
     margin-bottom: 2rem;
@@ -717,13 +747,32 @@ input.chat-input {
     width: -webkit-calc(100% - 30rem);
     width: calc(100% - 30rem);
 }
-.iw-content .product-item__reviews li.reviews-rating{
+
+.iw-content .product-item__reviews li.reviews-rating {
     padding: 3px 8px;
     margin-right: 2rem;
 }
-.iw-content .product-item__reviews li.reviews-rating::before{
+
+.iw-content .product-item__reviews li.reviews-rating::before {
     display: none;
 }
+
+.open_filter .filter {
+    justify-content: flex-start;
+    overflow: auto;
+    height: auto;
+    padding-bottom: 10rem;
+    min-height: 100vh;
+}
+.filter-list-wrap {
+    margin: 0;
+    height: auto;
+
+    overflow: visible;
+}
+
+
+
 @media (max-width: 1600px) {
     .advertise-item {
         width: -webkit-calc(33.333% - 2rem);
@@ -731,6 +780,7 @@ input.chat-input {
 
     }
 }
+
 
 @media (max-width: 1100px) {
     .advertise-item {

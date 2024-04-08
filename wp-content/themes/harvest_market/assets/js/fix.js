@@ -1414,12 +1414,12 @@ $doc.ready(function () {
         var $t = $(this);
         var div = $(".add-to-favorite");
         if (!div.is(e.target) && div.has(e.target).length === 0) {
-            var div = $(".product-item__organization");
+            var div = $(".product-item__seller-title");
             if (!div.is(e.target) && div.has(e.target).length === 0) {
                 showPreloader();
-                window.location.href = $t.find('.product-item__title').not('.product-item__organization').attr('href');
+                window.location.href = $t.find('.product-item__title').not('.product-item__seller-title').attr('href');
             } else {
-                window.location.href = $t.find('.product-item__organization').attr('href');
+                window.location.href = $t.find('.product-item__seller-title').attr('href');
             }
         }
     });
@@ -1559,6 +1559,9 @@ $doc.ready(function () {
     $('.tog-filter').on('click', function (e) {
         e.preventDefault();
         $('body').addClass('open_filter');
+        var selectric = $doc.find('.categories-select-js').data('selectric');
+        console.log(selectric)
+        selectric.open();
     });
     $(document).click(function (e) {
         var div = $(".content-field");
@@ -1921,6 +1924,19 @@ $doc.ready(function () {
     });
 
 });
+
+function setFavorites(){
+    var favorites = getCookie('favorites');
+    $doc.find('.add-to-favorite[data-id]').removeClass('active');
+    if(favorites){
+        favorites = favorites.split(',');
+        if(favorites){
+            favorites.forEach(function (productID){
+                if(productID !== '') $doc.find('.add-to-favorite[data-id="'+productID+'"]').addClass('active');
+            });
+        }
+    }
+}
 
 function initRange() {
     $doc.find('.js-range').not('.irs-hidden-input').each(function () {
@@ -2523,7 +2539,7 @@ function setSubCategories($select) {
             }
         } else {
             $next.removeAttr('required');
-            $next.html('');
+            $next.html('<option disabled>Не доступно</option>');
             $next.val('').trigger('change');
             $selectric.refresh();
             $next.closest('.form-group').addClass('not-active');
@@ -2676,7 +2692,6 @@ function setFilterCurrentList($form) {
             html += '<div data-id="' + ID + '" class="active-filter"><span></span>' + string + '</div>';
         }
     });
-
     if ($minPrice.length > 0 && $maxPrice.length > 0) {
         var minVal = $minPrice.val();
         var maxVal = $maxPrice.val();
@@ -2693,8 +2708,6 @@ function setFilterCurrentList($form) {
             html += '<div data-id="price-items" class="active-filter"><span></span>' + string + '</div>';
         }
     }
-
-
     $box.html(html);
 }
 

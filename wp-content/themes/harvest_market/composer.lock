@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "10187708284ef8be0c387ba8983fe300",
+    "content-hash": "db2c34e20c9ef66d46c81d6a7bc5fc9b",
     "packages": [
         {
             "name": "htmlburger/carbon-fields",
@@ -155,5 +155,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

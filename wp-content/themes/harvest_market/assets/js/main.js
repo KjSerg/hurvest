@@ -212,9 +212,9 @@ $(window).on('load resize scroll', function () {
     if ($('.map-btn').length > 0) {
         if ($('.catalog-group .btn_center').length > 0) {
             if ($('.catalog-group .btn_center').isInViewport()) {
-                $('.map-btn').fadeOut();
+                // $('.map-btn').fadeOut();
             } else {
-                $('.map-btn').fadeIn();
+                // $('.map-btn').fadeIn();
             }
         } else {
         }
@@ -422,8 +422,63 @@ function initMapList() {
                     verified_html = '<div class="iw-product-verified">' + verifiedSvg() + '</div>';
                 }
 
-                console.log(labels_html[i])
-                t_ = '<div class="iw-wrap">' +
+
+                t_ = '<div class="iw-wrap"><div class="product-item product-item-map ">\n' +
+                    labels_html[i] +
+                    '        <div class="product-item__slider">\n' +
+                                str_slider +
+                    '        </div>\n' +
+                    '        <div class="product-item__content">\n' +
+                    '            <a class="product-item__title" href="' + link[i] + '">' + title[i] +  '</a>\n' +
+                    '            <div class="product-item__seller">\n' +
+                    '                <a href="' + sellerLink[i] + '" class="product-item__seller-title" title="' + subtitle[i] + '">\n' +
+                                      subtitle[i] +
+                    '                </a>\n' +
+                                        verified_html +
+                    '            </div>\n' +
+                    '            <ul class="product-item__reviews">\n' +
+                    '                <li>\n' +
+                                            rating[i] + ' відгуків\n' +
+                    '                </li>\n' +
+                    '                <li>\n' +
+                    '                    <div class="rating-new">'+ reviews[i] + '</div>\n' +
+                    '                </li>\n' +
+                    '            </ul>\n' +
+                    '            <ul class="product-item__place">\n' +
+                    '                <li>' + place + '</li>\n' +
+                    '                <li>' + distance + '</li>\n' +
+                    '            </ul>\n' +
+                    '            <div class="product-item__price">\n' +
+                                        '<strong>' + price[i] + ' </strong>' + price_value[i] +
+                    '            </div>\n' +
+                    '            <div class="product-item__bot">\n' +
+                    '                <div class="counter_product">\n' +
+                    '                    <div class="btn_count num_minus disabled">\n' +
+                    '                        <span> </span>\n' +
+                    '                    </div>\n' +
+                    '                    <input class="counter_input" type="text" readonly="" value="1"/>\n' +
+                    '                    <div class="btn_count num_pluss active"><span></span></div>\n' +
+                    '                </div>\n' +
+                    '                <div class="product-item__btn">\n' +
+                    '                    <a class="add_btn" href="#">\n' +
+                    '                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"\n' +
+                    '                             style="enable-background:new 0 0 16 13"\n' +
+                    '                             viewBox="0 0 16 13">\n' +
+                    '                                            <path d="M15.2 4.4c0-.2 0-.3-.1-.5-.1-.1-.3-.2-.4-.2H1.3c-.2 0-.3.1-.4.2-.1.1-.2.3-.1.5 0 0 .8 4.6 1.1 6.9.2 1 1 1.7 2 1.7h8.2c1 0 1.9-.7 2-1.7l1.1-6.9zm-1.2.4-1 6.3c-.1.4-.5.8-.9.8H3.9c-.5 0-.8-.3-.9-.8L2 4.8h12z"\n' +
+                    '                                                  style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>\n' +
+                    '                            <path d="M12.9 4 10.7.3c-.1-.3-.5-.4-.8-.2-.2.1-.3.5-.1.7L12 4.6c.2.3.5.3.8.2.2-.2.3-.6.1-.8zM4 4.6 6.2.9c.2-.3.1-.6-.2-.8-.2-.2-.6-.1-.7.2L3.1 4c-.2.2-.1.6.1.7.3.2.7.1.8-.1zM7.4 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6s-.6.3-.6.6zM4.5 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6-.4 0-.6.3-.6.6zM10.4 6.9v3c0 .3.3.6.6.6s.6-.2.6-.6v-3c0-.3-.3-.6-.6-.6s-.6.3-.6.6z"\n' +
+                    '                                  style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>\n' +
+                    '                            <path d="M15.4 3.7H.6c-.3 0-.6.3-.6.6s.3.6.6.6h14.9c.3 0 .6-.2.6-.6-.1-.3-.3-.6-.7-.6z"\n' +
+                    '                                  style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"/>\n' +
+                    '                                        </svg>\n' +
+                    '                    </a>\n' +
+                    '                    <a data-id="' + ids[i] + '" class="product-item__favorite add-to-favorite ' + favorites[i] + '" href="#">' + favoriteSvg() + '</a>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '        </div>\n' +
+                    '    </div></div>';
+
+                var it_ = '<div class="iw-wrap">' +
                     labels_html[i] +
                     '<div class="iw-container-slide">' +
                     '<div class="iw-container">' +
@@ -471,7 +526,6 @@ function initMapList() {
             gmarkers1.push(marker1); // Marker click listener
 
             var infowindow = new google.maps.InfoWindow({
-
                 maxWidth: 700
             });
             infoWindows.push(infowindow);
@@ -481,32 +535,29 @@ function initMapList() {
                     for (var i = 0; i < infoWindows.length; i++) {
                         infoWindows[i].close();
                     }
-
                     infowindow.setContent(content);
                     infowindow.open(map, marker1);
                     setTimeout(function () {
-                        $('.iw-product-media .product-item__slider').slick({
+                        var $iwSlider = $doc.find('.iw-slider');
+                        $('.product-item-map .product-item__slider').slick({
                             dots: true,
                             slidesToShow: 1,
                             arrows: false
                         });
-                        $('.iw-slider').slick({
+                        $iwSlider.slick({
                             dots: false,
                             slidesToShow: 1,
                             swipe: false,
-                            draggable: false // arrows: false,
-
+                            draggable: false
                         });
-                        if ($(document).find('.iw-product-media .product-item__slider.slick-slider').length > 0) {
-                            // $(document).find('.iw-product-media .product-item__slider.slick-slider').slick('setPosition');
-                        }
-                        $('.iw-slider').slick('setPosition');
+                        $iwSlider.slick('setPosition');
                     }, 10);
                     var pos = this.getPosition();
                     var lat = pos.lat();
                     var lng = pos.lng();
                     map.panTo(pos);
                     localStorage.setItem('lastMapCenter', JSON.stringify({lat: lat, lng: lng}));
+                    setFavorites();
                 };
             }(marker1, content));
             $(document).on('click', function (e) {
@@ -552,6 +603,8 @@ function initMapList() {
 
     }, 'json');
 }
+
+
 
 $.fn.isInViewport = function () {
     var elementTop = $(this).offset().top;

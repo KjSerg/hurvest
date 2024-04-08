@@ -275,7 +275,7 @@ function the_user_advertisement() {
 							<?php endif; endforeach; ?>
 					<?php else: ?>
                         <option selected value="">
-                            <?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?>
+							<?php echo carbon_get_user_meta( $user_id, 'user_company_name' ); ?>
                         </option>
 					<?php endif; ?>
                 </select>
@@ -468,8 +468,15 @@ function the_user_product( $id = false ) {
 	if ( $post_status == 'draft' ) {
 		$cls .= ' not-active';
 	}
-	$personal_page = carbon_get_theme_option( 'personal_area_page' );
-	$_url          = $personal_page ? get_the_permalink( $personal_page[0]['id'] ) : $url;
+	$personal_page        = carbon_get_theme_option( 'personal_area_page' );
+	$_url                 = $personal_page ? get_the_permalink( $personal_page[0]['id'] ) : '/';
+	$time                 = time();
+	$product_is_top       = carbon_get_post_meta( $id, 'product_is_top' );
+	$product_end_top      = carbon_get_post_meta( $id, 'product_end_top' );
+	$product_start_top    = carbon_get_post_meta( $id, 'product_start_top' );
+	$product_is_urgently  = carbon_get_post_meta( $id, 'product_is_urgently' );
+	$product_end_urgently = carbon_get_post_meta( $id, 'product_end_urgently' );
+	$image                = _i( 'top' );
 	?>
     <div class="select-product__item <?php echo $cls; ?> " data-id="<?php echo $id; ?>">
         <label class="check_st_item">
@@ -548,6 +555,18 @@ function the_user_product( $id = false ) {
                         <li>
                             <span>В наявності: </span>
                             <strong><?php echo $max_value . ' ' . $unit; ?></strong>
+                        </li>
+					<?php endif; ?>
+					<?php if ( $product_is_top == 'top' && $product_end_top > $time && $time > $product_start_top ): ?>
+                        <li>
+                            <span><strong class="product-label product-label--top"><i class="product-label__image"><img src="<?php echo $image; ?>" alt=""></i>TOP</strong> діє до: </span>
+                            <strong><?php echo date( 'd.m.Y H:i', $product_end_top ); ?></strong>
+                        </li>
+					<?php endif; ?>
+					<?php if ( $product_is_urgently == 'urgently' && $product_end_urgently > $time ): ?>
+                        <li>
+                            <span><strong class="product-label">Терміново</strong> діє до: </span>
+                            <strong><?php echo date( 'd.m.Y H:i', $product_end_urgently ); ?></strong>
                         </li>
 					<?php endif; ?>
                 </ul>

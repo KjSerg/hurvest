@@ -50,6 +50,7 @@ $_price               = carbon_get_post_meta( $_id, 'product_price' );
 $_delivery_methods    = carbon_get_post_meta( $_id, 'product_delivery_methods' );
 $user_payment_methods = carbon_get_user_meta( $author_id, 'user_payment_methods' );
 $user_company_name    = carbon_get_user_meta( $author_id, 'user_company_name' ) ?: '';
+$login_page = carbon_get_theme_option( 'login_page' );
 $sub_sum              = $_price * $qnt;
 if ( $coupon_discount ) {
 	$discount     = ( $coupon_discount * $sub_sum ) / 100;
@@ -72,14 +73,17 @@ $user_city       = $user_id ? carbon_get_user_meta( $user_id, 'user_city' ) : ''
             <div class="order-group">
                 <div class="order-group__left">
 					<?php if ( ! $user_id ): ?>
+
+                        <?php if ( $login_page ): ?>
                         <div class="order-login">
                             <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                  style="enable-background:new 0 0 16.7 20" viewBox="0 0 16.7 20">
                                 <path d="M8.2 9.6c1.3 0 2.5-.5 3.4-1.4 1-.9 1.4-2.1 1.4-3.4 0-1.3-.5-2.5-1.4-3.4C10.7.5 9.5 0 8.2 0 6.9 0 5.7.5 4.8 1.4c-.9.9-1.4 2.1-1.4 3.4 0 1.3.5 2.5 1.4 3.4.9 1 2.1 1.4 3.4 1.4zM16.6 15.4c0-.4-.1-.8-.2-1.3s-.2-.9-.3-1.3c-.1-.4-.3-.8-.5-1.2-.2-.4-.5-.7-.8-1-.3-.3-.7-.5-1.1-.7-.4-.2-.9-.3-1.4-.3-.2 0-.4.1-.8.3-.2.2-.5.3-.8.5-.3.2-.6.3-1.1.5-.4.1-.9.2-1.3.2s-.9-.1-1.3-.2-.8-.3-1.1-.5c-.3-.2-.6-.4-.8-.5-.3-.2-.5-.2-.7-.2-.5 0-1 .1-1.4.3-.4.2-.8.4-1.1.7-.3.3-.6.6-.8 1-.2.4-.4.8-.5 1.2-.1.4-.2.8-.3 1.3-.2.4-.2.8-.3 1.2v1.2c0 1 .3 1.9 1 2.5.6.6 1.5.9 2.5.9h9.6c1 0 1.9-.3 2.5-.9.7-.6 1-1.5 1-2.5.1-.4.1-.8 0-1.2z"
                                       style="fill:#81b4a7"/>
                             </svg>
-                            <div class="order-login__text">Вже є обліковий запис? <a href="#">Авторизуватися </a></div>
+                            <div class="order-login__text">Вже є обліковий запис? <a href="<?php echo get_the_permalink( $login_page[0]['id'] ); ?>">Авторизуватися </a></div>
                         </div>
+					<?php endif; ?>
 					<?php endif; ?>
                     <form
                             action="<?php echo $admin_ajax; ?>" method="post"

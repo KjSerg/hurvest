@@ -587,7 +587,7 @@ function get_personal_title() {
 			$title = 'Сповіщення';
 			break;
 		case 'packages':
-			$title = 'Доступні послуги';
+			$title = 'Рекламувати оголошення';
 			break;
 		case 'purchased':
 			$title = 'Доступні послуги';

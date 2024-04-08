@@ -68,9 +68,10 @@ function the_product( $id = false ) {
 				<?php echo $title; ?>
             </a>
             <div class="product-item__seller">
-                <div class="product-item__seller-title" title="<?php echo $user_company_name; ?>">
+                <a class="product-item__seller-title" href="<?php echo $author_link ?>"
+                   title="<?php echo $user_company_name; ?>">
 					<?php echo $user_company_name; ?>
-                </div>
+                </a>
 				<?php if ( $user_verification ): ?>
                     <img src="<?php echo _i( 'verified' ); ?>" alt=""/>
 				<?php endif; ?>
@@ -260,14 +261,16 @@ function the_home_categories( $categories ) {
 
 function the_home_catalog() {
 	$query = get_query_index_data();
-
 //    v($query);
 	?>
     <div class="catalog catalog_main container-js">
 		<?php
-		if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post(); ?>
-			<?php the_product(); ?>
-		<?php endwhile; else : ?>
+		if ( $query->have_posts() ) :
+			while ( $query->have_posts() ) :
+				$query->the_post();
+				the_product();
+			endwhile;
+		else : ?>
             <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
                 Не знайдено!
             </div>
@@ -277,7 +280,6 @@ function the_home_catalog() {
 		wp_reset_query();
 		?>
     </div>
-
     <div class="btn_center pagination-js">
 		<?php echo _get_more_link( $query->max_num_pages ); ?>
     </div>
