@@ -438,10 +438,10 @@ function initMapList() {
                     '            </div>\n' +
                     '            <ul class="product-item__reviews">\n' +
                     '                <li>\n' +
-                                            rating[i] + ' відгуків\n' +
+                                            reviews[i] +
                     '                </li>\n' +
                     '                <li>\n' +
-                    '                    <div class="rating-new">'+ reviews[i] + '</div>\n' +
+                    '                    <div class="rating-new">'+ rating[i] + '</div>\n' +
                     '                </li>\n' +
                     '            </ul>\n' +
                     '            <ul class="product-item__place">\n' +

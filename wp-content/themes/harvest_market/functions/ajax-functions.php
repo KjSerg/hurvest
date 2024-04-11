@@ -907,6 +907,11 @@ function new_order() {
 						if ( ! in_array( $post_author->user_email, $emails ) ) {
 							$emails[] = $post_author->user_email;
 						}
+						set_notification( array(
+							'type'         => 'order',
+							'sender_id'    => $user_id,
+							'recipient_id' => $post_author_id,
+						) );
 					}
 				}
 			}
@@ -945,6 +950,7 @@ function new_order() {
 			$url                = $var['url'];
 			$personal_area_page = carbon_get_theme_option( 'personal_area_page' );
 			$_l                 = $personal_area_page ? get_the_permalink( $personal_area_page[0]['id'] ) : $url;
+
 			if ( $emails ) {
 				$_l           = $_l . '?route=history&subpage=sales';
 				$message_link = "<a href='$_l' target='_blank'>персональний кабінет</a>";
@@ -3069,8 +3075,29 @@ function set_notification( $array = array() ) {
 			carbon_set_post_meta( $notification_id, 'notification_recipient_id', $recipient_id );
 			carbon_set_post_meta( $notification_id, 'notification_is_read', 'not_read' );
 		}
-	}
+	} elseif ( $type == 'order' ) {
+		$message_product_id = $array['product_id'] ?? '';
+		$sender_id          = $array['sender_id'] ?? '';
+		$recipient_id       = $array['recipient_id'] ?? '';
+		$notification_data  = array(
+			'post_type'   => 'notifications',
+			'post_title'  => '%user% у Вас замовив товар ' . get_the_title( $message_product_id ),
+			'post_status' => 'publish',
+		);
+		$notification_id    = wp_insert_post( $notification_data, true );
+		$notification_post  = get_post( $notification_id );
+		if ( ! is_wp_error( $notification_id ) && $notification_post ) {
+			$personal_area_page = carbon_get_theme_option( 'personal_area_page' );
+			$_l                 = get_the_permalink( $personal_area_page[0]['id'] );
+			$_l                 .= '?route=history&subpage=sales';
+			$notification_html  = "<a href='$_l' class=''>Мої замовлення</a>";
+			carbon_set_post_meta( $notification_id, 'notification_text', $notification_html );
+			carbon_set_post_meta( $notification_id, 'notification_sender_id', $sender_id );
+			carbon_set_post_meta( $notification_id, 'notification_recipient_id', $recipient_id );
+			carbon_set_post_meta( $notification_id, 'notification_is_read', 'not_read' );
+		}
 
+	}
 	return $notification_id;
 }
 

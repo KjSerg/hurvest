@@ -559,7 +559,8 @@ function the_user_product( $id = false ) {
 					<?php endif; ?>
 					<?php if ( $product_is_top == 'top' && $product_end_top > $time && $time > $product_start_top ): ?>
                         <li>
-                            <span><strong class="product-label product-label--top"><i class="product-label__image"><img src="<?php echo $image; ?>" alt=""></i>TOP</strong> діє до: </span>
+                            <span><strong class="product-label product-label--top"><i class="product-label__image"><img
+                                                src="<?php echo $image; ?>" alt=""></i>TOP</strong> діє до: </span>
                             <strong><?php echo date( 'd.m.Y H:i', $product_end_top ); ?></strong>
                         </li>
 					<?php endif; ?>
@@ -915,22 +916,27 @@ function the_user_history() {
 }
 
 function the_order_item( $id = false ) {
-	$id               = $id ?: get_the_ID();
-	$user_id          = get_current_user_id();
-	$author_id        = get_post_field( 'post_author', $id );
-	$post_status      = get_post_status( $id );
-	$delivery_status  = carbon_get_post_meta( $id, 'delivery_status' );
-	$order_sum        = carbon_get_post_meta( $id, 'order_sum' );
-	$currency         = carbon_get_theme_option( 'currency' );
-	$order_cart       = carbon_get_post_meta( $id, 'order_cart' );
-	$delivery_method  = carbon_get_post_meta( $id, 'order_delivery_method' );
-	$delivery_address = carbon_get_post_meta( $id, 'order_delivery_address' );
-	$status           = '<span class="order-status">В процесі</span>';
+	$id                = $id ?: get_the_ID();
+	$user_id           = get_current_user_id();
+	$author_id         = (int) get_post_field( 'post_author', $id );
+	$post_status       = get_post_status( $id );
+	$delivery_status   = carbon_get_post_meta( $id, 'delivery_status' );
+	$order_sum         = carbon_get_post_meta( $id, 'order_sum' );
+	$currency          = carbon_get_theme_option( 'currency' );
+	$order_cart        = carbon_get_post_meta( $id, 'order_cart' );
+	$delivery_method   = carbon_get_post_meta( $id, 'order_delivery_method' );
+	$delivery_address  = carbon_get_post_meta( $id, 'order_delivery_address' );
+	$order_user_city   = carbon_get_post_meta( $id, 'order_user_city' );
+	$order_post_office = carbon_get_post_meta( $id, 'order_post_office' );
+	$user_tel          = carbon_get_post_meta( $id, 'order_user_tel' );
+	$order_user_name   = carbon_get_post_meta( $id, 'order_user_name' );
+	$status            = '<span class="order-status">В процесі</span>';
 	if ( $post_status == 'draft' ) {
 		$status = '<span class="order-status none">Скасовано</span>';
 	} elseif ( $delivery_status == 'delivered' && $post_status == 'publish' ) {
 		$status = '<span class="order-status done">Доставлено</span>';
 	}
+
 	?>
     <div class="orders-main__item">
         <div class="orders-main__item-top">
@@ -990,9 +996,10 @@ function the_order_item( $id = false ) {
 					$_id = $item['id'];
 					if ( $_id && get_post( $_id ) ):
 						$img = $item['image'];
-						$author_id = get_post_field( 'post_author', $id );
-						$company_name = carbon_get_user_meta( $author_id, 'user_company_name' );
-						$company_phone = carbon_get_user_meta( $author_id, 'user_company_phone' );
+						$_author_id = (int) get_post_field( 'post_author', $_id );
+						$company_name = carbon_get_user_meta( $_author_id, 'user_company_name' );
+						$company_phone = carbon_get_user_meta( $_author_id, 'user_company_phone' );
+
 						?>
                         <div class="order-product-main">
                             <div class="order-product__item">
@@ -1024,9 +1031,19 @@ function the_order_item( $id = false ) {
                                 </div>
                             </div>
                             <ul class="order-product-description">
-								<?php if ( $company_phone ): ?>
-                                    <li><strong>тел.<?php echo $company_phone; ?></strong></li>
+								<?php if ( $user_id == $_author_id ): ?>
+									<?php if ( $order_user_name ): ?>
+                                        <li><strong><?php echo $order_user_name; ?></strong></li>
+									<?php endif; ?>
+									<?php if ( $user_tel ): ?>
+                                        <li><strong>тел.<?php echo $user_tel; ?></strong></li>
+									<?php endif; ?>
+								<?php else: ?>
+									<?php if ( $company_phone ): ?>
+                                        <li><strong>тел.<?php echo $company_phone; ?></strong></li>
+									<?php endif; ?>
 								<?php endif; ?>
+
 								<?php if ( $delivery_method ):
 									$str = explode( '[', $delivery_method );
 									?>
@@ -1034,11 +1051,10 @@ function the_order_item( $id = false ) {
                                         Доставка: <?php echo $str[0]; ?>
                                     </li>
 								<?php endif; ?>
-								<?php if ( $delivery_address ): ?>
-                                    <li>
-										<?php echo $delivery_address; ?>
-                                    </li>
-								<?php endif; ?>
+                                <li>
+									<?php echo $order_user_city . ' ' . $delivery_address . ' ' . $order_post_office; ?>
+                                </li>
+
                             </ul>
                         </div>
 					<?php endif; endforeach; ?>
@@ -1629,7 +1645,6 @@ function the_organization_data_editing() {
                                            name="name" required="required"
                                            placeholder="Назва господарства*"/>
                                 </div>
-
                                 <div class="form-group third">
                                     <input class="input_st address-js" type="text"
                                            name="address"
@@ -1646,6 +1661,7 @@ function the_organization_data_editing() {
                                         <option>Офіс</option>
                                         <option>Приміщення</option>
                                         <option>Квартира</option>
+                                        <option>Приватний будинок</option>
                                     </select>
                                 </div>
                                 <div class="form-group half">
@@ -1730,7 +1746,9 @@ function the_organization_data_editing() {
                                 </div>
                                 <div class="cabinet-item" title="Загрузіть що найменше 1 фото">
                                     <div class="cabinet-item__title">Фото*</div>
-                                    <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
+                                    <div class="cabinet-item__text">Перше фото буде на обкладинці. Рекомендуємо додати
+                                        горизонтальне фото розміром 1920 × 340 px
+                                    </div>
                                     <div class="cabinet-item__photo">
                                         <div class="cabinet-item__photo-item cover-photo">
                                             <label>
@@ -1795,7 +1813,6 @@ function the_organization_data_editing() {
                                            value="<?php echo $company_name; ?>"
                                            placeholder="Назва господарства*"/>
                                 </div>
-
                                 <div class="form-group third">
                                     <input class="input_st address-js" type="text"
                                            name="address"
@@ -1819,6 +1836,9 @@ function the_organization_data_editing() {
                                         </option>
                                         <option <?php echo $office_type == 'Квартира' ? 'selected' : ''; ?> >
                                             Квартира
+                                        </option>
+                                        <option <?php echo $office_type == 'Приватний будинок' ? 'selected' : ''; ?> >
+                                            Приватний будинок
                                         </option>
                                     </select>
                                 </div>
@@ -1920,7 +1940,9 @@ function the_organization_data_editing() {
                                 </div>
                                 <div class="cabinet-item">
                                     <div class="cabinet-item__title">Фото*</div>
-                                    <div class="cabinet-item__text">Перше фото буде на обкладинці.</div>
+                                    <div class="cabinet-item__text">Перше фото буде на обкладинці. Рекомендуємо додати
+                                        горизонтальне фото розміром 1920 × 340 px
+                                    </div>
                                     <div class="cabinet-item__photo">
                                         <div class="cabinet-item__photo-item cover-photo">
                                             <label>
@@ -1965,5 +1987,21 @@ function the_organization_data_editing() {
 	<?php if ( $map_api_url ): ?>
         <script src="<?php echo $map_api_url; ?>" id="google-map-api" defer></script>
 	<?php endif; ?>
+	<?php
+}
+
+function the_favorites() {
+	$var        = variables();
+	$set        = $var['setting_home'];
+	$assets     = $var['assets'];
+	$url        = $var['url'];
+	$url_home   = $var['url_home'];
+	$admin_ajax = $var['admin_ajax'];
+	$user_id    = get_current_user_id();
+	the_header_cabinet();
+	?>
+    <div class="create-item-main">
+		<?php get_template_part( 'functions/components/favorites-page' ); ?>
+    </div>
 	<?php
 }

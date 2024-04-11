@@ -8,6 +8,7 @@ $url_home  = $var['url_home'];
 $user_id   = get_current_user_id();
 $favorites = carbon_get_user_meta( $user_id, 'user_favorites' ) ?: ( $_COOKIE['favorites'] ?? '' );
 $favorites = $favorites ? explode( ",", $favorites ) : array();
+$route = $_GET['route'] ?? '';
 ?>
 
 <section class="section-cart pad_section_sm_top pad_section_bot">
@@ -26,7 +27,7 @@ $favorites = $favorites ? explode( ",", $favorites ) : array();
                 </a>
 			<?php endif; ?>
         </div>
-        <div class="catalog">
+        <div class="catalog catalog_main">
 			<?php if ( $favorites ):
 				foreach ( $favorites as $favorite ):
 					if ( $favorite && get_post( $favorite ) && get_post_status( $favorite ) == 'publish' ):
@@ -35,7 +36,7 @@ $favorites = $favorites ? explode( ",", $favorites ) : array();
 				endforeach;
 			else: ?>
                 <div class="text-group" style="text-align: center; margin: 2rem; width: 100%;">
-                    Додайте оголошення із <a class="link-js" href="<?php echo $url ?>">каталогу</a>!
+                    Додайте оголошення із <a class="<?php echo !$route == 'favorites' ? 'link-js' : ''; ?>" href="<?php echo $url ?>">каталогу</a>!
                 </div>
 			<?php endif; ?>
         </div>

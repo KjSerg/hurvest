@@ -91,7 +91,9 @@ echo '</pre>';
 			the_promo_page();
 		} elseif ( $route == 'organization' ) {
 			the_organization_data_editing();
-        }
+        }elseif ( $route == 'favorites' ) {
+			the_favorites();
+		}
 		?>
     </div>
 </section>

@@ -98,7 +98,7 @@ function post_unpublished( $new_status, $old_status, $post ) {
 				$link         = "<a href='$permalink' target='_blank'>Створити оголошення</a>";
 				$link_seller  = "<a href='$_permalink' target='_blank'>Ваша сторінка продавця</a>";
 				$message_text = "Вітаємо! <br> Ви стали продавцем у нас на сайті. <br> $link <br> $link_seller";
-				send_message( $message_text, $post_author->user_email, $company_name . ' офіційний продавець на сайті' );
+				send_message( $message_text, $post_author->user_email, $company_name . ' офіційний продавець на ' . get_bloginfo('name') );
 				update_post_meta( $_id, '_yoast_wpseo_metadesc', $user_company_description );
 				if ( $logo = carbon_get_user_meta( $author_id, 'user_company_logo' ) ) {
 					set_post_thumbnail( $_id, $logo );

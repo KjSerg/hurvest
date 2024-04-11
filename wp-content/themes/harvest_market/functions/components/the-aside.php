@@ -71,6 +71,14 @@ function the_aside() {
                     </a>
                 </li>
                 <li>
+                    <a class="<?php echo $route == 'favorites' ? 'active' : ''; ?>" href="<?php echo $_url . '?route=favorites'; ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="enable-background:new 0 0 16 14" viewBox="0 0 16 14">
+                            <path d="M4.8 1.3c1 0 1.9.5 2.6 1.6.3.4.9.4 1.1 0 .7-1.2 1.6-1.6 2.6-1.6s2 .4 2.6 1.2c1.3 1.3 1.4 3.8-.3 5.5L8 12.5 2.6 8C.9 6.3 1 3.8 2.2 2.4c.6-.7 1.6-1.1 2.6-1.1zm0-1.3C3.4 0 2.1.6 1.2 1.6c-1.6 1.9-1.7 5.1.5 7.3l5.8 4.9c.2.2.6.2.9 0l5.8-4.9c2.2-2.2 2.1-5.4.5-7.3-.9-1-2.2-1.6-3.6-1.6C10 0 8.9.7 8 1.7 7.1.7 6 0 4.8 0z" style="fill:#fff"></path>
+                        </svg>
+                        <span>Обрані оголошення</span>
+                    </a>
+                </li>
+                <li>
                     <a class="<?php echo $route == 'organization' ? 'active' : ''; ?>" href="<?php echo $_url . '?route=organization'; ?>">
                         <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                              style="enable-background:new 0 0 12 15" viewBox="0 0 12 15">
@@ -96,8 +104,7 @@ function the_aside() {
                     </li>
 				<?php endif; ?>
                 <li>
-                    <a
-                            class="<?php echo $route == 'payment_history' ? 'active' : ''; ?>"
+                    <a class="<?php echo $route == 'payment_history' ? 'active' : ''; ?>"
                             href="<?php echo $_url . '?route=payment_history'; ?>">
                         <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                              style="enable-background:new 0 0 15 15" viewBox="0 0 15 15">
